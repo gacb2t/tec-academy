@@ -289,8 +289,8 @@ export const coursesData = [
     {
         id: 3,
         title: 'Processo de Venda',
-        description: 'Estratégias avançadas de Vendas B2B: Atendimento Humanizado, Metodologia SPIN Selling, Processo de Sondagem e Funil de Relacionamento.',
-        duration: '25 min',
+        description: 'Estratégias completas de Vendas B2B: Atendimento Humanizado, Metodologia SPIN Selling, Processo de Sondagem e Funil Rigoroso de Relacionamento.',
+        duration: '40 min',
         icon: '🤝',
         thumbnail: 'https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&q=80&w=400',
         departments: ['Todos'],
@@ -299,82 +299,101 @@ export const coursesData = [
                 type: 'content',
                 title: 'O Atendimento Humanizado',
                 html: true,
-                content: 'O atendimento humanizado foca na <b>empatia e na personalização</b>, valorizando o cliente como indivíduo e não apenas como comprador. O objetivo é proporcionar uma experiência completa e acolhedora.<br/><br/>Ele rompe com o tradicional modelo de telemarketing de roteiros rígidos. Esse tipo de atendimento fortalece a relação cliente-empresa e gera confiança. Estudos mostram que 66% dos consumidores afirmam que uma interação ruim pode arruinar seu dia, e mais da metade abandonará a empresa após uma única interação insatisfatória.<br/><br/><i>"Eu acredito que minha empresa só existe por causa dos clientes. A ideia não é seguir o clichê de que o cliente tem sempre razão, mas garantir que todas as decisões sejam feitas pensando na experiência e no sucesso do cliente. (Customer Centric)"</i>'
+                content: 'O atendimento humanizado foca na <b>empatia e na personalização</b>, valorizando o cliente como indivíduo e não apenas como comprador. Ele rompe com o tradicional modelo de telemarketing de roteiros rígidos. Esse tipo de atendimento fortalece a relação cliente-empresa e gera confiança.<br/><br/>De acordo com o Relatório Zendesk, 66% dos consumidores afirmam que uma interação ruim com o suporte pode arruinar seu dia, e 52% relatam sentir-se exaustos após essas interações. A consequência de não humanizar reflete em números preocupantes: enquanto 73% mudarão para um concorrente após várias experiências ruins, <b>mais da metade abandonará a empresa após uma única interação insatisfatória.</b><br/><br/><i>"Eu acredito que minha empresa só existe por causa dos clientes... Essa abordagem ‘customer centric’ é um processo de longo prazo que exige envolvimento de todos."</i><br/><br/>Tão importante quanto resolver um problema é entrar em contato depois que o cliente já está satisfeito ("posso ajudar com mais alguma coisa?").'
             },
             {
                 type: 'video',
                 title: 'Empatia e Encantamento (Disney)',
-                description: 'Assista ao vídeo para entender como a Disney aplica o conceito H.E.A.R.D (Ouvir, Empatizar, Pedir Desculpas, Resolver e Diagnosticar) para encantar os clientes.',
-                videoId: 'VIDEO_ID_PENDING', // MUDAR DEPOIS (O usuário fornecerá)
+                description: 'Conhecida como um lugar de sonhos, a Disney direciona seus esforços aplicando o conceito H.E.A.R.D: Ouvi (Hear), Empatizar (Empathize), Pedir desculpas (Apologize), Resolver (Resolve) e Diagnosticar (Diagnose).',
+                videoId: 'M8sQwMZiBfM',
                 requireDelay: 0
+            },
+            {
+                type: 'content',
+                title: 'O Processo Além da Empatia',
+                html: true,
+                content: 'Embora não sigamos um script rígido, isso não significa que devemos ignorar processos. A venda nasce de um relacionamento, e cada etapa é essencial.<br/><br/>O modelo se baseia em quatro pilares interconectados: <b>Processos, Empatia, Atenção e Personalizado</b> (substituindo o antigo "Script Fixo").'
             },
             {
                 type: 'carousel',
                 title: 'Metodologia: SPIN Selling',
                 slides: [
-                    { title: 'S - Situação', text: 'Essa etapa é fundamental para você conhecer seu comprador e os problemas que ele está enfrentando. O objetivo é coletar o máximo de informações.<br/><br/><b>Exemplos de Perguntas (Vivo Empresas):</b><br/>- Como está a estrutura de comunicação da sua empresa atualmente?<br/>- Quantos colaboradores utilizam dados móveis?<br/>- Vocês já utilizam PABX virtual?' },
-                    { title: 'P - Problema', text: 'A concentração é nos problemas que o cliente tem e que você pode vir a solucionar. Foque na dor do cliente e ouça absolutamente tudo que ele tem a dizer para descobrir dificuldades que talvez nem ele tenha percebido.<br/><br/><b>Exemplos:</b><br/>- Você enfrenta dificuldades com a comunicação interna ou externa?<br/>- Já teve interrupções na internet ou falta de mobilidade?' },
-                    { title: 'I - Implicação', text: 'É o momento de ajudar o cliente a identificar as consequências de <b>não</b> resolver o problema. Aumenta o senso de urgência.<br/><br/><b>Exemplos:</b><br/>- Se a comunicação continuar ineficiente, como isso pode afetar a produtividade?<br/>- Quais seriam os custos ou perdas de vendas se as interrupções persistirem?' },
-                    { title: 'N - Necessidade de Solução', text: 'Faça com que o comprador perceba que sua solução o ajudará em todos os problemas diagnosticados. Leve-o a imaginar como seria a vida sem a dor apontada.<br/><br/><b>Exemplos:</b><br/>- Como seria contar com uma comunicação rápida e confiável?<br/>- De que forma uma internet estável otimizaria suas operações de entrega?' }
-                ]
-            },
-            {
-                type: 'accordion',
-                title: 'Necessidades: Explícitas vs Implícitas',
-                instruction: 'No Processo de Sondagem, é crucial entender o que o cliente diz e o que ele escuta:',
-                items: [
-                    { title: 'Necessidades Explícitas', content: 'Cenários onde o cliente expressa sua dor de forma clara e direta.\n\nExemplo: "Preciso de um computador maior!" ou "A Vivo não pega lá em casa, preciso de fibra!"' },
-                    { title: 'Necessidades Implícitas', content: 'Dores que não são ditas diretamente, ou que o próprio cliente ainda não notou.\n\nExemplo: O cliente diz que o time de vendas demora muito para assinar contratos físicos de clientes de fora. A necessidade implícita pode ser "Voz na Nuvem, MDM ou Microsoft Teams" para formalizar tudo online.' }
-                ]
-            },
-            {
-                type: 'carousel',
-                title: 'As 8 Etapas do Relacionamento',
-                slides: [
-                    { title: '1. Pesquisa e Preparação', text: 'Atividade CNAE, número de colaboradores, produtos ativos (vide planta) e se tem site. Defina o seu objetivo antes de pegar o telefone.' },
-                    { title: '2. Primeiro Contato', text: 'Use o nome do cliente. Seja breve, apresente o propósito e utilize os canais que o cliente prefere. Envie seus contatos e sua carta de apresentação!' },
-                    { title: '3. Escuta Ativa', text: 'Perguntas abertas. "Há alguma melhoria que eu posso fazer?", "Qual sua expectativa com o meu atendimento?", "O Sr sabia que tem um gerente de contas?"' },
-                    { title: '4. Ofereça Valor', text: 'Proponha soluções reais. Por exemplo: Oferecer FTTH B2B de contingência, Voz na Nuvem para flexibilidade global, Link Dedicado pela garantia de SLA 4 horas, MDM para a LGPD, etc.' },
-                    { title: '5. Manutenção', text: 'Seja proativo! Não seja apenas reativo a problemas. Dê feedback da instalação do FTTH e acompanhe os primeiros usos.' },
-                    { title: '6, 7 e 8: Fidelização e Longo Prazo', text: 'Aproveite benefícios como o Vivo Valoriza, seja compreensivo na solução de conflitos operacionais, envolva a camada técnica local. Clientes parceiros escalam soluções B2B!' }
-                ]
-            },
-            {
-                type: 'swipecards',
-                title: 'Mito ou Verdade: A Venda Consultiva',
-                instruction: 'Deslize para a direita (Correto) ou esquerda (Mito) sobre Atendimento e SPIN Selling.',
-                cards: [
-                    { id: 's1', text: 'Na fase do P (Problema) no SPIN Selling, eu devo oferecer meu plano imediatamente ao cliente.', correctIsRight: false, explanation: 'Mito! Você foca apenas em DESTRAVAR as dores. Se você ofertar o produto rápido demais, gera resistência.' },
-                    { id: 's2', text: 'As "Implicações" criam o senso de urgência monetária e operacional de não assinar com você hoje.', correctIsRight: true, explanation: 'Correto! Fazer o cliente pensar "Nossa, se a internet cair perderemos R$ 1.000 em entregas" acelera o fechamento.' }
-                ]
-            },
-            {
-                type: 'drag_drop_sort',
-                title: 'Desafio Prático: A Metodologia SPIN',
-                instruction: 'Ordene as 4 fases do SPIN Selling na ordem correta, desde a primeira ligação exploratória até a abertura para fechamento da venda.',
-                steps: [
-                    'Situação (Ex: Como é a infraestrutura de vocês hoje?)',
-                    'Problema (Ex: A internet atual cai muito de tarde?)',
-                    'Implicação (Ex: Quanto de receita a loja perde offline nessas horas?)',
-                    'Necessidade (Ex: Se tivéssemos um link dedicado 99.6%, você resolveria isso...)'
-                ]
-            },
-            {
-                type: 'scenario',
-                title: 'Simulação - Escuta Ativa',
-                context: 'No contato de relacionamento trimestral (Carteira), a Dra. Maria reclama muito que seus funcionários gastam os 5GB do plano móvel básico porque ficam rodando o TikTok o dia todo na clínica.',
-                question: 'Como aplicar a "Oferecer Valor" mapeando a Necessidade IMPLÍCITA sem gerar briga?',
-                options: [
-                    { text: 'Aumentar agressivamente a fatura forçando o pacote de 50GB Mobile para a equipe gastar à vontade na rede social.', isCorrect: false, feedback: 'Incorreto. A médica vai achar ruim gastar mais sem motivo corporativo, ferindo o orçamento dela.' },
-                    { text: 'Pedir desculpas e dizer para os funcionários que a Vivo não permite redes sociais.', isCorrect: false, feedback: 'Incorreto. Mentir foge totalmente da ética e do Atendimento Humanizado Padrão Ouro.' },
-                    { text: 'Aproveitar a brecha de segurança revelada para apresentar a torre DIGITAL com licença MDM (Gestão Mobile), permitindo o bloqueio do TikTok no horário de trabalho, reduzindo o custo dela com dados extras.', isCorrect: true, feedback: 'Perfeito! É a essência do "Oferecer Valor" sobre uma Dor Implícita. Você transformou um estresse em uma nova venda de licenças Digitais!' }
+                    { title: 'A Origem', text: 'Desenvolvido por Neil Rackham (1970) após estudo de 35 mil ligações em 20 países (com Xerox e IBM). Conclusão: a melhor forma de vender não é forçar, mas <b>criar valor</b> e atuar como consultor de confiança.<br/><br/>O método trabalha fechamento de negócios complexos por meio de Perguntas na ordem certa.' },
+                    { title: 'S - Situação', text: 'Etapa fundamental para conhecer seu comprador e problemas atuais. Aqui coletamos o máximo de info.<br/><br/><b>Exemplos Vivo Empresas:</b><br/>- Como está a estrutura de comunicação atualmente?<br/>- Quantos colaboradores utilizam dados móveis no trabalho?<br/>- Vocês já utilizam PABX virtual?' },
+                    { title: 'P - Problema', text: 'Concentra nas dores. Destaca problemas que talvez nem o cliente tenha percebido. Foque na dor e ouça 100%.<br/><br/><b>Exemplos Vivo Empresas:</b><br/>- Você enfrenta dificuldades com comunicação interna?<br/>- Teve interrupções na internet?<br/>- Os colaboradores precisam de mobilidade e não conseguem acesso remoto?' },
+                    { title: 'I - Implicação', text: 'Ajuda o cliente a identificar as consequências de NÃO resolver o problema. Aumenta o senso de urgência!<br/><br/><b>Exemplos Vivo Empresas:</b><br/>- Se continuar ineficiente, como afeta a produtividade?<br/>- Quais os custos/perdas se as interrupções persistirem?<br/>- Como a falta de mobilidade impacta o atendimento ao público?' },
+                    { title: 'N - Necessidade de Solução', text: 'Fazer o comprador perceber que sua solução o ajudará em todos os problemas acima. Faça-o imaginar a vida sem a dor.<br/><br/><b>Exemplos Vivo Empresas:</b><br/>- Como seria contar com comunicação confiável?<br/>- De que forma uma internet estável otimizaria operações?<br/>- Se acessassem remoto com segurança, impactaria o atendimento?' }
                 ]
             },
             {
                 type: 'content',
-                title: 'Tudo Mapeado no Funil de Vendas!',
+                title: 'Incorpore Estratégia e TIS',
                 html: true,
-                content: 'Lembre-se: O Funil documenta tudo via nosso CRM (Leads > Oportunidade > Negociação > Confecção de Contrato > Fechamento).<br/><br/>Registrar contatos rastreia a jornada, fomenta a personalização e protege a equipe (LGPD). Nossa expectativa de Excelência B2B é que <b>100% dos clientes da Carteira tenham contato de humanização a cada 90 dias</b> (sendo esse volume de aprox. 33% dos seus clientes todo mês). Boas Vendas!'
+                content: 'Hoje as informações existem e devem ser aproveitadas. Observe o ramo da empresa, mídias sociais e o site. No <b>TIS</b>, você encontra inúmeras informações sobre o comportamento do cliente, facilitando a comunicação empática. No fechamento, o vendedor apenas consolida as informações das etapas do SPIN para visualizar a solução ideal ("Com base em nossa conversa, qual o próximo passo...").'
+            },
+            {
+                type: 'accordion',
+                title: 'Processo de Sondagem e Tipos de Necessidades',
+                instruction: 'Explore as diretrizes de Sondagem para Escuta Ativa:',
+                items: [
+                    { title: 'Preparação', content: 'Conhecimento prévio (pesquisar CNAE, etc) e Definição de Objetivos (o que descobrir hoje).' },
+                    { title: 'Início da Conversa', content: 'Abertura amigável para ambiente de confiança. Explane o objetivo da interação.' },
+                    { title: 'Necessidades Explícitas', content: 'Dores claras e diretas. O cliente já reconhece e comunica Ativamente.\n\nExemplo 1: Preciso de um pc maior.\nExemplo 2: Software está com problema (Assistência).' },
+                    { title: 'Necessidades Implícitas', content: 'Dores não ditas, latentes. Cabe ao vendedor identificar entrelinhas.\n\nExemplo 1: Reclama da lentidão mas não pede upgrade (Dor: processador).\nExemplo 2: Insatisfeito com a entrega mas não sabe nomear a solução.' },
+                    { title: 'Análise e Diagnóstico', content: 'Compile dados e defina ações e soluções Vivo Empresas baseadas nas respostas abertas.' },
+                    { title: 'Feedback e Seguimento', content: 'Compartilhe o encontrado, encaminhe a solução, e faça acompanhamento dos próximos passos.' }
+                ]
+            },
+            {
+                type: 'carousel',
+                title: 'A Jornada do Processo de Relacionamento',
+                slides: [
+                    { title: 'O Poder da Relação', text: 'Usamos marcação de manutenção para oportunizar negócios. Um cliente bem relacionado <b>eleva em 80% a contratação de novos produtos</b> e em <b>97% a chance de mantê-lo.</b> Expectativa de 1 contato a cada 90 dias (33% da carteira/mês) marcados como Relacionamento, Negociação, etc.' },
+                    { title: '1. Pesquisa e Preparação', text: 'Atividade CNAE; Nº de Colaboradores; Planta de Produtos VIVO; Site. Defina o objetivo claro.' },
+                    { title: '2. Primeiro Contato', text: 'Abordagem pessoal (nome do cliente). Seja breve. Use o canal adequado. APROVEITE para enviar Carta de Apresentação e WhatsApp se apresentando.' },
+                    { title: '3. Escuta Ativa', text: 'Ouça mais, fale menos. Ex: "O que eu posso fazer para melhorar seu uso?", "Deseja testar novos produtos vivo?", "Sr sabia do gerente exclusivo?"' },
+                    { title: '4. Ofereça Valor (Soluções)', text: 'Mobilidade (chip do cadastro é vivo? FTTH (venda 20GB extra e ticket médio)? VVN (todos perfis)? Digital (Office/LGPD)? Avançada (Link 99.6% SLA 4h)? Equipamentos. É impossível sair sem oferta.' },
+                    { title: '5. Manutenção e Fidelização', text: 'Seja PROATIVO nas tratativas (avise do andamento do pedido antes que ele cobre). O uso de dados acima do contrato é chance de abordar. Apresente do VIVO VALORIZA.' },
+                    { title: '7 e 8. Longo Prazo e Conflitos', text: 'Resolução rápida (Nós temos profissional exclusivo técnico TEC-B2). Evolução conjunta entendendo que parcerias maduras ganham customizações extras.' }
+                ]
+            },
+            {
+                type: 'content',
+                title: 'Funil de Vendas Visual',
+                html: true,
+                content: 'A representação visual do funil passa por:<br/>1. <b>Oportunidade (Leads / Fresh / Carteira)</b>: Clientes com perfil para expansão ou sem integração.<br/>2. <b>Relacionamento (SPIN)</b>: Onde aplicamos o método com as dores reais (latentes ou futuras).<br/>3. <b>Negociação</b>: Momento de não retorno formal (sucesso depende da etapa 2).<br/>4. <b>Fechamento</b>: Construção do vínculo virou assinatura. Previsibilidade de receita.'
+            },
+            {
+                type: 'swipecards',
+                title: 'Mito ou Verdade: SPIN e Implícitas',
+                instruction: 'Deslize para a direita (Correto) ou esquerda (Mito) sobre as falas abaixo:',
+                cards: [
+                    { id: 'sv1', text: 'Segundo o SPIN Selling, minha primeira atitude com um Lead é listar os preços do Vivo FTTH.', correctIsRight: false, explanation: 'Mito! Iniciar pelo PREÇO destrói o SPIN. O S de Situação manda você primeiro pesquisar como está a infraestrutura dele.' },
+                    { id: 'sv2', text: 'Apenas ser Reativo (responder só quando o cliente chama com problema) passa impressão de indiferença.', correctIsRight: true, explanation: 'Correto. Manutenção Proativa (avisar andamento de ticket, apontar uso extra de dados) cria Fidelização fortíssima.' },
+                    { id: 'sv3', text: 'Um cliente dizendo "A comunicação do meu time externo é lenta" está dando uma Necessidade Implícita para MDM e MÓVEL.', correctIsRight: true, explanation: 'Fato perfeito. Ele falou a dor mascarada, o vendedor qualificado traduz a dor na Solução certa!' }
+                ]
+            },
+            {
+                type: 'drag_drop_sort',
+                title: 'Desafio Prático: A Metodologia do SPIN',
+                instruction: 'Ordene a Lógica do SPIN Selling pela estrutura evolutiva da negociação:',
+                steps: [
+                    'SITUAÇÃO (Qual o seu CNAE e como trabalha seu TI?)',
+                    'PROBLEMA (A internet de hoje derruba sua operação de NF?)',
+                    'IMPLICAÇÃO (Se parar 3 horas, o prejuízo das NF não emitidas passa seu orçamento atual?)',
+                    'NECESSIDADE (Se o Link Dedicado 99.6% garantir o seu faturamento seguro, nós fechamos?)'
+                ]
+            },
+            {
+                type: 'scenario',
+                title: 'Simulação: A Oferta de Valor B2B',
+                context: 'No contato de relacionamento trimestral com uma rede de pequenas padarias (PME), o dono reclama informalmente que alguns gerentes não abrem planilhas rápido em casa nem conseguem bater ponto e diz: "Eu gasto com plano controle vagabundo e a internet deles acaba antes do fim do mês".',
+                question: 'Como aplicar a "Oferta de Valor" diagnosticando a dor do cliente segundo as cartilhas Vivo?',
+                options: [
+                    { text: 'Aconselhar o cliente a mandar os gerentes comprarem pacote de internet com o próprio bolso, já que é erro pessoal deles.', isCorrect: false, feedback: 'Incorreto e anti-humanizado. Quebra total de relacionamento e perde venda.' },
+                    { text: 'Empurrar um Link Avançado Dedicado caríssimo para as padarias, ignorando os celulares.', isCorrect: false, feedback: 'Incorreto. A oferta não conecta com a dor descrita (home office/controle móvel). Solução cara e sem propósito falha no SPIN.' },
+                    { text: 'Investigar se os telefones em uso são Vivo (linha VIVO na Planta). Realizar a venda de Alta Móvel Corporativa + Licenças DIGITAIS de Office/Teams, unificando a gestão e resolvendo o problema de dados móveis do time.', isCorrect: true, feedback: 'Excelente! Isso é "Escuta Ativa" em Mestre. O cliente entregou dores (comunicação e cota de dados) e você achou Torres cruzadas MÓVEL+DIGITAL.' }
+                ]
             }
         ]
     }
