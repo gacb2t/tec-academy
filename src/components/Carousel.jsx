@@ -40,7 +40,7 @@ const Carousel = ({ slides, onComplete }) => {
                 <h3 className="carousel-title">{slides[currentSlide].title}</h3>
 
                 <div className="carousel-text">
-                    <p>{slides[currentSlide].text}</p>
+                    <p dangerouslySetInnerHTML={{ __html: slides[currentSlide].text }} />
                 </div>
             </div>
 
