@@ -171,32 +171,6 @@ export const coursesData = [
         ]
     },
     {
-        id: "seguranca-informacao",
-        title: "Segurança da Informação e LGPD",
-        description: "Protegendo nossos dados e os dados de nossos clientes no dia a dia.",
-        duration: "15 min",
-        icon: "🔒",
-        departments: ["Todos"],
-        modules: [
-            {
-                type: 'content',
-                title: 'O Básico de Segurança',
-                content: 'A segurança dos dados é essencial. Nunca compartilhe suas senhas, mesmo com colegas de trabalho.'
-            },
-            {
-                type: 'scenario',
-                title: 'Simulação - O Email Suspeito',
-                context: 'Você recebeu um email que parece ser do departamento de TI pedindo para você clicar em um link e redefinir sua senha imediatamente devido a uma vazamento.',
-                question: 'O que você faz?',
-                options: [
-                    { text: 'Clico imediatamente para não perder acesso.', isCorrect: false, feedback: 'Errado! O TI nunca pede para redefinir senhas por links emergenciais em emails genéricos.' },
-                    { text: 'Relato o email como phishing e ligo para a TI para confirmar.', isCorrect: true, feedback: 'Perfeito! É sempre melhor verificar por outro canal.' },
-                    { text: 'Ignoro o email e deixo na caixa de entrada.', isCorrect: false, feedback: 'Quase. Ignorar é melhor que clicar, mas você deve sempre relatar para proteger seus colegas.' },
-                ]
-            }
-        ]
-    },
-    {
         id: "onboarding-rh",
         title: "Onboarding Especialista RH",
         description: "Processos internos, folha e gestão de benefícios da TEC-B2.",
@@ -225,6 +199,7 @@ export const coursesData = [
         title: 'Indicadores',
         description: 'Domine a métrica R$ FRESH, conheça as Torres de Venda da Vivo (Móvel, FTTH, Avançada, etc) e a Lógica de Atendimento B2B.',
         duration: '15 min',
+        icon: '📈',
         thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=400',
         departments: ['Todos'], // Aberto para todos conforme solicitado
         modules: [
@@ -254,31 +229,31 @@ export const coursesData = [
                 content: 'O pilar do nosso negócio é a R$ FRESH (Novas Receitas). Este indicador é o gatilho da sua política de premiação. Sem cumprir a meta de FRESH, o processo não rentabiliza e não gera comissionamento. Fique atento às torres necessárias para manter suas melhores porcentagens!'
             },
             {
-                type: 'swipecards',
-                title: 'Verdade ou Mito: R$ FRESH',
-                instruction: 'Deslize para a direita (Correto) ou esquerda (Incorreto) nas afirmações sobre a R$ FRESH.',
-                cards: [
-                    { id: 'c1', text: 'Renovação de contratos conta como R$ FRESH para o gatilho da premiação.', correctIsRight: false, explanation: 'Incorreto! Renovação não conta como FRESH, mas é um meio de encontrar novas receitas.' },
-                    { id: 'c2', text: 'Para faturar a FRESH completa, os produtos devem ser de clientes PME dos DDDs 51, 53, 54 e 55.', correctIsRight: true, explanation: 'Correto! Outros DDDs ou segmentos gerarão apenas 30% da pontuação normal.' }
-                ]
-            },
-            {
                 type: 'carousel',
                 title: 'As Torres de Venda (Parte 1)',
                 slides: [
-                    { content: '📱 **ALTA MÓVEL:** Vendas em Novo, Incremento e Portabilidade (DDD 51 a 55 / PME). Fundamental no simulador de premiação. TCM R$ 52,50.' },
-                    { content: '🌐 **FTTH - BANDA LARGA:** A "menina dos olhos" da Vivo. Fonte fortíssima de rentabilização. Não trabalhe apenas no limite da meta. TCM R$ 91,50.' },
-                    { content: '🗣️ **VVN (Voz na Nuvem):** Solução revolucionária! Supera barreiras estruturais em 75% do território gaúcho. Aliado gigante para faturamento. TCM R$ 47,80.' }
+                    { title: '📱 ALTA MÓVEL', text: 'Vendas em Novo, Incremento e Portabilidade (DDD 51 a 55 / PME). Fundamental no simulador de premiação. TCM R$ 52,50.' },
+                    { title: '🌐 FTTH', text: 'A "menina dos olhos" da Vivo. Fonte fortíssima de rentabilização. Não trabalhe apenas no limite da meta. TCM R$ 91,50.' },
+                    { title: '🗣️ VVN (Voz na Nuvem)', text: 'Solução revolucionária! Supera barreiras estruturais em 75% do território gaúcho. Aliado gigante para faturamento. TCM R$ 47,80.' }
                 ]
             },
             {
                 type: 'carousel',
                 title: 'As Torres de Venda (Parte 2)',
                 slides: [
-                    { content: '💻 **DIGITAL:** Microsoft, Google, MDM. Ticket médio menor (R$ 15,60), mas grande porta de entrada para projetos de alto valor agregado.' },
-                    { content: '🚀 **AVANÇADA:** Quer faturar alto? Link Dedicado, SIP, 0800, SDWAN. Ticket elevadíssimo (R$ 680,00). É a "cereja do bolo".' },
-                    { content: '🔄 **RENOVAÇÃO:** Pilar da equipe Farm. Meta de fidelizar 85%. Busque Renovação com UPGRADE (+6% de receita). Downgrade prejudica a premiação!' },
-                    { content: '🛒 **EQUIPAMENTOS:** Facilidade para o cliente (em 24x). Gera pontes para vender Alta Móvel e Digital. Ticket Médio: R$ 1.450,00.' }
+                    { title: '💻 DIGITAL', text: 'Microsoft, Google, MDM. Ticket médio menor (R$ 15,60), mas grande porta de entrada para projetos de alto valor agregado.' },
+                    { title: '🚀 AVANÇADA', text: 'Quer faturar alto? Link Dedicado, SIP, 0800, SDWAN. Ticket elevadíssimo (R$ 680,00). É a "cereja do bolo".' },
+                    { title: '🔄 RENOVAÇÃO', text: 'Pilar da equipe Farm. Meta de fidelizar 85%. Busque Renovação com UPGRADE (+6% de receita). Downgrade prejudica a premiação!' },
+                    { title: '🛒 EQUIPAMENTOS', text: 'Facilidade para o cliente (em 24x). Gera pontes para vender Alta Móvel e Digital. Ticket Médio: R$ 1.450,00.' }
+                ]
+            },
+            {
+                type: 'swipecards',
+                title: 'Verdade ou Mito: R$ FRESH',
+                instruction: 'Deslize para a direita (Correto) ou esquerda (Incorreto) nas afirmações sobre a R$ FRESH.',
+                cards: [
+                    { id: 'c1', text: 'Renovação de contratos conta como R$ FRESH para o gatilho da premiação.', correctIsRight: false, explanation: 'Incorreto! Renovação não conta como FRESH, mas é um meio de encontrar novas receitas.' },
+                    { id: 'c2', text: 'Para faturar a R$ FRESH completa, os produtos devem ser de clientes PME dos DDDs 51, 53, 54 e 55.', correctIsRight: true, explanation: 'Correto! Outros DDDs ou segmentos gerarão apenas 30% da pontuação normal.' }
                 ]
             },
             {

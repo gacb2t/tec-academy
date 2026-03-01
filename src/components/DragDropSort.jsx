@@ -76,6 +76,7 @@ const DragDropSort = ({ instruction, steps, onComplete }) => {
                                             ref={provided.innerRef}
                                             {...provided.draggableProps}
                                             {...provided.dragHandleProps}
+                                            style={provided.draggableProps.style}
                                         >
                                             <span className="drag-handle">☰</span>
                                             <span className="item-content">{item.content}</span>
