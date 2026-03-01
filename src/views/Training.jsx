@@ -185,6 +185,7 @@ const Training = ({ courseId, onComplete, onAbort }) => {
                             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--text-secondary)', zIndex: 0 }}>⏳ Carregando vídeo...</div>
                             <iframe
                                 src={`https://www.youtube.com/embed/${currentModule.videoId}`}
+                                loading="lazy"
                                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', zIndex: 1 }}
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen

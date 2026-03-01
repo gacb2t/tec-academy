@@ -124,7 +124,7 @@ export const coursesData = [
                 title: 'Reflexão Importante: Ética',
                 description: 'Assista ao vídeo do filósofo Mario Sergio Cortella sobre Ética e Integridade (Obrigatório).',
                 videoId: 'SOY2BIapESA',
-                requireDelay: 0 // Removido temporariamente a pedido para testes (era 180)
+                requireDelay: 180
             },
             {
                 type: 'carousel',
