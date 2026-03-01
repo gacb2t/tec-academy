@@ -289,110 +289,167 @@ export const coursesData = [
     {
         id: 3,
         title: 'Processo de Venda',
-        description: 'Estratégias completas de Vendas B2B: Atendimento Humanizado, Metodologia SPIN Selling, Processo de Sondagem e Funil Rigoroso de Relacionamento.',
-        duration: '40 min',
+        description: 'Treinamento Supremo de Vendas B2B: Atendimento Humanizado, Metodologia SPIN Selling, TIS, Processo de Sondagem e as 8 Etapas do Relacionamento.',
+        duration: '45 min',
         icon: '🤝',
         thumbnail: 'https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&q=80&w=400',
         departments: ['Todos'],
         modules: [
             {
                 type: 'content',
-                title: 'O Atendimento Humanizado',
+                title: 'O que é Atendimento Humanizado?',
                 html: true,
-                content: 'O atendimento humanizado foca na <b>empatia e na personalização</b>, valorizando o cliente como indivíduo e não apenas como comprador. Ele rompe com o tradicional modelo de telemarketing de roteiros rígidos. Esse tipo de atendimento fortalece a relação cliente-empresa e gera confiança.<br/><br/>De acordo com o Relatório Zendesk, 66% dos consumidores afirmam que uma interação ruim com o suporte pode arruinar seu dia, e 52% relatam sentir-se exaustos após essas interações. A consequência de não humanizar reflete em números preocupantes: enquanto 73% mudarão para um concorrente após várias experiências ruins, <b>mais da metade abandonará a empresa após uma única interação insatisfatória.</b><br/><br/><i>"Eu acredito que minha empresa só existe por causa dos clientes... Essa abordagem ‘customer centric’ é um processo de longo prazo que exige envolvimento de todos."</i><br/><br/>Tão importante quanto resolver um problema é entrar em contato depois que o cliente já está satisfeito ("posso ajudar com mais alguma coisa?").'
+                content: 'O <b>atendimento humanizado</b> foca na empatia e na personalização, valorizando o cliente como indivíduo e não apenas como comprador. O objetivo é proporcionar uma experiência completa.<br/><br/>Ele é caracterizado por um diálogo atento e empático, focado em resolver problemas de forma acolhedora. Rompe com o tradicional modelo de telemarketing de roteiros rígidos, promovendo comunicação próxima e genuína.'
+            },
+            {
+                type: 'content',
+                title: 'Por que a Humanização é Importante?',
+                html: true,
+                content: 'Em um mercado onde a impessoalidade predomina, o tratamento diferenciado destaca você da concorrência.<br/><br/>De acordo com o Relatório Zendesk:<br/>- <b>66%</b> dos consumidores afirmam que uma interação ruim estraga o dia.<br/>- <b>52%</b> sentem-se exaustos após suportes ruins.<br/>- <b>73%</b> mudarão para um concorrente após várias experiências ruins.<br/>- <b>Mais da metade</b> abandonará a empresa após UMA ÚNICA interação insatisfatória.'
+            },
+            {
+                type: 'content',
+                title: 'A Empatia como Peça-Chave',
+                html: true,
+                content: 'Ter empatia é fundamental no atendimento, onde lidamos com emoções como frustração e raiva. A capacidade de ajustar a abordagem e <b>oferecer desculpas genuínas é insubstituível</b>.<br/><br/>Daniel Kahneman destaca: 70% das experiências de compra são influenciadas pela percepção de como o consumidor é tratado. Mesmo quando você não pode resolver o problema naquele segundo, demonstrar empatia faz o cliente se sentir ouvido e valorizado.'
             },
             {
                 type: 'video',
-                title: 'Empatia e Encantamento (Disney)',
-                description: 'Conhecida como um lugar de sonhos, a Disney direciona seus esforços aplicando o conceito H.E.A.R.D: Ouvi (Hear), Empatizar (Empathize), Pedir desculpas (Apologize), Resolver (Resolve) e Diagnosticar (Diagnose).',
+                title: 'A Magia da Disney e a Empatia',
+                description: 'A Disney é referência mundial em atendimento (encantamento) pois empodera os funcionários a sentirem o que é felicidade.',
                 videoId: 'M8sQwMZiBfM',
                 requireDelay: 0
             },
             {
-                type: 'content',
-                title: 'O Processo Além da Empatia',
-                html: true,
-                content: 'Embora não sigamos um script rígido, isso não significa que devemos ignorar processos. A venda nasce de um relacionamento, e cada etapa é essencial.<br/><br/>O modelo se baseia em quatro pilares interconectados: <b>Processos, Empatia, Atenção e Personalizado</b> (substituindo o antigo "Script Fixo").'
-            },
-            {
-                type: 'carousel',
-                title: 'Metodologia: SPIN Selling',
-                slides: [
-                    { title: 'A Origem', text: 'Desenvolvido por Neil Rackham (1970) após estudo de 35 mil ligações em 20 países (com Xerox e IBM). Conclusão: a melhor forma de vender não é forçar, mas <b>criar valor</b> e atuar como consultor de confiança.<br/><br/>O método trabalha fechamento de negócios complexos por meio de Perguntas na ordem certa.' },
-                    { title: 'S - Situação', text: 'Etapa fundamental para conhecer seu comprador e problemas atuais. Aqui coletamos o máximo de info.<br/><br/><b>Exemplos Vivo Empresas:</b><br/>- Como está a estrutura de comunicação atualmente?<br/>- Quantos colaboradores utilizam dados móveis no trabalho?<br/>- Vocês já utilizam PABX virtual?' },
-                    { title: 'P - Problema', text: 'Concentra nas dores. Destaca problemas que talvez nem o cliente tenha percebido. Foque na dor e ouça 100%.<br/><br/><b>Exemplos Vivo Empresas:</b><br/>- Você enfrenta dificuldades com comunicação interna?<br/>- Teve interrupções na internet?<br/>- Os colaboradores precisam de mobilidade e não conseguem acesso remoto?' },
-                    { title: 'I - Implicação', text: 'Ajuda o cliente a identificar as consequências de NÃO resolver o problema. Aumenta o senso de urgência!<br/><br/><b>Exemplos Vivo Empresas:</b><br/>- Se continuar ineficiente, como afeta a produtividade?<br/>- Quais os custos/perdas se as interrupções persistirem?<br/>- Como a falta de mobilidade impacta o atendimento ao público?' },
-                    { title: 'N - Necessidade de Solução', text: 'Fazer o comprador perceber que sua solução o ajudará em todos os problemas acima. Faça-o imaginar a vida sem a dor.<br/><br/><b>Exemplos Vivo Empresas:</b><br/>- Como seria contar com comunicação confiável?<br/>- De que forma uma internet estável otimizaria operações?<br/>- Se acessassem remoto com segurança, impactaria o atendimento?' }
-                ]
-            },
-            {
-                type: 'content',
-                title: 'Incorpore Estratégia e TIS',
-                html: true,
-                content: 'Hoje as informações existem e devem ser aproveitadas. Observe o ramo da empresa, mídias sociais e o site. No <b>TIS</b>, você encontra inúmeras informações sobre o comportamento do cliente, facilitando a comunicação empática. No fechamento, o vendedor apenas consolida as informações das etapas do SPIN para visualizar a solução ideal ("Com base em nossa conversa, qual o próximo passo...").'
-            },
-            {
                 type: 'accordion',
-                title: 'Processo de Sondagem e Tipos de Necessidades',
-                instruction: 'Explore as diretrizes de Sondagem para Escuta Ativa:',
+                title: 'O Conceito H.E.A.R.D (Disney)',
+                instruction: 'Clique nas letras para aprender o método aplicado pelos "Cast Members" dos parques:',
                 items: [
-                    { title: 'Preparação', content: 'Conhecimento prévio (pesquisar CNAE, etc) e Definição de Objetivos (o que descobrir hoje).' },
-                    { title: 'Início da Conversa', content: 'Abertura amigável para ambiente de confiança. Explane o objetivo da interação.' },
-                    { title: 'Necessidades Explícitas', content: 'Dores claras e diretas. O cliente já reconhece e comunica Ativamente.\n\nExemplo 1: Preciso de um pc maior.\nExemplo 2: Software está com problema (Assistência).' },
-                    { title: 'Necessidades Implícitas', content: 'Dores não ditas, latentes. Cabe ao vendedor identificar entrelinhas.\n\nExemplo 1: Reclama da lentidão mas não pede upgrade (Dor: processador).\nExemplo 2: Insatisfeito com a entrega mas não sabe nomear a solução.' },
-                    { title: 'Análise e Diagnóstico', content: 'Compile dados e defina ações e soluções Vivo Empresas baseadas nas respostas abertas.' },
-                    { title: 'Feedback e Seguimento', content: 'Compartilhe o encontrado, encaminhe a solução, e faça acompanhamento dos próximos passos.' }
-                ]
-            },
-            {
-                type: 'carousel',
-                title: 'A Jornada do Processo de Relacionamento',
-                slides: [
-                    { title: 'O Poder da Relação', text: 'Usamos marcação de manutenção para oportunizar negócios. Um cliente bem relacionado <b>eleva em 80% a contratação de novos produtos</b> e em <b>97% a chance de mantê-lo.</b> Expectativa de 1 contato a cada 90 dias (33% da carteira/mês) marcados como Relacionamento, Negociação, etc.' },
-                    { title: '1. Pesquisa e Preparação', text: 'Atividade CNAE; Nº de Colaboradores; Planta de Produtos VIVO; Site. Defina o objetivo claro.' },
-                    { title: '2. Primeiro Contato', text: 'Abordagem pessoal (nome do cliente). Seja breve. Use o canal adequado. APROVEITE para enviar Carta de Apresentação e WhatsApp se apresentando.' },
-                    { title: '3. Escuta Ativa', text: 'Ouça mais, fale menos. Ex: "O que eu posso fazer para melhorar seu uso?", "Deseja testar novos produtos vivo?", "Sr sabia do gerente exclusivo?"' },
-                    { title: '4. Ofereça Valor (Soluções)', text: 'Mobilidade (chip do cadastro é vivo? FTTH (venda 20GB extra e ticket médio)? VVN (todos perfis)? Digital (Office/LGPD)? Avançada (Link 99.6% SLA 4h)? Equipamentos. É impossível sair sem oferta.' },
-                    { title: '5. Manutenção e Fidelização', text: 'Seja PROATIVO nas tratativas (avise do andamento do pedido antes que ele cobre). O uso de dados acima do contrato é chance de abordar. Apresente do VIVO VALORIZA.' },
-                    { title: '7 e 8. Longo Prazo e Conflitos', text: 'Resolução rápida (Nós temos profissional exclusivo técnico TEC-B2). Evolução conjunta entendendo que parcerias maduras ganham customizações extras.' }
+                    { title: 'H - Hear (Ouvir)', content: 'Escute ativamente o cliente, sem interromper, permitindo que ele expresse toda a sua frustração.' },
+                    { title: 'E - Empathize (Empatizar)', content: 'Valide os sentimentos do cliente. Mostre que você entende o peso do problema dele ("Eu entendo perfeitamente como isso é frustrante").' },
+                    { title: 'A - Apologize (Pedir Desculpas)', content: 'Peça desculpas sinceras, não apenas de forma mecânica. Peça desculpas pela situação, mesmo que a culpa "técnica" não seja unicamente sua.' },
+                    { title: 'R - Resolve (Resolver)', content: 'Dê uma solução rápida e eficiente. Se não puder resolver o problema raiz na hora, ofereça uma alternativa paliativa ou prazo real.' },
+                    { title: 'D - Diagnose (Diagnosticar)', content: 'Entenda por que o problema ocorreu e trabalhe nos bastidores (processos internos) para que não aconteça de novo com outro cliente.' }
                 ]
             },
             {
                 type: 'content',
-                title: 'Funil de Vendas Visual',
+                title: 'Customer Centric e Pós-Tratativa',
                 html: true,
-                content: 'A representação visual do funil passa por:<br/>1. <b>Oportunidade (Leads / Fresh / Carteira)</b>: Clientes com perfil para expansão ou sem integração.<br/>2. <b>Relacionamento (SPIN)</b>: Onde aplicamos o método com as dores reais (latentes ou futuras).<br/>3. <b>Negociação</b>: Momento de não retorno formal (sucesso depende da etapa 2).<br/>4. <b>Fechamento</b>: Construção do vínculo virou assinatura. Previsibilidade de receita.'
+                content: 'Acredite: <i>"A minha empresa só existe por causa dos clientes"</i>.<br/>Isso é <b>Customer Centric</b> - garantir que todas as decisões sejam feitas pensando na experiência de sucesso do cliente.<br/><br/><b>Dica de Ouro: Entre em contato DEPOIS que o problema foi resolvido!</b><br/>Ligue dizendo apenes "Posso ajudar com mais alguma coisa?". Isso demonstra compromisso absurdamente raro no Brasil e gera indicações (vendas adicionais).'
+            },
+            {
+                type: 'content',
+                title: 'Além do Script Fixo',
+                html: true,
+                content: 'Embora não sigamos scripts rígidos para não parecermos robôs, <b>não podemos ignorar Processos</b>.<br/>O nosso processo de relacionamento substitui o "script inflexível" por um Quadrado Mágico: <b>Processos + Empatia + Atenção + Personalizado</b>.<br/>Isso permite, por exemplo, ouvir uma contestação de fatura e transformar a bronca em uma renegociação amigável de ampliação de plano.'
+            },
+            {
+                type: 'carousel',
+                title: 'Introdução ao SPIN Selling',
+                slides: [
+                    { title: 'O Que É?', text: 'Técnica focada em fazer boas perguntas, na ordem certa, para traduzir dores em vendas B2B.' },
+                    { title: 'Como Surgiu?', text: 'Criada em 1988 por Neil Rackham após estudar 35 mil ligações de vendas da Xerox/IBM. A conclusão? Não se "empurra" o produto. Você diagnostica e o cliente pede para comprar.' }
+                ]
+            },
+            {
+                type: 'carousel',
+                title: 'Mergulho: As 4 Letras do SPIN',
+                slides: [
+                    { title: '1. S - Situação', text: 'Coleta de Dados ("Fase de Investigação").<br/><br/>Exemplo Vivo: "Como está sua infra atual?", "Usam PABX?", "Quantos da equipe tem Home Office?"' },
+                    { title: '2. P - Problema', text: 'Investigar dores que talvez nem o cliente saiba nomear.<br/><br/>Exemplo Vivo: "Você enfrenta quedas do link à tarde?", "Sua equipe fica sem dados móveis no dia 15?"' },
+                    { title: '3. I - Implicação', text: 'Tocar na ferida. O que acontece se NÃO resolver hoje?<br/><br/>Exemplo Vivo: "Se a internet de vocês parar 2 horas, quanto se perde de nota fiscal?", "Sem dados, sua equipe deixa de bater metas externas?"' },
+                    { title: '4. N - Necessidade de Solução', text: 'Apresentar o produto como remédio. Fazer ele imaginar a cura.<br/><br/>Exemplo Vivo: "Se eu colocasse uma VPN para sua equipe trabalhar seguro de casa, isso impactaria quantos % nas vendas?"' }
+                ]
+            },
+            {
+                type: 'content',
+                title: 'SPIN Selling: Pontos de Atenção',
+                html: true,
+                content: '<b>Atenção:</b> O SPIN exige nível de proficiência, sondagem aprofundada, personalização (não leia regras como um robô) e acompanhamento.<br/><br/>Use o sistema <b>TIS</b> para incorporar estratégia! Veja redes sociais, ramo de atuação (CNAE) e entenda quais soluções concorrentes podem ser atacadas. O TIS revela comportamentos e dá munição real para suas perguntas.'
+            },
+            {
+                type: 'content',
+                title: 'O Fechamento no SPIN',
+                html: true,
+                content: 'O Fechamento <b>NÃO</b> deve ser o momento de mais tensão!<br/>No passo "Necessidade de Solução", o cliente já concordou que precisa de você. No fechamento, você apenas consolida tudo o que foi conversado nas letras S, P e I.<br/><br/>Faça perguntas abertas e suaves: <i>"Com base nas nossas conversas, qual o próximo passo que podemos seguir para implementar isso?"</i>.'
             },
             {
                 type: 'swipecards',
-                title: 'Mito ou Verdade: SPIN e Implícitas',
-                instruction: 'Deslize para a direita (Correto) ou esquerda (Mito) sobre as falas abaixo:',
+                title: 'Mito ou Verdade: A Venda Consultiva',
+                instruction: 'Deslize para a direita (Correto) ou esquerda (Mito) sobre Atendimento e SPIN Selling.',
                 cards: [
-                    { id: 'sv1', text: 'Segundo o SPIN Selling, minha primeira atitude com um Lead é listar os preços do Vivo FTTH.', correctIsRight: false, explanation: 'Mito! Iniciar pelo PREÇO destrói o SPIN. O S de Situação manda você primeiro pesquisar como está a infraestrutura dele.' },
-                    { id: 'sv2', text: 'Apenas ser Reativo (responder só quando o cliente chama com problema) passa impressão de indiferença.', correctIsRight: true, explanation: 'Correto. Manutenção Proativa (avisar andamento de ticket, apontar uso extra de dados) cria Fidelização fortíssima.' },
-                    { id: 'sv3', text: 'Um cliente dizendo "A comunicação do meu time externo é lenta" está dando uma Necessidade Implícita para MDM e MÓVEL.', correctIsRight: true, explanation: 'Fato perfeito. Ele falou a dor mascarada, o vendedor qualificado traduz a dor na Solução certa!' }
+                    { id: 'sv_1', text: 'Ao ouvir um cliente reclamar muito da fatura alta (P: Problema), devo jogar a tabela de preços do Vivo Total na cara dele.', correctIsRight: false, explanation: 'Mito! Entendemos a dor, mas falta fazer a Implicação. E se o preço estiver caro porque a equipe dele gasta desordenadamente? Analise primeiro.' },
+                    { id: 'sv_2', text: 'O "S"ituação é a hora onde lemos o CNAE e o TIS para sabermos com quem estamos falando antes da dor aparecer.', correctIsRight: true, explanation: 'Correto! Fazer o "Dever de casa" no TIS te deixa pronto para a fase S do SPIN.' },
+                    { id: 'sv_3', text: 'Um atendimento humanizado não pode envolver scripts, nem processos internos organizacionais.', correctIsRight: false, explanation: 'Mito! O material deixa claro: fugir do rótulo de telemarketing não isenta a TEC-B2 de seguir PROCESSOS rígidos com organização.' }
+                ]
+            },
+            {
+                type: 'accordion',
+                title: 'A Lógica Visual do Funil de Relacionamento',
+                instruction: 'Como dividimos o Funil B2B internamente:',
+                items: [
+                    { title: '1. Oportunidade (Leads / Fresh / Carteira)', content: 'Clientes do Fresh (estão em outra operadora e ativaremos) ou da Carteira (estouraram dados mensais e dão sinal para upgrade).' },
+                    { title: '2. Relacionamento (SPIN)', content: 'Fase de SONDAGEM. Entender se a oportunidade é latente ou para o futuro. Classificar o cliente de forma correta e conversar.' },
+                    { title: '3. Negociação', content: 'Identificamos a dor formalizando a Proposta e Enviando Contrato. O sucesso aqui é reflexo de ter escutado bem no Relacionamento.' },
+                    { title: '4. Fechamento', content: 'A fase mais esperada. É o "Case de Sucesso", pois provou o vínculo de confiança construcionado nas etapas anteriores.' }
+                ]
+            },
+            {
+                type: 'content',
+                title: 'O Funil: Metas de Registro da TEC-B2',
+                html: true,
+                content: 'A finalidade do CRM e Funil é dar <b>previsibilidade de receitas</b> e garantir segurança LGPD das conversas.<br/><br/><b>A REGRA DOS 90 DIAS:</b> Nossa expectativa é que 100% dos clientes da Carteira recebam contato de relacionamento pelo menos uma vez a cada 90 dias.<br/><br/>Isso significa que o vendedor deve bater <b>33% da sua carteira mensalmente</b> apenas gerando relacionamento proativo!'
+            },
+            {
+                type: 'accordion',
+                title: 'O Processo Oculto da Sondagem',
+                instruction: 'O que o cliente fala X O que o cliente não percebe:',
+                items: [
+                    { title: 'Necessidades Explícitas', content: 'As fáceis. Cenários onde o cliente expressa sua dor de forma clara.\n\nExemplo: "O celular da chefia quebrou." ou "Preciso de pacote maior pois acabou a cota do office."' },
+                    { title: 'Necessidades Implícitas', content: 'Cuidado extra! Dores subentendidas ou latentes.\n\nExemplo: O cliente liga insatisfeito com o setor de SAC da loja que trava. A necessidade Implícita = Ele precisa modernizar com PABX (Voz na Nuvem Vivo) no setor dele.' }
+                ]
+            },
+            {
+                type: 'carousel',
+                title: 'As 8 Etapas do Processo: 1 a 4',
+                slides: [
+                    { title: '1. Pesquisa e Preparação', text: 'Uso do CNAE, Quantidade de Colaboradores e Planta de Produtos. Ter objetivo do contato definido na cabeça.' },
+                    { title: '2. Primeiro Contato', text: 'Nome do cliente na ponta da língua! Ser breve. IMPORTANTE: Envie também o seu cartão de visita, sua carta de apresentação e deixe o WhatsApp visível.' },
+                    { title: '3. Escuta Ativa', text: 'Faça perguntas relevantes. "Qual sua expectativa com meu atendimento?", "Há melhorias que eu posso puxar para vocês?"' },
+                    { title: '4. Ofereça Valor (Soluções!)', text: 'Você sabe as dores, atire as soluções! Temos Mobilidade, FTTH B2B (20GB+, ticket rico), VVN, PACOTE OFFICE GoogleWorkspace, Link Dedicado (99.6% / 4h SLA) e Segurança MDM/LGPD.' }
+                ]
+            },
+            {
+                type: 'carousel',
+                title: 'As 8 Etapas do Processo: 5 a 8',
+                slides: [
+                    { title: '5. Manutenção', text: 'O Erro Crasso é ser Reativo (responder só quando ele liga bravo). Seja PROATIVO: informe o status do pedido, avise uso alto de dados, seja o "Guardião" da conta dele.' },
+                    { title: '6. Fidelização', text: 'Comunique de forma respeitosa (sem invadir a caixa de emails). Promova o programa Vivo Valoriza B2B.' },
+                    { title: '7. Resolução de Conflitos', text: 'Seja Empático e Resolva rápido! Um conflito resolvido em minutos fixa um cliente. Nós da TEC-B2 possuímos Analistas Técnicos Exclusivos para você chamar e mitigar dores grandes!' },
+                    { title: '8. Relacionamento a Longo Prazo', text: 'A Evolução Conjunta do B2B. A empresa dele vai crescer, precisará de Link IP maior, de Data Center, de IoT. Cresça junto com o CNPJ dele!' }
                 ]
             },
             {
                 type: 'drag_drop_sort',
-                title: 'Desafio Prático: A Metodologia do SPIN',
-                instruction: 'Ordene a Lógica do SPIN Selling pela estrutura evolutiva da negociação:',
+                title: 'Desafio Prático: Sondando Necessidades',
+                instruction: 'Organize a lógica impecável da Etapa de Sondagem. O que você faz antes de abrir a boca até a consolidação da venda?',
                 steps: [
-                    'SITUAÇÃO (Qual o seu CNAE e como trabalha seu TI?)',
-                    'PROBLEMA (A internet de hoje derruba sua operação de NF?)',
-                    'IMPLICAÇÃO (Se parar 3 horas, o prejuízo das NF não emitidas passa seu orçamento atual?)',
-                    'NECESSIDADE (Se o Link Dedicado 99.6% garantir o seu faturamento seguro, nós fechamos?)'
+                    'Pesquisa Prévia: Leio o CNAE e o TIS do cliente antes de discar.',
+                    'Escuta Ativa: Faço o cliente expor as Necessidades (Explícitas ou Implícitas).',
+                    'Oferta de Valor: Conecto um MDM/Link Dedicado na dor que ele confessou.',
+                    'Manutenção: Ligo para ele só pra avisar que a instalação foi sucesso e gerar Fidelização.'
                 ]
             },
             {
                 type: 'scenario',
-                title: 'Simulação: A Oferta de Valor B2B',
-                context: 'No contato de relacionamento trimestral com uma rede de pequenas padarias (PME), o dono reclama informalmente que alguns gerentes não abrem planilhas rápido em casa nem conseguem bater ponto e diz: "Eu gasto com plano controle vagabundo e a internet deles acaba antes do fim do mês".',
-                question: 'Como aplicar a "Oferta de Valor" diagnosticando a dor do cliente segundo as cartilhas Vivo?',
+                title: 'Simulação - Sala de Guerra B2B',
+                context: 'A Imobiliária AlugaRápido ligou hoje. A Gerente Joana está uma fera. Ela perdeu duas negociações porque o sistema dela travou por queda de internet, ao mesmo tempo o telefone físico parou. Ela acusa: "A internet básica da loja atual não resolve nada. Preciso cancelar tudo ou me mudem!".',
+                question: 'Como aplicar a empatia H.E.A.R.D aliada à Metodologia SPIN para converter o estresse em um Upgrade Gigante?',
                 options: [
-                    { text: 'Aconselhar o cliente a mandar os gerentes comprarem pacote de internet com o próprio bolso, já que é erro pessoal deles.', isCorrect: false, feedback: 'Incorreto e anti-humanizado. Quebra total de relacionamento e perde venda.' },
-                    { text: 'Empurrar um Link Avançado Dedicado caríssimo para as padarias, ignorando os celulares.', isCorrect: false, feedback: 'Incorreto. A oferta não conecta com a dor descrita (home office/controle móvel). Solução cara e sem propósito falha no SPIN.' },
-                    { text: 'Investigar se os telefones em uso são Vivo (linha VIVO na Planta). Realizar a venda de Alta Móvel Corporativa + Licenças DIGITAIS de Office/Teams, unificando a gestão e resolvendo o problema de dados móveis do time.', isCorrect: true, feedback: 'Excelente! Isso é "Escuta Ativa" em Mestre. O cliente entregou dores (comunicação e cota de dados) e você achou Torres cruzadas MÓVEL+DIGITAL.' }
+                    { text: 'A: Focar em Necessidade Explícita: Dizer "Mil desculpas, vamos arrumar a sua internet" e pedir abertura de chamado na Anatel ou na base de TI para consertar o plano dela de internet.', isCorrect: false, feedback: 'Incorreto. Você foi reativo e deixou a cliente com a mesma dor central. Ela poderá rescindir se der defeito de novo mês que vem.' },
+                    { text: 'B: Listar o Catálogo de Preços: Falar "A culpa é do seu roteador antigo. Por 1.990 Reais ao mês eu te indico uma nova infra IP."', isCorrect: false, feedback: 'Incorreto. Você pulou a letram "E" (Empatia) e já fez Oferta antes de rodar o SPIN (Situação e Problema). O cliente ficará ofendido!' },
+                    { text: 'C: Empregar o H.E.A.R.D para ouvir a dor. Em seguida, aplicar SPIN mostrando a Implicação Financeira. Escutar a Necessidade Implícita (Telefone parado? Pode ser Voz Na Nuvem) (Quedas? Linha de Link Dedicado). Ofertar VVN Básico + Link Avançado SLA 4h para fechar a empresa num escudo.', isCorrect: true, feedback: 'Obra Prima B2B! Você acolheu a emoção, aplicou o SPIN e achou Dores Implícitas de Backup e Telefonia IP, dobrando a receita da cliente blindando a imobiliária dela contra prejuízos.' }
                 ]
             }
         ]
