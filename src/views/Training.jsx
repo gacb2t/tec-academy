@@ -12,6 +12,7 @@ import OpenQuestion from '../components/OpenQuestion';
 import SwipeCards from '../components/SwipeCards';
 import AvatarBalloons from '../components/AvatarBalloons';
 import WebhookForm from '../components/WebhookForm';
+import DragDropSort from '../components/DragDropSort';
 import { getCourseById } from '../data/coursesData';
 import './Training.css';
 
@@ -274,6 +275,21 @@ const Training = ({ courseId, onComplete, onAbort }) => {
                             webhookUrl={currentModule.webhookUrl}
                             onComplete={(isCorrect, ans) => {
                                 const { newCalculatedScore, newAnswersList } = recordAnswer(false, `Formulário Enviado: ${JSON.stringify(ans)}`, currentModule.title);
+                                handleNext(newCalculatedScore, newAnswersList);
+                            }}
+                        />
+                    </div>
+                )}
+
+                {currentModule.type === 'drag_drop_sort' && (
+                    <div className="drag-drop-module slide-enter" style={{ width: '100%' }}>
+                        <h2 className="module-title" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>{currentModule.title}</h2>
+                        <DragDropSort
+                            instruction={currentModule.instruction}
+                            steps={currentModule.steps}
+                            onComplete={() => {
+                                // Since validation happens inside, it's always correct when this triggers
+                                const { newCalculatedScore, newAnswersList } = recordAnswer(true, "Ordem Correta", currentModule.title || 'Ordenação Lógica');
                                 handleNext(newCalculatedScore, newAnswersList);
                             }}
                         />

@@ -219,6 +219,96 @@ export const coursesData = [
                 ]
             }
         ]
+    },
+    {
+        id: 2,
+        title: 'Indicadores',
+        description: 'Domine a métrica R$ FRESH, conheça as Torres de Venda da Vivo (Móvel, FTTH, Avançada, etc) e a Lógica de Atendimento B2B.',
+        duration: '15 min',
+        thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=400',
+        departments: ['Todos'], // Aberto para todos conforme solicitado
+        modules: [
+            {
+                type: 'content',
+                title: 'Introdução: A Bússola do Vendedor',
+                content: 'Os indicadores para um vendedor são ferramentas essenciais para medir o desempenho e auxiliar na melhoria contínua das vendas. Eles oferecem informações precisas sobre diferentes aspectos da atuação e ajudam a tomar decisões informadas para atingir suas metas financeiras e premiações.'
+            },
+            {
+                type: 'accordion',
+                title: 'As 8 Finalidades dos Indicadores',
+                instruction: 'Acesse cada finalidade para compreender a importância do monitoramento.',
+                items: [
+                    { title: '1. Avaliar Desempenho', content: 'Mede como o vendedor atinge metas de vendas, captação de clientes, valor total e taxa de conversão.' },
+                    { title: '2. Padrões e Tendências', content: 'Identifica produtos mais vendidos, melhores estratégias e períodos mais produtivos.' },
+                    { title: '3. Melhorar a Performance', content: 'Otimiza tempo e abordagem acompanhando tempo de fechamento e taxas de follow-up.' },
+                    { title: '4. Foco nas Metas', content: 'Garante que as ações diárias estejam focadas nas metas de faturamento e leads.' },
+                    { title: '5. Áreas de Melhoria', content: 'Aponta o que deve melhorar quando algo não atinge a expectativa.' },
+                    { title: '6. Crescimento Profissional', content: 'O aumento do ticket médio ajuda a reconhecer virtudes e a indicar necessidade de treinamentos.' },
+                    { title: '7. Decisões Estratégicas', content: 'Baseia as mudanças e escolhas dos vendedores e gestores em fatos e dados concretos.' },
+                    { title: '8. Motivação', content: 'Acompanhar seus próprios resultados motiva e é base para o sistema de remuneração e prêmios.' }
+                ]
+            },
+            {
+                type: 'content',
+                title: 'O Gatilho da Premiação: R$ FRESH',
+                content: 'O pilar do nosso negócio é a R$ FRESH (Novas Receitas). Este indicador é o gatilho da sua política de premiação. Sem cumprir a meta de FRESH, o processo não rentabiliza e não gera comissionamento. Fique atento às torres necessárias para manter suas melhores porcentagens!'
+            },
+            {
+                type: 'swipecards',
+                title: 'Verdade ou Mito: R$ FRESH',
+                instruction: 'Deslize para a direita (Correto) ou esquerda (Incorreto) nas afirmações sobre a R$ FRESH.',
+                cards: [
+                    { id: 'c1', text: 'Renovação de contratos conta como R$ FRESH para o gatilho da premiação.', correctIsRight: false, explanation: 'Incorreto! Renovação não conta como FRESH, mas é um meio de encontrar novas receitas.' },
+                    { id: 'c2', text: 'Para faturar a FRESH completa, os produtos devem ser de clientes PME dos DDDs 51, 53, 54 e 55.', correctIsRight: true, explanation: 'Correto! Outros DDDs ou segmentos gerarão apenas 30% da pontuação normal.' }
+                ]
+            },
+            {
+                type: 'carousel',
+                title: 'As Torres de Venda (Parte 1)',
+                slides: [
+                    { content: '📱 **ALTA MÓVEL:** Vendas em Novo, Incremento e Portabilidade (DDD 51 a 55 / PME). Fundamental no simulador de premiação. TCM R$ 52,50.' },
+                    { content: '🌐 **FTTH - BANDA LARGA:** A "menina dos olhos" da Vivo. Fonte fortíssima de rentabilização. Não trabalhe apenas no limite da meta. TCM R$ 91,50.' },
+                    { content: '🗣️ **VVN (Voz na Nuvem):** Solução revolucionária! Supera barreiras estruturais em 75% do território gaúcho. Aliado gigante para faturamento. TCM R$ 47,80.' }
+                ]
+            },
+            {
+                type: 'carousel',
+                title: 'As Torres de Venda (Parte 2)',
+                slides: [
+                    { content: '💻 **DIGITAL:** Microsoft, Google, MDM. Ticket médio menor (R$ 15,60), mas grande porta de entrada para projetos de alto valor agregado.' },
+                    { content: '🚀 **AVANÇADA:** Quer faturar alto? Link Dedicado, SIP, 0800, SDWAN. Ticket elevadíssimo (R$ 680,00). É a "cereja do bolo".' },
+                    { content: '🔄 **RENOVAÇÃO:** Pilar da equipe Farm. Meta de fidelizar 85%. Busque Renovação com UPGRADE (+6% de receita). Downgrade prejudica a premiação!' },
+                    { content: '🛒 **EQUIPAMENTOS:** Facilidade para o cliente (em 24x). Gera pontes para vender Alta Móvel e Digital. Ticket Médio: R$ 1.450,00.' }
+                ]
+            },
+            {
+                type: 'drag_drop_sort',
+                title: 'Desafio Prático: A Lógica do Contato',
+                instruction: 'Arraste e solte para ordenar a sequência ideal da Venda Digital TEC-B2:',
+                steps: [
+                    '1. Sondagem e Identificação (Escutar ativamente a "dor" de conectividade do cliente).',
+                    '2. Ancoragem de Valor (Abordar o pacote VVN ou Link Dedicado visando solucionar o problema).',
+                    '3. Proposição de Fechamento (Propor o envio do contrato via aceite virtual).',
+                    '4. Registro da Venda (Acompanhar a R$ FRESH virando Pontuação Real).'
+                ]
+            },
+            {
+                type: 'scenario',
+                title: 'Simulação - Foco na Rentabilidade',
+                context: 'Você está no final do mês. Conseguiu fechar com um cliente pequeno um projeto imenso de Link Dedicado (Avançada) no município de Curitiba (DDD 41).',
+                question: 'Qual o impacto direto dessa venda na sua métrica de R$ FRESH oficial?',
+                options: [
+                    { text: 'A venda não valerá nada, pois Link Dedicado parou de ser comissionado neste semestre.', isCorrect: false, feedback: 'Incorreto. Link Avançado é a cereja do bolo e continua hiper comissionado.' },
+                    { text: 'A venda contará com percentual reduzido (30%), pois o cliente pertence a um DDD não listado como foco principal (fora da área 51-55).', isCorrect: true, feedback: 'Exatamente! O valor negociado de cliente fora dos DDDs oficiais vai rentabilizar a R$ FRESH em apenas 30% da pontuação normal. A regra é implacável.' },
+                    { text: 'A venda contará 100% de FRESH, pois serviços avançados ignoram a regra de DDD ou Área.', isCorrect: false, feedback: 'Incorreto. A premissa de Segmento PME e DDDs específicos é exigência fundamental para os 100% no R$ FRESH.' }
+                ]
+            },
+            {
+                type: 'content',
+                title: 'Conclusão: A Matemática Final',
+                content: 'Tudo o que você vende gera uma pontuação baseada na torre e no tipo de cliente. Acompanhe ativamente sua placa de pontuação! Vender com estratégia eleva a base, fideliza a carteira e multiplica a sua própria recompensa.'
+            }
+        ]
     }
 ];
 
