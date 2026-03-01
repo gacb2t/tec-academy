@@ -262,11 +262,9 @@ export const coursesData = [
                 title: 'Desafio Prático: A Lógica do TCM',
                 instruction: 'Com base no Ticket Central Médio (TCM) dos produtos, ordene as Torres de Venda da Vivo posicionando o produto de MAIOR VALOR FINANCEIRO (topo) até o de MENOR VALOR:',
                 steps: [
-                    'Equipamentos (Acessórios ou Venda parcelada - Maior montante)',
                     'Avançada Voz e Dados (Link Dedicado, SIP, SDWAN)',
                     'FTTH (A "menina dos olhos" da Vivo em Banda Larga)',
                     'Alta Móvel (Novas linhas e Portabilidade)',
-                    'VVN (Voz na Nuvem sem barreiras estruturais)',
                     'Digital (A "porta de entrada": Microsoft, Google, MDM)'
                 ]
             },

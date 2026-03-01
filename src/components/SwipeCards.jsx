@@ -50,10 +50,10 @@ const SwipeCards = ({ cards, instruction, onComplete }) => {
                                             onDragEnd={(e, { offset }) => {
                                                 if (offset.x > 100) {
                                                     // Swiped Right -> Verdade
-                                                    handleAnswer('right', card.isCorrect);
+                                                    handleAnswer('right', card.correctIsRight);
                                                 } else if (offset.x < -100) {
                                                     // Swiped Left -> Mito
-                                                    handleAnswer('left', card.isCorrect);
+                                                    handleAnswer('left', card.correctIsRight);
                                                 }
                                             }}
                                             whileDrag={{ scale: 1.05, cursor: 'grabbing' }}
@@ -70,13 +70,13 @@ const SwipeCards = ({ cards, instruction, onComplete }) => {
                         <div className="swipe-actions">
                             <button
                                 className="swipe-btn mito-btn"
-                                onClick={() => handleAnswer('left', stack[stack.length - 1].isCorrect)}
+                                onClick={() => handleAnswer('left', stack[stack.length - 1].correctIsRight)}
                             >
                                 👈 MITO
                             </button>
                             <button
                                 className="swipe-btn verdade-btn"
-                                onClick={() => handleAnswer('right', stack[stack.length - 1].isCorrect)}
+                                onClick={() => handleAnswer('right', stack[stack.length - 1].correctIsRight)}
                             >
                                 VERDADE 👉
                             </button>
