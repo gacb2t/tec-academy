@@ -59,7 +59,10 @@ const Training = ({ courseId, onComplete, onAbort }) => {
         m.type === 'quiz' || m.type === 'scenario' || m.type === 'swipecards' || m.type === 'drag_drop_sort'
     ).length;
 
-    const handleNext = (finalScore = score, finalAnswers = allAnswers) => {
+    const handleNext = (overrideScore, overrideAnswers) => {
+        const finalScore = typeof overrideScore === 'number' ? overrideScore : score;
+        const finalAnswers = Array.isArray(overrideAnswers) ? overrideAnswers : allAnswers;
+
         // Auto scroll using ref to guarantee it works inside the scrolling container
         if (rootRef.current) {
             rootRef.current.scrollIntoView({ behavior: 'smooth' });
