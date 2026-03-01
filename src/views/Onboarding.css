@@ -1,0 +1,65 @@
+.welcome-login-box {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 3rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2rem;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+.microsoft-btn {
+    font-size: 1.15rem !important;
+    padding: 1rem 2rem !important;
+}
+
+.onboarding-view {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 3rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 500px;
+    margin: 0 auto;
+    align-items: stretch;
+}
+
+.onboarding-header {
+    text-align: center;
+}
+
+.onboarding-header h2 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.onboarding-header p {
+    color: var(--text-secondary);
+}
+
+.onboarding-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.error-state {
+    border-color: var(--danger);
+    align-items: center;
+    text-align: center;
+}
+
+.error-state h2 {
+    color: var(--danger);
+}
+
+.email-display {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.5rem;
+    border-radius: var(--radius-sm);
+    margin: 1rem 0;
+}

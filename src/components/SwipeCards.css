@@ -1,0 +1,141 @@
+.swipecards-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.swipecards-instruction {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    max-width: 600px;
+}
+
+.tindercards-wrapper {
+    position: relative;
+    width: 340px;
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cards-stack {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    margin-bottom: 1.5rem;
+}
+
+.swipe-card-custom {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    will-change: transform, opacity;
+}
+
+.swipecard-inner {
+    background: var(--bg-card, #1e293b);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    border-radius: var(--radius-xl, 16px);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2.5rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.swipecard-inner h3 {
+    font-size: 1.3rem;
+    text-align: center;
+    color: var(--text-primary, #fff);
+    user-select: none;
+    line-height: 1.6;
+}
+
+/* Animations for fly out */
+.fly-out-left {
+    transform: translateX(-150%) rotate(-15deg) !important;
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s !important;
+}
+
+.fly-out-right {
+    transform: translateX(150%) rotate(15deg) !important;
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s !important;
+}
+
+/* Action Buttons */
+.swipe-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 1rem;
+}
+
+.swipe-btn {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: var(--radius-lg, 12px);
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+
+.swipe-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.swipe-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.mito-btn {
+    background: rgba(239, 68, 68, 0.15);
+    /* danger color */
+    color: var(--danger, #ef4444);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+}
+
+.mito-btn:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.25);
+}
+
+.verdade-btn {
+    background: rgba(16, 185, 129, 0.15);
+    /* accent color */
+    color: var(--accent, #10b981);
+    border: 2px solid rgba(16, 185, 129, 0.3);
+}
+
+.verdade-btn:hover:not(:disabled) {
+    background: rgba(16, 185, 129, 0.25);
+}
+
+.swipecards-end {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-card, #1e293b);
+    border-radius: var(--radius-xl, 16px);
+    text-align: center;
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+    padding: 2rem;
+}

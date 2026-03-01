@@ -1,0 +1,111 @@
+.timeline-container {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.timeline-wrapper {
+    position: relative;
+    padding-left: 1rem;
+    margin-bottom: 2rem;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    min-width: 40px;
+}
+
+.timeline-number {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color, #3b82f6);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    z-index: 2;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+}
+
+.timeline-image-container {
+    width: 60px;
+    height: 60px;
+    background: var(--bg-card, #1e293b);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    border: 3px solid var(--primary-color, #3b82f6);
+    overflow: hidden;
+}
+
+.timeline-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.timeline-line {
+    position: absolute;
+    top: 40px;
+    bottom: -2rem;
+    /* Stretch down to the next item */
+    width: 2px;
+    background: var(--primary-light);
+    opacity: 0.5;
+    z-index: 1;
+}
+
+.timeline-content {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    flex-grow: 1;
+    transition: var(--transition-fast);
+}
+
+.timeline-content:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.timeline-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+.timeline-text {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.timeline-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
