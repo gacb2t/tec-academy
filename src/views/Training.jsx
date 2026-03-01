@@ -56,7 +56,7 @@ const Training = ({ courseId, onComplete, onAbort }) => {
 
     // Calculate actual scorable questions to grade later
     const totalQuestions = trainingModules.filter(m =>
-        m.type === 'quiz' || m.type === 'scenario' || m.type === 'swipecards'
+        m.type === 'quiz' || m.type === 'scenario' || m.type === 'swipecards' || m.type === 'drag_drop_sort'
     ).length;
 
     const handleNext = (finalScore = score, finalAnswers = allAnswers) => {

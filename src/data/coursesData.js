@@ -232,19 +232,19 @@ export const coursesData = [
                 type: 'carousel',
                 title: 'As Torres de Venda (Parte 1)',
                 slides: [
-                    { title: '📱 ALTA MÓVEL', text: 'Vendas em Novo, Incremento e Portabilidade (DDD 51 a 55 / PME). Fundamental no simulador de premiação. TCM R$ 52,50.' },
-                    { title: '🌐 FTTH', text: 'A "menina dos olhos" da Vivo. Fonte fortíssima de rentabilização. Não trabalhe apenas no limite da meta. TCM R$ 91,50.' },
-                    { title: '🗣️ VVN (Voz na Nuvem)', text: 'Solução revolucionária! Supera barreiras estruturais em 75% do território gaúcho. Aliado gigante para faturamento. TCM R$ 47,80.' }
+                    { title: '📱 ALTA MÓVEL', text: 'Vendas em Novo, Incremento e Portabilidade (DDD 51 a 55 / Segmento PME). Fundamental no simulador de premiação. Entregar este indicador lhe trará rentabilização, aumentará seu parque móvel e proporcionará maior rentabilização no médio e longo prazo!\n\n**TCM (Ticket Médio) Produto:** R$ 52,50.\n**Melhor Perfil:** PME focado em 1 a 9 colaboradores, ou oportunidades de clientes que só possuem básica.' },
+                    { title: '🌐 FTTH', text: 'A "menina dos olhos" da Vivo. Ponto focado na tecnologia de banda larga (Fibra). Fonte fortíssima de rentabilização para vendedores. Não trabalhe apenas no limite da meta para evitar problemas de viabilidade e desistência.\n\n**TCM Produto:** R$ 91,50.\n**Melhor Perfil:** Focado em todos os tamanhos, com oportunidade extra para clientes que só possuem móvel.' },
+                    { title: '🗣️ VVN (Voz na Nuvem)', text: 'Solução revolucionária que não depende de barreiras estruturais! Supera o território gaúcho em mais de 75%. Aliado gigante para faturamento com modulações e descontos por volume. Você pode inclusive vender módulos de gravação e URA (Unidade de Resposta Audível).\n\n**TCM Produto:** R$ 47,80.\n**Melhor Perfil:** Fundamental para quem não tem oportunidade momentânea de Móvel ou FTTH.' }
                 ]
             },
             {
                 type: 'carousel',
                 title: 'As Torres de Venda (Parte 2)',
                 slides: [
-                    { title: '💻 DIGITAL', text: 'Microsoft, Google, MDM. Ticket médio menor (R$ 15,60), mas grande porta de entrada para projetos de alto valor agregado.' },
-                    { title: '🚀 AVANÇADA', text: 'Quer faturar alto? Link Dedicado, SIP, 0800, SDWAN. Ticket elevadíssimo (R$ 680,00). É a "cereja do bolo".' },
-                    { title: '🔄 RENOVAÇÃO', text: 'Pilar da equipe Farm. Meta de fidelizar 85%. Busque Renovação com UPGRADE (+6% de receita). Downgrade prejudica a premiação!' },
-                    { title: '🛒 EQUIPAMENTOS', text: 'Facilidade para o cliente (em 24x). Gera pontes para vender Alta Móvel e Digital. Ticket Médio: R$ 1.450,00.' }
+                    { title: '💻 DIGITAL', text: 'Compreende produtos como Microsoft, Google e MDM (Gestão de Dispositivos Móveis). Apesar do ticket médio menor, é uma grande porta de entrada para projetos de alto valor, ajudando na descoberta do que o cliente usa na prática.\n\n**TCM Produto:** R$ 15,60.\n**Melhor Perfil:** Qualquer cliente PME, com possibilidade de agregar alto valor.' },
+                    { title: '🚀 AVANÇADA', text: 'Quer faturar alto? Link Dedicado (IP Exclusivo), SIP (Voz sobre IP), 0800 e SDWAN. Ticket elevadíssimo. Soluções que já fazem parte de grandes empresas, você tem uma excelente oportunidade de colocar a "cereja do bolo".\n\n**TCM Produto:** R$ 680,00.\n**Melhor Perfil:** Mapear empresas estruturadas (Acima de 3 colaboradores).' },
+                    { title: '🔄 RENOVAÇÃO', text: 'Pilar da equipe Farm. Meta de fidelizar 85%. O foco é rentabilizar o cliente renovando parque buscando UPGRADE (aumento de valor da receita em +6%).\n\nAtenção: Renovações com DOWNGRADE (redução do plano) afetam negativamente a sua premiação e não geram pontuação!' },
+                    { title: '🛒 EQUIPAMENTOS', text: 'Excelente caminho para gerar relacionamento, com possibilidade de renovar em até 24x diretamente na fatura (menos Titularidade para o mesmo CNPJ). Acessório fundamental para viabilizar Alta Móvel.\n\n**TCM Médio:** R$ 1.450,00.' }
                 ]
             },
             {
@@ -261,10 +261,10 @@ export const coursesData = [
                 title: 'Desafio Prático: A Lógica do Contato',
                 instruction: 'Arraste e solte para ordenar a sequência ideal da Venda Digital TEC-B2:',
                 steps: [
-                    '1. Sondagem e Identificação (Escutar ativamente a "dor" de conectividade do cliente).',
-                    '2. Ancoragem de Valor (Abordar o pacote VVN ou Link Dedicado visando solucionar o problema).',
-                    '3. Proposição de Fechamento (Propor o envio do contrato via aceite virtual).',
-                    '4. Registro da Venda (Acompanhar a R$ FRESH virando Pontuação Real).'
+                    'Sondagem e Identificação (Escutar ativamente a "dor" de conectividade do cliente).',
+                    'Ancoragem de Valor (Abordar o pacote VVN ou Link Dedicado visando solucionar o problema).',
+                    'Proposição de Fechamento (Propor o envio do contrato via aceite virtual).',
+                    'Registro da Venda (Acompanhar a R$ FRESH virando Pontuação Real).'
                 ]
             },
             {

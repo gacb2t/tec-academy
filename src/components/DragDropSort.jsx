@@ -14,7 +14,8 @@ const DragDropSort = ({ instruction, steps, onComplete }) => {
         const initialItems = steps.map((step, index) => ({
             id: `step-${index}`,
             content: step,
-            correctIndex: index
+            correctIndex: index,
+            isLocked: false // new property tracking correct position
         }));
 
         // Shuffle logic (Fisher-Yates)
@@ -45,6 +46,13 @@ const DragDropSort = ({ instruction, steps, onComplete }) => {
         // Validation: Verify if the sorted index matches the original correctIndex
         const isOrderCorrect = items.every((item, index) => item.correctIndex === index);
 
+        // Lock correctly ordered items
+        const newItems = items.map((item, index) => ({
+            ...item,
+            isLocked: item.correctIndex === index
+        }));
+
+        setItems(newItems);
         setIsCorrect(isOrderCorrect);
         setHasChecked(true);
 
@@ -69,16 +77,16 @@ const DragDropSort = ({ instruction, steps, onComplete }) => {
                             ref={provided.innerRef}
                         >
                             {items.map((item, index) => (
-                                <Draggable key={item.id} draggableId={item.id} index={index}>
+                                <Draggable key={item.id} draggableId={item.id} index={index} isDragDisabled={item.isLocked}>
                                     {(provided, snapshot) => (
                                         <div
-                                            className={`draggable-item ${snapshot.isDragging ? 'dragging' : ''} ${hasChecked && item.correctIndex === index ? 'correct-pos' : ''} ${hasChecked && item.correctIndex !== index && !isCorrect ? 'wrong-pos' : ''}`}
+                                            className={`draggable-item ${snapshot.isDragging ? 'dragging' : ''} ${item.isLocked ? 'correct-pos locked' : ''} ${hasChecked && !item.isLocked && !isCorrect ? 'wrong-pos' : ''}`}
                                             ref={provided.innerRef}
                                             {...provided.draggableProps}
                                             {...provided.dragHandleProps}
                                             style={provided.draggableProps.style}
                                         >
-                                            <span className="drag-handle">☰</span>
+                                            <span className="drag-handle">{item.isLocked ? '✔️' : '☰'}</span>
                                             <span className="item-content">{item.content}</span>
                                         </div>
                                     )}
