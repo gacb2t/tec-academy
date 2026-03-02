@@ -6,6 +6,8 @@ import Onboarding from './views/Onboarding';
 import HomeDashboard from './views/HomeDashboard';
 import Training from './views/Training';
 import Result from './views/Result';
+import AdminDashboard from './views/AdminDashboard';
+import CourseBuilder from './views/CourseBuilder';
 import Sidebar from './components/Sidebar';
 import './App.css';
 
@@ -16,6 +18,7 @@ function App() {
   // App Global State
   const [department, setDepartment] = useState('');
   const [activeCourseId, setActiveCourseId] = useState(null);
+  const [adminEditCourseId, setAdminEditCourseId] = useState(null); // Added for the Admin Builder
   const [isFetchingData, setIsFetchingData] = useState(false);
 
   // Results & Tracking
@@ -112,6 +115,13 @@ function App() {
     setCurrentView('training');
   };
 
+  const handleAdminViewChange = (view, data = {}) => {
+    if (view === 'course-builder') {
+      setAdminEditCourseId(data.courseId);
+    }
+    setCurrentView(view);
+  };
+
   if (!isLoaded) {
     return <div className="loading-screen">Carregando TEC-B2 Academy...</div>;
   }
@@ -151,16 +161,18 @@ function App() {
   };
 
   return (
-    <div className="app-layout">
-      <Sidebar
-        currentView={currentView}
-        onViewChange={setCurrentView}
-        department={department}
-        onDepartmentChange={setDepartment}
-      />
+    <div className={`app-layout ${currentView === 'course-builder' ? 'builder-mode' : ''}`}>
+      {currentView !== 'course-builder' && (
+        <Sidebar
+          currentView={currentView}
+          onViewChange={setCurrentView}
+          department={department}
+          onDepartmentChange={setDepartment}
+        />
+      )}
 
-      <main className="app-main-content">
-        <div className="content-wrapper glass-panel">
+      <main className={`app-main-content ${currentView === 'course-builder' ? 'full-bleed' : ''}`}>
+        <div className={`content-wrapper ${currentView === 'course-builder' ? 'full-bleed' : 'glass-panel'}`}>
           {currentView === 'home' && (
             <HomeDashboard user={userData} progress={userProgress} onStartCourse={handleStartCourse} />
           )}
@@ -182,6 +194,19 @@ function App() {
               allAnswers={recentResult.allAnswers}
               onToHome={handleBackToHome}
               onRetry={handleRetryCourse}
+            />
+          )}
+
+          {currentView === 'admin' && (
+            <AdminDashboard
+              onViewChange={handleAdminViewChange}
+            />
+          )}
+
+          {currentView === 'course-builder' && (
+            <CourseBuilder
+              courseId={adminEditCourseId}
+              onViewChange={handleAdminViewChange}
             />
           )}
         </div>

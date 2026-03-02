@@ -1,9 +1,27 @@
-import { getAvailableCourses } from '../data/coursesData';
+import { useState, useEffect } from 'react';
+import { courseService } from '../services/courseService';
 import CourseCard from '../components/CourseCard';
 import './HomeDashboard.css';
 
 const HomeDashboard = ({ user, progress, onStartCourse }) => {
-    const availableCourses = getAvailableCourses(user.department);
+    const [availableCourses, setAvailableCourses] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                const courses = await courseService.getAvailableCourses(user.department);
+                setAvailableCourses(courses);
+            } catch (error) {
+                console.error("Failed to load courses:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchCourses();
+    }, [user.department]);
+
     // Filter completed courses to ensure we only count active, existing courses
     const validCompletedCourses = progress.completedCourses.filter(courseId =>
         availableCourses.some(c => c.id === courseId)
@@ -14,6 +32,10 @@ const HomeDashboard = ({ user, progress, onStartCourse }) => {
     const overallPercentage = availableCourses.length > 0
         ? Math.round((completedCount / availableCourses.length) * 100)
         : 0;
+
+    if (isLoading) {
+        return <div className="loading-screen" style={{ height: '100%', minHeight: '300px' }}>Carregando treinamentos...</div>;
+    }
 
     return (
         <div className="home-dashboard fade-in">

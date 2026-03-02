@@ -123,6 +123,18 @@ const Sidebar = ({ currentView, onViewChange, department, onDepartmentChange }) 
                     <span className="nav-icon">💡</span>
                     Ajuda
                 </button>
+
+                {/* Hardcoded Admin check for MVP */}
+                {user?.primaryEmailAddress?.emailAddress === 'gac.b2t@gmail.com' && (
+                    <button
+                        className={`nav-item ${currentView === 'admin' ? 'active' : ''}`}
+                        onClick={() => onViewChange('admin')}
+                        style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}
+                    >
+                        <span className="nav-icon">⚙️</span>
+                        Administração
+                    </button>
+                )}
             </nav>
 
             <div className="sidebar-footer">
