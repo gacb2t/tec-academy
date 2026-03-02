@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
+import { courseService } from '../services/courseService';
 import Button from '../components/Button';
 import './AdminDashboard.css';
 
@@ -29,6 +30,18 @@ const AdminDashboard = ({ onViewChange }) => {
 
     const handleEditCourse = (id) => {
         onViewChange('course-builder', { courseId: id });
+    };
+
+    const handleDeleteCourse = async (id, title) => {
+        if (window.confirm(`Tem absoluta certeza que deseja EXCLUIR o curso "${title}"?\nEssa ação não pode ser desfeita.`)) {
+            try {
+                await courseService.deleteCourse(id);
+                setCourses(courses.filter(c => c.id !== id));
+            } catch (err) {
+                console.error("Erro ao deletar curso:", err);
+                alert("Erro ao excluir o curso. Verifique o console.");
+            }
+        }
     };
 
     if (isLoading) return <div className="loading-screen">Carregando painel de administração...</div>;
@@ -79,6 +92,9 @@ const AdminDashboard = ({ onViewChange }) => {
                                     </td>
                                     <td>
                                         <Button variant="secondary" onClick={() => handleEditCourse(course.id)} className="edit-btn">Editar</Button>
+                                        <button className="del-btn" style={{ marginLeft: '10px', padding: '0.5rem', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} onClick={() => handleDeleteCourse(course.id, course.title)}>
+                                            Excluir
+                                        </button>
                                     </td>
                                 </tr>
                             ))}

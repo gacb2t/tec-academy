@@ -24,6 +24,23 @@ const CourseBuilder = ({ courseId, onViewChange }) => {
     const [departments, setDepartments] = useState(['Todos']);
     const [courseStatus, setCourseStatus] = useState('Draft');
 
+    const AVAILABLE_DEPARTMENTS = ['Todos', 'Vendas', 'RH', 'Suporte', 'Mecânica', 'Administrativo', 'Diretoria'];
+
+    const handleDepartmentToggle = (dept) => {
+        if (dept === 'Todos') {
+            setDepartments(['Todos']);
+        } else {
+            let newDepts = departments.filter(d => d !== 'Todos');
+            if (newDepts.includes(dept)) {
+                newDepts = newDepts.filter(d => d !== dept);
+            } else {
+                newDepts.push(dept);
+            }
+            if (newDepts.length === 0) newDepts = ['Todos'];
+            setDepartments(newDepts);
+        }
+    };
+
     const [steps, setSteps] = useState([]);
     const [activeStepId, setActiveStepId] = useState(null);
     const [activeBlockId, setActiveBlockId] = useState(null);
@@ -390,6 +407,10 @@ const CourseBuilder = ({ courseId, onViewChange }) => {
                                         const updated = activeBlock.slides.map(s => s.id === slide.id ? { ...s, title: e.target.value } : s);
                                         updateActiveBlock({ slides: updated });
                                     }} placeholder="Título do Slide" />
+                                    <input className="clean-input" style={{ padding: '0.5rem' }} value={slide.image || ''} onChange={e => {
+                                        const updated = activeBlock.slides.map(s => s.id === slide.id ? { ...s, image: e.target.value } : s);
+                                        updateActiveBlock({ slides: updated });
+                                    }} placeholder="URL da Imagem (Ex: https://.../img.jpg)" />
                                     <textarea className="clean-input" rows="3" style={{ padding: '0.5rem', resize: 'vertical' }} value={slide.text} onChange={e => {
                                         const updated = activeBlock.slides.map(s => s.id === slide.id ? { ...s, text: e.target.value } : s);
                                         updateActiveBlock({ slides: updated });
@@ -453,8 +474,19 @@ const CourseBuilder = ({ courseId, onViewChange }) => {
                                         <input className="clean-input" value={duration} onChange={e => setDuration(e.target.value)} />
                                     </div>
                                     <div className="prop-group">
-                                        <label>Liberado para Setores (,)</label>
-                                        <input className="clean-input" value={departments.join(', ')} onChange={e => setDepartments(e.target.value.split(',').map(s => s.trim()))} />
+                                        <label>Liberado para Setores</label>
+                                        <div className="department-checkboxes" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px' }}>
+                                            {AVAILABLE_DEPARTMENTS.map(dept => (
+                                                <label key={dept} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem' }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={departments.includes(dept)}
+                                                        onChange={() => handleDepartmentToggle(dept)}
+                                                    />
+                                                    {dept}
+                                                </label>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             )}
