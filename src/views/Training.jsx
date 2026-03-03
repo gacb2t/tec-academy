@@ -75,7 +75,7 @@ const Training = ({ courseId, onComplete, onAbort }) => {
 
         // Suporte para versão plana antiga e versão aninhada nova
         const blocks = currentModule.blocks ? currentModule.blocks : [currentModule];
-        const videoBlock = blocks.find(b => b.type === 'video' && b.requireDelay);
+        const videoBlock = blocks.find(b => b.type === 'video' && b.requireDelay > 0);
 
         if (videoBlock) {
             setVideoCanProceed(false);
@@ -401,10 +401,20 @@ const Training = ({ courseId, onComplete, onAbort }) => {
                     {blocksToRender.map((block, index) => renderBlock(block, index))}
 
                     {!blocksToRender.some(b => ['scenario', 'quiz', 'carousel', 'myth_truth', 'swipecards', 'drag_drop_sort', 'avatar_balloons', 'open_question', 'accordion'].includes(b.type)) && (
-                        <div className="step-actions" style={{ display: 'flex', justifyContent: 'center', marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div className="step-actions" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                             <Button onClick={handleNextStep} variant="primary" disabled={!canAdvanceStep()}>
-                                {currentIndex === totalSteps - 1 ? 'Concluir Treinamento 🏆' : 'Continuar para a Próxima Etapa ➡️'}
+                                {!videoCanProceed && videoTimer > 0
+                                    ? `Aguarde ${String(Math.floor(videoTimer / 60)).padStart(2, '0')}:${String(videoTimer % 60).padStart(2, '0')} para continuar ⏳`
+                                    : currentIndex === totalSteps - 1
+                                        ? 'Concluir Treinamento 🏆'
+                                        : 'Continuar para a Próxima Etapa ➡️'
+                                }
                             </Button>
+                            {!videoCanProceed && videoTimer > 0 && (
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>
+                                    Assista ao vídeo completo para continuar
+                                </p>
+                            )}
                         </div>
                     )}
                 </div>
