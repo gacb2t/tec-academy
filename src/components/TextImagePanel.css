@@ -1,0 +1,68 @@
+.text-image-panel {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.tip-text {
+    flex: 1;
+    min-width: 240px;
+    line-height: 1.7;
+}
+
+/* Image wrapper with subtle glow on hover */
+.tip-image-wrapper {
+    flex-shrink: 0;
+}
+
+.tip-image {
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.35);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tip-image:hover {
+    transform: scale(1.03);
+    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.55);
+}
+
+/* On narrow screens, stack vertically with image below text */
+@media (max-width: 600px) {
+    .text-image-panel {
+        flex-direction: column;
+    }
+
+    .tip-image-wrapper {
+        max-width: 100% !important;
+        flex: 1 !important;
+    }
+
+    /* For left-image variant, keep image on top */
+    .tip-left .tip-image-wrapper {
+        order: -1;
+    }
+}
+
+/* Rich text styles inside the panel */
+.tip-text h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--primary-light, #a5b4fc);
+}
+
+.tip-text p {
+    margin-bottom: 0.75rem;
+    color: var(--text-primary, #e2e8f0);
+}
+
+.tip-text ul {
+    padding-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.tip-text li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}

@@ -14,6 +14,7 @@ import SwipeCards from '../components/SwipeCards';
 import Timeline from '../components/Timeline';
 import WebhookForm from '../components/WebhookForm';
 import MythTruthCard from '../components/MythTruthCard';
+import TextImagePanel from '../components/TextImagePanel';
 import { courseService } from '../services/courseService';
 import { supabase } from '../services/supabaseClient';
 import { useUser } from '@clerk/clerk-react';
@@ -357,6 +358,18 @@ const Training = ({ courseId, onComplete, onAbort }) => {
                 return (
                     <div key={block._id} className="webhook-module block-wrapper">
                         <WebhookForm title={block.title} instruction={block.defaultInstruction || block.instruction} webhookUrl={block.defaultWebhookUrl || block.webhookUrl} />
+                    </div>
+                );
+            case 'text_image_panel':
+                return (
+                    <div key={block._id} className="tip-module block-wrapper">
+                        <TextImagePanel
+                            content={block.content || ''}
+                            imageSrc={block.imageSrc}
+                            imagePosition={block.imagePosition || 'right'}
+                            imageSize={block.imageSize || 'md'}
+                            imageAlt={block.imageAlt || ''}
+                        />
                     </div>
                 );
             case 'avatar_balloons':
