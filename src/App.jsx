@@ -55,9 +55,21 @@ function App() {
             .gte('percentage', 70);
 
           if (progressLogs && progressLogs.length > 0) {
-            // Extract just the IDs into an array
             const courseIds = progressLogs.map(log => log.course_id);
-            setUserProgress({ completedCourses: courseIds });
+            setUserProgress(prev => ({ ...prev, completedCourses: courseIds }));
+          }
+
+          // 3. Fetch In-Progress Courses (started but not completed)
+          const { data: inProgressLogs } = await supabase
+            .from('course_progress')
+            .select('course_id')
+            .eq('user_id', user.id)
+            .gt('current_step', 0)
+            .lt('percentage', 70);
+
+          if (inProgressLogs && inProgressLogs.length > 0) {
+            const inProgressIds = inProgressLogs.map(log => log.course_id);
+            setUserProgress(prev => ({ ...prev, inProgressCourses: inProgressIds }));
           }
 
         } catch (error) {
@@ -114,6 +126,24 @@ function App() {
 
   const handleRetryCourse = () => {
     setRecentResult(null);
+    setCurrentView('training');
+  };
+
+  const handleRestartCourse = async (courseId) => {
+    // Delete progress from DB so Training starts from step 0
+    await supabase
+      .from('course_progress')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('course_id', courseId);
+
+    // Remove from local progress state
+    setUserProgress(prev => ({
+      completedCourses: prev.completedCourses.filter(id => id !== courseId),
+      inProgressCourses: (prev.inProgressCourses || []).filter(id => id !== courseId)
+    }));
+
+    setActiveCourseId(courseId);
     setCurrentView('training');
   };
 
@@ -176,7 +206,7 @@ function App() {
       <main className={`app-main-content ${currentView === 'course-builder' ? 'full-bleed' : ''}`}>
         <div className={`content-wrapper ${currentView === 'course-builder' || currentView === 'rh' ? 'full-bleed' : 'glass-panel'}`}>
           {currentView === 'home' && (
-            <HomeDashboard user={userData} progress={userProgress} onStartCourse={handleStartCourse} />
+            <HomeDashboard user={userData} progress={userProgress} onStartCourse={handleStartCourse} onRestartCourse={handleRestartCourse} />
           )}
 
           {currentView === 'training' && activeCourseId && (

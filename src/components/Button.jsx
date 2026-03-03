@@ -1,6 +1,6 @@
 import './Button.css';
 
-const Button = ({ children, onClick, variant = 'primary', disabled = false, fullWidth = false, className = '' }) => {
+const Button = ({ children, onClick, variant = 'primary', disabled = false, fullWidth = false, className = '', style = {} }) => {
     const baseClass = `gamified-btn btn-${variant} ${fullWidth ? 'btn-full' : ''} ${className}`;
 
     return (
@@ -8,6 +8,7 @@ const Button = ({ children, onClick, variant = 'primary', disabled = false, full
             className={baseClass}
             onClick={onClick}
             disabled={disabled}
+            style={style}
         >
             <span className="btn-content">{children}</span>
             <div className="btn-glow"></div>

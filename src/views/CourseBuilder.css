@@ -439,6 +439,7 @@
     padding: 1.5rem;
     z-index: 5;
     flex-shrink: 0;
+    overflow-y: auto;
 }
 
 .palette-container h4 {

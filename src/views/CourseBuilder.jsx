@@ -13,6 +13,8 @@ const MODULE_TEMPLATES = [
     { type: 'open_question', title: 'Questão Descritiva', icon: <Type size={18} />, defaultContext: '', defaultQuestion: 'O que você achou disso?' },
     { type: 'advanced_form', title: 'Formulário / Landing Page', icon: <Edit3 size={18} />, defaultTitle: 'Solicitação de Acesso', defaultFields: [{ id: `fld_${Date.now()}`, label: 'Seu Email Corporativo', type: 'text', required: true }] },
     { type: 'carousel', title: 'Carrossel de Slides', icon: <Image size={18} />, defaultSlides: [{ id: `sld_${Date.now()}`, title: 'Slide 1', text: '' }] },
+    { type: 'image_content', title: 'Imagem + Texto', icon: <Image size={18} />, defaultImageSrc: '', defaultContent: 'Descreva a imagem aqui...' },
+    { type: 'scenario', title: 'Simulador (Cenário)', icon: <HelpCircle size={18} />, defaultContext: 'Você depara-se com um problema...', defaultQuestion: 'O que você faz?', defaultOptions: [{ id: `opt_${Date.now()}`, text: 'Ação 1', isCorrect: true }] },
     { type: 'accordion', title: 'Acordeão', icon: <List size={18} />, defaultInstruction: 'Clique nos itens para ler as regras.', defaultItems: [{ id: `acc_${Date.now()}`, icon: '📌', title: 'Item 1', content: 'Descrição do item...' }] },
     { type: 'timeline', title: 'Linha do Tempo', icon: <GitCommit size={18} />, defaultInstruction: 'Acompanhe a ordem:', defaultSteps: [{ id: `tml_${Date.now()}`, title: 'Passo 1', description: 'O que acontece aqui', imageUrl: '' }] },
     { type: 'webhook_form', title: 'Formulário Automático', icon: <Globe size={18} />, defaultInstruction: 'Preencha os dados abaixo:', defaultWebhookUrl: 'https://hook.us2.make.com/...' },
@@ -237,6 +239,63 @@ const CourseBuilder = ({ courseId, onViewChange }) => {
                         <label>Conteúdo HTML/Texto</label>
                         <textarea className="clean-input" rows="6" value={activeBlock.content || ''} onChange={e => updateActiveBlock({ content: e.target.value })} />
                     </div>
+                )}
+
+                {activeBlock.type === 'image_content' && (
+                    <>
+                        <div className="prop-group">
+                            <label>URL da Imagem</label>
+                            <input className="clean-input" value={activeBlock.imageSrc || ''} onChange={e => updateActiveBlock({ imageSrc: e.target.value })} placeholder="URL da imagem (ex: /images/courses/img.png)" />
+                        </div>
+                        <div className="prop-group">
+                            <label>Conteúdo HTML/Texto (Abaixo da Imagem)</label>
+                            <textarea className="clean-input" rows="6" value={activeBlock.content || ''} onChange={e => updateActiveBlock({ content: e.target.value })} />
+                        </div>
+                    </>
+                )}
+
+                {activeBlock.type === 'scenario' && (
+                    <>
+                        <div className="prop-group">
+                            <label>Contexto (Descreva o Cenário)</label>
+                            <textarea className="clean-input" rows="3" value={activeBlock.context || ''} onChange={e => updateActiveBlock({ context: e.target.value })} />
+                        </div>
+                        <div className="prop-group">
+                            <label>Pergunta Final (Ação do Player)</label>
+                            <textarea className="clean-input" rows="2" value={activeBlock.question || ''} onChange={e => updateActiveBlock({ question: e.target.value })} />
+                        </div>
+                        <div className="prop-group">
+                            <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                Ações / Opções
+                                <span className="add-opt-btn" onClick={() => {
+                                    const newOpts = [...(activeBlock.options || []), { id: `opt_${Date.now()}`, text: 'Nova Ação', isCorrect: false }];
+                                    updateActiveBlock({ options: newOpts });
+                                }}>+ Adicionar Ação</span>
+                            </label>
+
+                            <div className="options-list">
+                                {(activeBlock.options || []).map((opt) => (
+                                    <div key={opt.id} className="option-edit-row">
+                                        <input
+                                            type="radio"
+                                            name={`scenario_correct_${activeBlock._id}`}
+                                            checked={opt.isCorrect}
+                                            onChange={() => {
+                                                const updated = activeBlock.options.map(o => ({ ...o, isCorrect: o.id === opt.id }));
+                                                updateActiveBlock({ options: updated });
+                                            }}
+                                            title="Marcar como ação correta"
+                                        />
+                                        <input className="clean-input" value={opt.text} onChange={e => {
+                                            const updated = activeBlock.options.map(o => o.id === opt.id ? { ...o, text: e.target.value } : o);
+                                            updateActiveBlock({ options: updated });
+                                        }} placeholder="Descrição da ação..." />
+                                        <button className="del-btn" onClick={() => updateActiveBlock({ options: activeBlock.options.filter(o => o.id !== opt.id) })} title="Remover Ação"><X size={14} /></button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </>
                 )}
 
                 {activeBlock.type === 'video' && (

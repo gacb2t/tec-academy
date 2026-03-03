@@ -54,7 +54,7 @@ const Carousel = ({ slides, onComplete, onNextStep }) => {
                     ← Anterior
                 </button>
 
-                <Button onClick={handleNext} variant={currentSlide === slides.length - 1 ? "success" : "primary"}>
+                <Button onClick={handleNext} variant="primary">
                     {currentSlide === slides.length - 1 ? 'Concluir Etapa ✅' : 'Próximo →'}
                 </Button>
             </div>

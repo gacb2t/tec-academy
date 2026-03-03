@@ -3,7 +3,7 @@ import { courseService } from '../services/courseService';
 import CourseCard from '../components/CourseCard';
 import './HomeDashboard.css';
 
-const HomeDashboard = ({ user, progress, onStartCourse }) => {
+const HomeDashboard = ({ user, progress, onStartCourse, onRestartCourse }) => {
     const [availableCourses, setAvailableCourses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -63,7 +63,6 @@ const HomeDashboard = ({ user, progress, onStartCourse }) => {
                     {/* Render pending courses first */}
                     {availableCourses
                         .filter(course => !progress.completedCourses.includes(course.id))
-                        .sort((a, b) => a.title.localeCompare(b.title))
                         .map(course => (
                             <CourseCard
                                 key={course.id}
@@ -71,6 +70,7 @@ const HomeDashboard = ({ user, progress, onStartCourse }) => {
                                 isCompleted={false}
                                 isInProgress={progress.inProgressCourses?.includes(course.id)}
                                 onStart={onStartCourse}
+                                onRestart={onRestartCourse}
                             />
                         ))}
                     {/* Render completed courses last */}
@@ -83,6 +83,7 @@ const HomeDashboard = ({ user, progress, onStartCourse }) => {
                                 course={course}
                                 isCompleted={true}
                                 onStart={onStartCourse}
+                                onRestart={onRestartCourse}
                             />
                         ))}
                 </div>

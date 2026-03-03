@@ -15,9 +15,11 @@ const SwipeCards = ({ cards, instruction, onComplete, onNextStep }) => {
         }
     }, [results, cards.length]);
 
-    const handleAnswer = (direction, isCorrect) => {
+    const handleAnswer = (direction, card) => {
         const isRightSwipe = direction === 'right'; // Verdade
-        const earnedPoint = isRightSwipe === isCorrect;
+        // Suporta 'correctIsRight' (explícito) ou 'isCorrect' (true = Verdade = direita)
+        const correctIsRight = card.correctIsRight !== undefined ? card.correctIsRight : card.isCorrect;
+        const earnedPoint = isRightSwipe === correctIsRight;
 
         setResults(prev => [...prev, earnedPoint]);
         setStack(prev => prev.slice(0, prev.length - 1));
@@ -68,11 +70,9 @@ const SwipeCards = ({ cards, instruction, onComplete, onNextStep }) => {
                                             dragConstraints={{ left: 0, right: 0 }}
                                             onDragEnd={(e, { offset }) => {
                                                 if (offset.x > 100) {
-                                                    // Swiped Right -> Verdade
-                                                    handleAnswer('right', card.correctIsRight);
+                                                    handleAnswer('right', card);
                                                 } else if (offset.x < -100) {
-                                                    // Swiped Left -> Mito
-                                                    handleAnswer('left', card.correctIsRight);
+                                                    handleAnswer('left', card);
                                                 }
                                             }}
                                             whileDrag={{ scale: 1.05, cursor: 'grabbing' }}
@@ -89,13 +89,13 @@ const SwipeCards = ({ cards, instruction, onComplete, onNextStep }) => {
                         <div className="swipe-actions">
                             <button
                                 className="swipe-btn mito-btn"
-                                onClick={() => handleAnswer('left', stack[stack.length - 1].correctIsRight)}
+                                onClick={() => handleAnswer('left', stack[stack.length - 1])}
                             >
                                 👈 MITO
                             </button>
                             <button
                                 className="swipe-btn verdade-btn"
-                                onClick={() => handleAnswer('right', stack[stack.length - 1].correctIsRight)}
+                                onClick={() => handleAnswer('right', stack[stack.length - 1])}
                             >
                                 VERDADE 👉
                             </button>

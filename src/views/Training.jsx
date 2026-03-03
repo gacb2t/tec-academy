@@ -28,6 +28,8 @@ const Training = ({ courseId, onComplete, onAbort }) => {
 
     const rootRef = useRef(null);
     const answeredRef = useRef(new Set());
+    const scoreRef = useRef(0);
+    const answersRef = useRef([]);
     const [videoTimer, setVideoTimer] = useState(0);
     const [videoCanProceed, setVideoCanProceed] = useState(true);
 
@@ -105,7 +107,7 @@ const Training = ({ courseId, onComplete, onAbort }) => {
     const totalQuestions = trainingModules.reduce((total, m) => {
         const blocks = m.blocks ? m.blocks : [m];
         return total + blocks.filter(b =>
-            b.type === 'quiz' || b.type === 'scenario' || b.type === 'swipecards' || b.type === 'drag_drop_sort' || b.type === 'open_question' || b.type === 'advanced_form'
+            b.type === 'quiz' || b.type === 'scenario' || b.type === 'swipecards' || b.type === 'drag_drop_sort'
         ).length;
     }, 0);
 
@@ -138,8 +140,8 @@ const Training = ({ courseId, onComplete, onAbort }) => {
     };
 
     const handleNextStep = async (overrideScore, overrideAnswers) => {
-        const finalScore = typeof overrideScore === 'number' ? overrideScore : score;
-        const finalAnswers = Array.isArray(overrideAnswers) ? overrideAnswers : allAnswers;
+        const finalScore = typeof overrideScore === 'number' ? overrideScore : scoreRef.current;
+        const finalAnswers = Array.isArray(overrideAnswers) ? overrideAnswers : answersRef.current;
 
         if (rootRef.current) {
             rootRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -191,14 +193,14 @@ const Training = ({ courseId, onComplete, onAbort }) => {
         answeredRef.current.add(questionText);
 
         const newAnswerObj = { question: questionText, answer: answerText, correct: isCorrect, attempts };
-        setAllAnswers(prev => [...prev, newAnswerObj]);
+        answersRef.current = [...answersRef.current, newAnswerObj];
+        setAllAnswers(answersRef.current);
 
-        let newScore = score;
+        let newScore = scoreRef.current;
         if (isCorrect) {
-            setScore(prev => {
-                newScore = prev + 1;
-                return newScore;
-            });
+            scoreRef.current += 1;
+            newScore = scoreRef.current;
+            setScore(scoreRef.current);
         }
 
         return { newCalculatedScore: newScore, newAnswersList: [...allAnswers, newAnswerObj] };
@@ -230,6 +232,14 @@ const Training = ({ courseId, onComplete, onAbort }) => {
                         <div className="module-text" dangerouslySetInnerHTML={{ __html: block.content }} />
                     </div>
                 );
+            case 'image_content':
+                return (
+                    <div key={block._id} className="content-module block-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+                        {block.title && <h3 className="block-title" style={{ textAlign: 'center', width: '100%' }}>{block.title}</h3>}
+                        <img src={block.imageSrc} alt={block.title} style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain', borderRadius: '12px' }} />
+                        <div className="module-text" dangerouslySetInnerHTML={{ __html: block.content }} />
+                    </div>
+                );
             case 'video':
                 return (
                     <div key={block._id} className="video-module block-wrapper">
@@ -248,13 +258,13 @@ const Training = ({ courseId, onComplete, onAbort }) => {
             case 'open_question':
                 return (
                     <div key={block._id} className="open-question-module block-wrapper">
-                        <OpenQuestion context={block.context} question={block.question} onComplete={(success, ans) => handleOpenQuestionComplete(ans, block.question)} />
+                        <OpenQuestion context={block.context} question={block.question} onComplete={(success, ans) => handleOpenQuestionComplete(ans, block.question)} onNextStep={handleNextStep} />
                     </div>
                 );
             case 'carousel':
                 return (
                     <div key={block._id} className="carousel-module block-wrapper">
-                        <Carousel slides={block.slides} onComplete={() => { }} />
+                        <Carousel slides={block.slides} onComplete={() => { }} onNextStep={handleNextStep} />
                     </div>
                 );
             case 'scenario':
@@ -334,7 +344,7 @@ const Training = ({ courseId, onComplete, onAbort }) => {
             case 'accordion':
                 return (
                     <div key={block._id} className="accordion-module block-wrapper">
-                        <AccordionList title={block.title} instruction={block.defaultInstruction || block.instruction} items={block.defaultItems || block.items} />
+                        <AccordionList title={block.title} instruction={block.defaultInstruction || block.instruction} items={block.defaultItems || block.items} onNextStep={handleNextStep} />
                     </div>
                 );
             case 'timeline':
@@ -352,7 +362,7 @@ const Training = ({ courseId, onComplete, onAbort }) => {
             case 'avatar_balloons':
                 return (
                     <div key={block._id} className="avatar-module block-wrapper">
-                        <AvatarBalloons title={block.title} instruction={block.defaultInstruction || block.instruction} avatarUrl={block.defaultAvatarUrl || block.avatarUrl} balloons={block.defaultBalloons || block.balloons} />
+                        <AvatarBalloons title={block.title} instruction={block.defaultInstruction || block.instruction} avatarUrl={block.defaultAvatarUrl || block.avatarUrl} balloons={block.defaultBalloons || block.balloons} onNextStep={handleNextStep} />
                     </div>
                 );
             case 'swipecards':
@@ -390,7 +400,7 @@ const Training = ({ courseId, onComplete, onAbort }) => {
                     {/* Render all blocks stacked vertically */}
                     {blocksToRender.map((block, index) => renderBlock(block, index))}
 
-                    {!blocksToRender.some(b => ['scenario', 'quiz', 'carousel', 'myth_truth', 'swipecards', 'drag_drop_sort'].includes(b.type)) && (
+                    {!blocksToRender.some(b => ['scenario', 'quiz', 'carousel', 'myth_truth', 'swipecards', 'drag_drop_sort', 'avatar_balloons', 'open_question', 'accordion'].includes(b.type)) && (
                         <div className="step-actions" style={{ display: 'flex', justifyContent: 'center', marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                             <Button onClick={handleNextStep} variant="primary" disabled={!canAdvanceStep()}>
                                 {currentIndex === totalSteps - 1 ? 'Concluir Treinamento 🏆' : 'Continuar para a Próxima Etapa ➡️'}
