@@ -5,7 +5,7 @@ import './RHDashboard.css';
 import CandidatesCRM from '../components/CandidatesCRM';
 
 const RHDashboard = () => {
-    const [activeTab, setActiveTab] = useState('colaboradores'); // colaboradores, candidatos
+    const [activeTab, setActiveTab] = useState('colaboradores');
     const [stats, setStats] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -13,6 +13,8 @@ const RHDashboard = () => {
     const [isLoadingAnswers, setIsLoadingAnswers] = useState(false);
     const [coursesMap, setCoursesMap] = useState({});
     const [selectedCourseId, setSelectedCourseId] = useState(null);
+    const [completionHistory, setCompletionHistory] = useState([]);
+    const [selectedExecutionId, setSelectedExecutionId] = useState(null);
 
     // Filters
     const [searchTerm, setSearchTerm] = useState('');
@@ -21,7 +23,6 @@ const RHDashboard = () => {
     useEffect(() => {
         const fetchRHStats = async () => {
             try {
-                // Fetch all courses to build a map including titles and icons
                 const { data: coursesData, error: coursesErr } = await supabase.from('courses').select('id, title, icon, thumbnail');
                 if (coursesErr) throw coursesErr;
 
@@ -29,15 +30,12 @@ const RHDashboard = () => {
                 coursesData.forEach(c => cMap[c.id] = c);
                 setCoursesMap(cMap);
 
-                // Fetch user profiles to know departments and emails
                 const { data: profiles, error: profErr } = await supabase.from('user_profiles').select('user_id, name, department, email');
                 if (profErr) throw profErr;
 
-                // Fetch course progress
                 const { data: progressList, error: progErr } = await supabase.from('course_progress').select('user_id, course_id, percentage, score, total_questions, id');
                 if (progErr) throw progErr;
 
-                // Aggregate stats by Department -> User
                 const deptMap = {};
 
                 for (const profile of profiles || []) {
@@ -79,13 +77,24 @@ const RHDashboard = () => {
         setSelectedUser(userObj);
         setIsLoadingAnswers(true);
         setUserAnswers([]);
+        setCompletionHistory([]);
+        setSelectedCourseId(null);
+        setSelectedExecutionId(null);
 
         try {
-            // Re-fetch progress live from DB to get the latest data (avoid stale cache)
             const { data: freshProgress } = await supabase
                 .from('course_progress')
                 .select('id, course_id, score, total_questions, percentage')
                 .eq('user_id', userObj.user_id);
+
+            // Fetch completion history including answers jsonb (newest first)
+            const { data: historyData } = await supabase
+                .from('course_completion_history')
+                .select('id, course_id, score, total_questions, percentage, completed_at, answers')
+                .eq('user_id', userObj.user_id)
+                .order('completed_at', { ascending: false });
+
+            setCompletionHistory(historyData || []);
 
             const progressIds = (freshProgress || []).map(p => p.id);
             if (progressIds.length === 0) return;
@@ -213,6 +222,7 @@ const RHDashboard = () => {
                         <button className="rh-modal-close" onClick={() => { setSelectedUser(null); setSelectedCourseId(null); }}>✖</button>
                         <h2>Detalhes Analíticos: {selectedUser.name}</h2>
 
+                        {/* User summary stats */}
                         <div style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px' }}>
                             <div>
                                 <p style={{ color: 'var(--text-secondary)', margin: '0 0 5px 0' }}>Setor</p>
@@ -232,83 +242,123 @@ const RHDashboard = () => {
                             </div>
                         </div>
 
+                        {/* Completion history section */}
                         <div style={{ marginBottom: '2rem' }}>
                             <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Treinamentos Concluídos</h3>
-                            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                                {selectedUser.progressList.filter(p => p.percentage >= 90 && coursesMap[p.course_id]).length === 0 ? (
-                                    <p style={{ color: 'var(--text-secondary)' }}>Nenhum treinamento finalizado ainda.</p>
-                                ) : (
-                                    selectedUser.progressList.filter(p => p.percentage >= 90 && coursesMap[p.course_id]).map(p => {
-                                        const cData = coursesMap[p.course_id];
-                                        const isSelected = selectedCourseId === p.course_id;
-                                        return (
-                                            <div
-                                                key={p.course_id}
-                                                onClick={() => setSelectedCourseId(isSelected ? null : p.course_id)}
-                                                style={{
-                                                    padding: '1rem',
-                                                    background: isSelected ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
-                                                    borderRadius: '12px',
-                                                    cursor: 'pointer',
-                                                    border: isSelected ? '1px solid var(--primary-light)' : '1px solid rgba(255,255,255,0.1)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '10px',
-                                                    transition: 'all 0.2s ease',
-                                                    minWidth: '200px'
-                                                }}
-                                            >
-                                                <span style={{ fontSize: '1.5rem' }}>{cData?.icon || cData?.thumbnail || '📚'}</span>
-                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <span style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>{cData?.title || 'Curso Excluído'}</span>
-                                                    <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>Score: {p.score}/{p.total_questions}</span>
-                                                </div>
-                                            </div>
-                                        );
-                                    })
-                                )}
-                            </div>
-                        </div>
 
-                        {selectedCourseId && (
-                            <div className="rh-answers-list fade-in">
-                                <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--primary-light)' }}>
-                                    Histórico: {coursesMap[selectedCourseId]?.title}
-                                </h3>
-                                {isLoadingAnswers ? (
-                                    <p>Buscando histórico do banco de dados...</p>
-                                ) : userAnswers.filter(a => a.courseId === selectedCourseId).length === 0 ? (
-                                    <p>Nenhuma resposta registrada para este treinamento.</p>
-                                ) : (
-                                    <div className="rh-answers-table-wrapper">
-                                        <table className="rh-answers-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Questão/Cenário</th>
-                                                    <th>Resposta Final</th>
-                                                    <th>Resultado</th>
-                                                    <th>Tentativas</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {userAnswers.filter(a => a.courseId === selectedCourseId).map(ans => (
-                                                    <tr key={ans.id}>
-                                                        <td title={ans.question_text}>{ans.question_text?.substring(0, 70)}...</td>
-                                                        <td title={ans.answer_text}>{ans.answer_text?.substring(0, 50)}</td>
-                                                        <td style={{ color: ans.is_correct ? 'var(--success)' : 'var(--danger)' }}>
-                                                            {ans.is_correct ? '✅ Sim' : '❌ Não'}
-                                                        </td>
-                                                        <td style={{ fontWeight: 'bold' }}>
-                                                            {ans.attempts}x
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+                            {(() => {
+                                const courseIds = [...new Set(completionHistory.map(h => h.course_id))];
+                                if (courseIds.length === 0) {
+                                    return <p style={{ color: 'var(--text-secondary)' }}>Nenhum treinamento finalizado ainda.</p>;
+                                }
+                                return (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                        {courseIds.filter(id => coursesMap[id]).map(courseId => {
+                                            const cData = coursesMap[courseId];
+                                            const executions = completionHistory.filter(h => h.course_id === courseId);
+                                            const isCardOpen = selectedCourseId === courseId;
+                                            return (
+                                                <div key={courseId}
+                                                    onClick={() => {
+                                                        setSelectedCourseId(isCardOpen ? null : courseId);
+                                                        setSelectedExecutionId(null);
+                                                    }}
+                                                    style={{
+                                                        padding: '1rem',
+                                                        background: isCardOpen ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.05)',
+                                                        borderRadius: '12px',
+                                                        cursor: 'pointer',
+                                                        border: isCardOpen ? '1px solid var(--primary-light)' : '1px solid rgba(255,255,255,0.1)',
+                                                        transition: 'all 0.2s ease'
+                                                    }}
+                                                >
+                                                    {/* Course card header — always visible */}
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                        <span style={{ fontSize: '1.5rem' }}>{cData?.icon || cData?.thumbnail || '📚'}</span>
+                                                        <div>
+                                                            <div style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>{cData?.title}</div>
+                                                            <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>
+                                                                {executions.length} execução{executions.length !== 1 ? 'ões' : ''} — clique para ver datas
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Execution date rows — only appear when card is open */}
+                                                    {isCardOpen && (
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.75rem' }}>
+                                                            {executions.map(ex => {
+                                                                const dt = new Date(ex.completed_at);
+                                                                const label = dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                                                const time = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                                                                const isExSelected = selectedExecutionId === ex.id;
+                                                                const hasAnswers = Array.isArray(ex.answers) && ex.answers.length > 0;
+                                                                return (
+                                                                    <div key={ex.id}>
+                                                                        {/* Clickable date row */}
+                                                                        <div
+                                                                            onClick={e => {
+                                                                                e.stopPropagation();
+                                                                                if (hasAnswers) setSelectedExecutionId(isExSelected ? null : ex.id);
+                                                                            }}
+                                                                            style={{
+                                                                                display: 'flex',
+                                                                                justifyContent: 'space-between',
+                                                                                fontSize: '0.82rem',
+                                                                                padding: '0.4rem 0.6rem',
+                                                                                borderRadius: '6px',
+                                                                                cursor: hasAnswers ? 'pointer' : 'default',
+                                                                                background: isExSelected ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.03)',
+                                                                                transition: 'background 0.15s',
+                                                                                marginBottom: '2px'
+                                                                            }}
+                                                                        >
+                                                                            <span style={{ color: hasAnswers ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                                                                                📅 {label} às {time}{hasAnswers ? ' 🔍' : ''}
+                                                                            </span>
+                                                                            <span style={{ color: ex.percentage >= 90 ? 'var(--success)' : 'var(--warning)', fontWeight: 'bold' }}>
+                                                                                {ex.score}/{ex.total_questions} ({ex.percentage}%)
+                                                                            </span>
+                                                                        </div>
+
+                                                                        {/* Inline answers table for this execution */}
+                                                                        {isExSelected && hasAnswers && (
+                                                                            <div className="rh-answers-table-wrapper fade-in" style={{ marginTop: '0.4rem', marginBottom: '0.6rem' }}>
+                                                                                <table className="rh-answers-table">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th>Questão</th>
+                                                                                            <th>Resposta</th>
+                                                                                            <th>Resultado</th>
+                                                                                            <th>Tentativas</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        {ex.answers.map((ans, i) => (
+                                                                                            <tr key={i}>
+                                                                                                <td title={ans.question}>{ans.question?.substring(0, 60)}{ans.question?.length > 60 ? '...' : ''}</td>
+                                                                                                <td title={ans.answer}>{ans.answer?.substring(0, 45)}{ans.answer?.length > 45 ? '...' : ''}</td>
+                                                                                                <td style={{ color: ans.correct ? 'var(--success)' : 'var(--danger)' }}>
+                                                                                                    {ans.correct ? '✅ Sim' : '❌ Não'}
+                                                                                                </td>
+                                                                                                <td style={{ fontWeight: 'bold', textAlign: 'center' }}>{ans.attempts || 1}x</td>
+                                                                                            </tr>
+                                                                                        ))}
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
-                                )}
-                            </div>
-                        )}
+                                );
+                            })()}
+                        </div>
                     </div>
                 </div>,
                 document.body

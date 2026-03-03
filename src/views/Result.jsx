@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../services/supabaseClient';
 import Button from '../components/Button';
@@ -7,6 +7,7 @@ import './Result.css';
 const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, onRetry }) => {
     const { user: clerkUser } = useUser();
     const [status, setStatus] = useState('sending'); // sending, success, error
+    const hasSavedRef = useRef(false); // StrictMode guard — prevents double-save
 
     // Evaluation State
     const [rating, setRating] = useState(0);
@@ -55,6 +56,9 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
     };
 
     useEffect(() => {
+        if (hasSavedRef.current) return; // StrictMode: skip double-fire
+        hasSavedRef.current = true;
+
         async function saveToDatabase() {
             try {
                 const percentage = Math.round((score / totalQuestions) * 100) || 0;
@@ -97,6 +101,22 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
                     progressRow = data;
                 }
 
+                // Record this completion in the history table (never deleted on restart)
+                const { error: historyErr } = await supabase.from('course_completion_history').insert({
+                    user_id: clerkUser.id,
+                    course_id: courseId,
+                    score: score,
+                    total_questions: totalQuestions,
+                    percentage: percentage,
+                    answers: allAnswers.map(a => ({
+                        question: a.question,
+                        answer: a.answer,
+                        correct: a.correct,
+                        attempts: a.attempts || 1
+                    }))
+                });
+                if (historyErr) console.error('Erro ao salvar histórico de conclusão:', historyErr);
+
                 // 2. Save individual answers tied to that progress id for Excel exports
                 if (progressRow && allAnswers.length > 0) {
 
@@ -110,7 +130,8 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
                         progress_id: progressRow.id,
                         question_text: ans.question,
                         answer_text: ans.answer,
-                        is_correct: ans.correct
+                        is_correct: ans.correct,
+                        attempts: ans.attempts || 1
                     }));
 
                     const { error: answersErr } = await supabase
