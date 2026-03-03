@@ -1,7 +1,7 @@
 import './CourseCard.css';
 import Button from './Button';
 
-const CourseCard = ({ course, isCompleted, onStart }) => {
+const CourseCard = ({ course, isCompleted, isInProgress, onStart }) => {
     return (
         <div className={`course-card ${isCompleted ? 'completed' : ''}`}>
             <div className="course-icon">{course.icon}</div>
@@ -18,12 +18,12 @@ const CourseCard = ({ course, isCompleted, onStart }) => {
                             ✅ Concluído
                         </div>
                         <Button variant="secondary" onClick={() => onStart(course.id)} className="retake-btn">
-                            Refazer Treinamento
+                            Revisar Treinamento
                         </Button>
                     </div>
                 ) : (
-                    <Button variant="primary" onClick={() => onStart(course.id)}>
-                        Iniciar Treinamento
+                    <Button variant={isInProgress ? "success" : "primary"} onClick={() => onStart(course.id)}>
+                        {isInProgress ? 'Continuar Assistindo ➡️' : 'Iniciar Treinamento'}
                     </Button>
                 )}
             </div>

@@ -1,0 +1,189 @@
+/* CandidatesCRM.css */
+.crm-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.crm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 1rem;
+}
+
+.crm-header h2 {
+    font-size: 1.5rem;
+    color: white;
+    margin: 0;
+}
+
+.kanban-board {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 1.5rem;
+    min-height: 60vh;
+    align-items: flex-start;
+    padding-right: 2rem;
+    /* Creates breathing room on the very right */
+}
+
+.kanban-column {
+    flex: 0 0 320px;
+    /* Wider columns */
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+}
+
+.column-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.column-header .badge {
+    background: var(--primary);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.kanban-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.candidate-card {
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.candidate-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.candidate-card.dragging {
+    opacity: 0.5;
+    border: 2px dashed var(--primary);
+    transform: scale(0.98);
+    cursor: grabbing;
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.card-top h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: white;
+}
+
+.card-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    font-size: 1rem;
+}
+
+.card-actions button:hover {
+    opacity: 1;
+}
+
+.cand-role {
+    font-size: 0.85rem;
+    color: var(--primary-light);
+    margin: 0 0 0.5rem 0;
+    font-weight: 500;
+}
+
+.cand-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.5rem;
+    border-radius: 6px;
+}
+
+.cv-link {
+    display: inline-block;
+    font-size: 0.85rem;
+    color: var(--accent);
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    background: rgba(34, 197, 94, 0.1);
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+}
+
+.cv-link:hover {
+    text-decoration: underline;
+}
+
+.cand-notes {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-style: italic;
+}
+
+.cand-date {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-align: right;
+    margin-top: 0.8rem;
+    opacity: 0.7;
+}
+
+.crm-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}

@@ -23,8 +23,6 @@ const AvatarBalloons = ({ balloons, instruction, onComplete }) => {
     const handleNext = () => {
         if (currentIndex < balloons.length - 1) {
             setCurrentIndex(prev => prev + 1);
-        } else {
-            onComplete();
         }
     };
 
@@ -69,9 +67,11 @@ const AvatarBalloons = ({ balloons, instruction, onComplete }) => {
                             </div>
                             <div className="speech-footer">
                                 <span className="step-counter">Princípio {currentIndex + 1} de {balloons.length}</span>
-                                <Button onClick={handleNext} variant="primary">
-                                    {currentIndex === balloons.length - 1 ? 'Concluir Mentoria ✔️' : 'Próximo ➡️'}
-                                </Button>
+                                {currentIndex < balloons.length - 1 && (
+                                    <Button onClick={handleNext} variant="primary">
+                                        Próximo ➡️
+                                    </Button>
+                                )}
                             </div>
                         </motion.div>
                     </AnimatePresence>

@@ -25,6 +25,7 @@
     width: 100%;
     border-collapse: collapse;
     text-align: left;
+    table-layout: fixed;
 }
 
 .admin-table th,
@@ -42,11 +43,43 @@
     letter-spacing: 0.05em;
 }
 
+/* Dynamic column widths for the 5-column layout */
+.admin-table th:nth-child(1),
+.admin-table td:nth-child(1) {
+    width: 45%;
+}
+
+.admin-table th:nth-child(2),
+.admin-table td:nth-child(2) {
+    width: 16%;
+}
+
+.admin-table th:nth-child(3),
+.admin-table td:nth-child(3) {
+    width: 12%;
+}
+
+.admin-table th:nth-child(4),
+.admin-table td:nth-child(4) {
+    width: 14%;
+}
+
+.admin-table th:nth-child(5),
+.admin-table td:nth-child(5) {
+    width: 13%;
+}
+
 .course-cell-title {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     font-weight: 500;
+}
+
+.course-name-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .course-table-icon {
@@ -64,6 +97,13 @@
     padding: 0.25rem 0.6rem;
     border-radius: 12px;
     font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.tag-more {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    cursor: help;
 }
 
 .status-badge {
@@ -85,13 +125,69 @@
     border: 1px solid rgba(234, 179, 8, 0.3);
 }
 
-.edit-btn {
-    padding: 0.5rem 1rem !important;
-    font-size: 0.85rem;
-}
-
 .empty-state {
     text-align: center;
     padding: 3rem;
     color: var(--text-secondary);
+}
+
+.order-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-right: 0.75rem;
+}
+
+.order-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.order-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.order-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+.icon-btn-edit,
+.icon-btn-delete {
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn-edit {
+    color: var(--text-secondary);
+}
+
+.icon-btn-edit:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.icon-btn-delete {
+    color: var(--text-secondary);
+}
+
+.icon-btn-delete:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
 }

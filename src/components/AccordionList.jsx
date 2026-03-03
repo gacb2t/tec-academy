@@ -100,11 +100,6 @@ const AccordionList = ({ items, instruction, onComplete }) => {
                 })}
             </div>
 
-            <div className="module-actions" style={{ justifyContent: 'center', marginTop: '2.5rem' }}>
-                <Button onClick={onComplete} variant="primary" disabled={!allChecked}>
-                    {allChecked ? 'Continuar Treinamento ➡️' : `Leia ${items.length - checkedItems.length} item(ns) pendente(s)`}
-                </Button>
-            </div>
         </div>
     );
 };

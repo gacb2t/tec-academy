@@ -3,10 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Button from './Button';
 import './SwipeCards.css';
 
-const SwipeCards = ({ cards, instruction, onComplete }) => {
+const SwipeCards = ({ cards, instruction, onComplete, onNextStep }) => {
     // Reverse the array so [0] is drawn last (on top)
     const [stack, setStack] = useState([...cards].reverse());
     const [results, setResults] = useState([]);
+    const [attempts, setAttempts] = useState(1);
+
+    React.useEffect(() => {
+        if (results.length === cards.length) {
+            handleFinish();
+        }
+    }, [results, cards.length]);
 
     const handleAnswer = (direction, isCorrect) => {
         const isRightSwipe = direction === 'right'; // Verdade
@@ -19,8 +26,20 @@ const SwipeCards = ({ cards, instruction, onComplete }) => {
     const handleFinish = () => {
         const correctCount = results.filter(r => r).length;
         const passed = correctCount === cards.length;
-        onComplete(passed, `Acertou ${correctCount} de ${cards.length} no Swipe`);
+        if (passed) {
+            onComplete(true, `Acertou ${correctCount} de ${cards.length} no Swipe`, attempts);
+        }
     };
+
+    const handleRetry = () => {
+        setAttempts(prev => prev + 1);
+        setStack([...cards].reverse());
+        setResults([]);
+    };
+
+    const handleContinue = () => {
+        if (onNextStep) onNextStep();
+    }
 
     return (
         <div className="swipecards-container slide-enter">
@@ -84,11 +103,15 @@ const SwipeCards = ({ cards, instruction, onComplete }) => {
                     </>
                 ) : (
                     <div className="swipecards-end">
-                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎉</div>
-                        <h3>Você concluiu as Cartas!</h3>
-                        <p>Total de Acertos: {results.filter(r => r).length} de {cards.length}</p>
-                        <br />
-                        <Button onClick={handleFinish} variant="primary">Avançar ➡️</Button>
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{results.filter(r => r).length === cards.length ? '🎉' : '⚠️'}</div>
+                        <h3>{results.filter(r => r).length === cards.length ? 'Você concluiu as Cartas!' : 'Atenção ao Risco!'}</h3>
+                        <p style={{ marginBottom: '1.5rem' }}>Total de Acertos: {results.filter(r => r).length} de {cards.length}</p>
+
+                        {results.filter(r => r).length === cards.length ? (
+                            <Button variant="success" onClick={handleContinue}>Continuar Etapa</Button>
+                        ) : (
+                            <Button variant="outline" style={{ borderColor: '#ef4444', color: '#ef4444' }} onClick={handleRetry}>🔁 Refazer Cartas</Button>
+                        )}
                     </div>
                 )}
             </div>

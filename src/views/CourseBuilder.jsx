@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { GripVertical, X, Plus, Save, ArrowLeft, Settings, Layers, Image, Type, PlaySquare, HelpCircle, AlignLeft, Trash2, AlertTriangle, Edit3 } from 'lucide-react';
+import { GripVertical, X, Plus, Save, ArrowLeft, Settings, Layers, Image, Type, PlaySquare, HelpCircle, AlignLeft, Trash2, AlertTriangle, Edit3, List, GitCommit, Globe, MessageCircle, GripHorizontal, MoveVertical } from 'lucide-react';
 import Button from '../components/Button';
 import { supabase } from '../services/supabaseClient';
 import './CourseBuilder.css';
@@ -12,7 +12,13 @@ const MODULE_TEMPLATES = [
     { type: 'myth_truth', title: 'Mito ou Verdade', icon: <AlertTriangle size={18} />, defaultQuestion: 'Afirmação...', defaultIsTruth: true, defaultExplanation: 'Explicação do porquê...' },
     { type: 'open_question', title: 'Questão Descritiva', icon: <Type size={18} />, defaultContext: '', defaultQuestion: 'O que você achou disso?' },
     { type: 'advanced_form', title: 'Formulário / Landing Page', icon: <Edit3 size={18} />, defaultTitle: 'Solicitação de Acesso', defaultFields: [{ id: `fld_${Date.now()}`, label: 'Seu Email Corporativo', type: 'text', required: true }] },
-    { type: 'carousel', title: 'Carrossel de Slides', icon: <Image size={18} />, defaultSlides: [{ title: 'Slide 1', text: '' }] },
+    { type: 'carousel', title: 'Carrossel de Slides', icon: <Image size={18} />, defaultSlides: [{ id: `sld_${Date.now()}`, title: 'Slide 1', text: '' }] },
+    { type: 'accordion', title: 'Acordeão', icon: <List size={18} />, defaultInstruction: 'Clique nos itens para ler as regras.', defaultItems: [{ id: `acc_${Date.now()}`, icon: '📌', title: 'Item 1', content: 'Descrição do item...' }] },
+    { type: 'timeline', title: 'Linha do Tempo', icon: <GitCommit size={18} />, defaultInstruction: 'Acompanhe a ordem:', defaultSteps: [{ id: `tml_${Date.now()}`, title: 'Passo 1', description: 'O que acontece aqui', imageUrl: '' }] },
+    { type: 'webhook_form', title: 'Formulário Automático', icon: <Globe size={18} />, defaultInstruction: 'Preencha os dados abaixo:', defaultWebhookUrl: 'https://hook.us2.make.com/...' },
+    { type: 'avatar_balloons', title: 'Balões Interativos', icon: <MessageCircle size={18} />, defaultInstruction: 'Avance os cards para interagir.', defaultAvatarUrl: '', defaultBalloons: [{ id: `bal_${Date.now()}`, icon: '💡', title: 'Princípio 1', content: 'Descrição...' }] },
+    { type: 'swipecards', title: 'Cartões Deslizantes', icon: <GripHorizontal size={18} />, defaultInstruction: 'Arraste as cartas para responder.', defaultCards: [{ id: `swp_${Date.now()}`, text: 'Afirmação...', correctIsRight: true, explanation: 'Justificativa...' }] },
+    { type: 'drag_drop_sort', title: 'Desafio de Ordenação', icon: <MoveVertical size={18} />, defaultInstruction: 'Ordene do MAIOR para o MENOR:', defaultStepsList: ['Item A', 'Item B', 'Item C'] },
 ];
 
 const CourseBuilder = ({ courseId, onViewChange }) => {
@@ -384,6 +390,219 @@ const CourseBuilder = ({ courseId, onViewChange }) => {
                             <input className="clean-input" value={activeBlock.question || ''} onChange={e => updateActiveBlock({ question: e.target.value })} />
                         </div>
                     </>
+                )}
+
+                {activeBlock.type === 'webhook_form' && (
+                    <>
+                        <div className="prop-group">
+                            <label>Instrução / Contexto</label>
+                            <textarea className="clean-input" rows="2" value={activeBlock.defaultInstruction || ''} onChange={e => updateActiveBlock({ defaultInstruction: e.target.value })} />
+                        </div>
+                        <div className="prop-group">
+                            <label>URL do Webhook (ex: Make/Zapier)</label>
+                            <input className="clean-input" value={activeBlock.defaultWebhookUrl || ''} onChange={e => updateActiveBlock({ defaultWebhookUrl: e.target.value })} placeholder="https://hook.us2.make.com/..." />
+                        </div>
+                    </>
+                )}
+
+                {activeBlock.type === 'accordion' && (
+                    <div className="prop-group">
+                        <div className="prop-group" style={{ marginBottom: '1rem' }}>
+                            <label>Instrução Geral</label>
+                            <input className="clean-input" value={activeBlock.defaultInstruction || ''} onChange={e => updateActiveBlock({ defaultInstruction: e.target.value })} />
+                        </div>
+                        <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            Itens do Acordeão
+                            <span className="add-opt-btn" onClick={() => {
+                                const newItems = [...(activeBlock.defaultItems || []), { id: `acc_${Date.now()}`, icon: '📌', title: 'Novo Item', content: '' }];
+                                updateActiveBlock({ defaultItems: newItems });
+                            }}>+ Item</span>
+                        </label>
+                        <div className="options-list">
+                            {(activeBlock.defaultItems || []).map((item, index) => (
+                                <div key={item.id} className="option-edit-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '0.5rem', background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderLeft: '3px solid var(--primary)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>ITEM {index + 1}</span>
+                                        <button className="del-btn" onClick={() => updateActiveBlock({ defaultItems: activeBlock.defaultItems.filter(i => i.id !== item.id) })}><X size={14} /></button>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <input className="clean-input" style={{ padding: '0.5rem', width: '60px', textAlign: 'center' }} value={item.icon} onChange={e => {
+                                            const updated = activeBlock.defaultItems.map(i => i.id === item.id ? { ...i, icon: e.target.value } : i);
+                                            updateActiveBlock({ defaultItems: updated });
+                                        }} placeholder="Ícone" />
+                                        <input className="clean-input" style={{ padding: '0.5rem', flex: 1 }} value={item.title} onChange={e => {
+                                            const updated = activeBlock.defaultItems.map(i => i.id === item.id ? { ...i, title: e.target.value } : i);
+                                            updateActiveBlock({ defaultItems: updated });
+                                        }} placeholder="Título do Item" />
+                                    </div>
+                                    <textarea className="clean-input" rows="2" style={{ padding: '0.5rem' }} value={item.content} onChange={e => {
+                                        const updated = activeBlock.defaultItems.map(i => i.id === item.id ? { ...i, content: e.target.value } : i);
+                                        updateActiveBlock({ defaultItems: updated });
+                                    }} placeholder="Conteúdo do texto explicativo..." />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {activeBlock.type === 'timeline' && (
+                    <div className="prop-group">
+                        <div className="prop-group" style={{ marginBottom: '1rem' }}>
+                            <label>Contexto / Instrução</label>
+                            <input className="clean-input" value={activeBlock.defaultInstruction || ''} onChange={e => updateActiveBlock({ defaultInstruction: e.target.value })} />
+                        </div>
+                        <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            Passos da Linha do Tempo
+                            <span className="add-opt-btn" onClick={() => {
+                                const newSteps = [...(activeBlock.defaultSteps || []), { id: `tml_${Date.now()}`, title: 'Novo Passo', description: '', imageUrl: '' }];
+                                updateActiveBlock({ defaultSteps: newSteps });
+                            }}>+ Passo</span>
+                        </label>
+                        <div className="options-list">
+                            {(activeBlock.defaultSteps || []).map((step, index) => (
+                                <div key={step.id} className="option-edit-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '0.5rem', background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderLeft: '3px solid var(--accent)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>PASSO {index + 1}</span>
+                                        <button className="del-btn" onClick={() => updateActiveBlock({ defaultSteps: activeBlock.defaultSteps.filter(s => s.id !== step.id) })}><X size={14} /></button>
+                                    </div>
+                                    <input className="clean-input" style={{ padding: '0.5rem' }} value={step.title} onChange={e => {
+                                        const updated = activeBlock.defaultSteps.map(s => s.id === step.id ? { ...s, title: e.target.value } : s);
+                                        updateActiveBlock({ defaultSteps: updated });
+                                    }} placeholder="Título do Passo" />
+                                    <textarea className="clean-input" rows="2" style={{ padding: '0.5rem' }} value={step.description} onChange={e => {
+                                        const updated = activeBlock.defaultSteps.map(s => s.id === step.id ? { ...s, description: e.target.value } : s);
+                                        updateActiveBlock({ defaultSteps: updated });
+                                    }} placeholder="Descrição do que acontece..." />
+                                    <input className="clean-input" style={{ padding: '0.5rem' }} value={step.imageUrl || ''} onChange={e => {
+                                        const updated = activeBlock.defaultSteps.map(s => s.id === step.id ? { ...s, imageUrl: e.target.value } : s);
+                                        updateActiveBlock({ defaultSteps: updated });
+                                    }} placeholder="URL da Imagem de Fundo (Opcional)" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {activeBlock.type === 'avatar_balloons' && (
+                    <div className="prop-group">
+                        <div className="prop-group" style={{ marginBottom: '1rem' }}>
+                            <label>Contexto / Instrução</label>
+                            <input className="clean-input" value={activeBlock.defaultInstruction || ''} onChange={e => updateActiveBlock({ defaultInstruction: e.target.value })} />
+
+                            <label style={{ marginTop: '1rem' }}>URL do Avatar (Imagem)</label>
+                            <input className="clean-input" value={activeBlock.defaultAvatarUrl || ''} onChange={e => updateActiveBlock({ defaultAvatarUrl: e.target.value })} placeholder="Deixe em branco para o padrão..." />
+                        </div>
+                        <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            Balões de Fala
+                            <span className="add-opt-btn" onClick={() => {
+                                const newBalloons = [...(activeBlock.defaultBalloons || []), { id: `bal_${Date.now()}`, icon: '💬', title: 'Novo Balão', content: '' }];
+                                updateActiveBlock({ defaultBalloons: newBalloons });
+                            }}>+ Balão</span>
+                        </label>
+                        <div className="options-list">
+                            {(activeBlock.defaultBalloons || []).map((balloon, index) => (
+                                <div key={balloon.id} className="option-edit-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '0.5rem', background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderLeft: '3px solid #8b5cf6' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>BALÃO {index + 1}</span>
+                                        <button className="del-btn" onClick={() => updateActiveBlock({ defaultBalloons: activeBlock.defaultBalloons.filter(b => b.id !== balloon.id) })}><X size={14} /></button>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <input className="clean-input" style={{ padding: '0.5rem', width: '60px', textAlign: 'center' }} value={balloon.icon} onChange={e => {
+                                            const updated = activeBlock.defaultBalloons.map(b => b.id === balloon.id ? { ...b, icon: e.target.value } : b);
+                                            updateActiveBlock({ defaultBalloons: updated });
+                                        }} placeholder="Ícone" />
+                                        <input className="clean-input" style={{ padding: '0.5rem', flex: 1 }} value={balloon.title} onChange={e => {
+                                            const updated = activeBlock.defaultBalloons.map(b => b.id === balloon.id ? { ...b, title: e.target.value } : b);
+                                            updateActiveBlock({ defaultBalloons: updated });
+                                        }} placeholder="Título Menor" />
+                                    </div>
+                                    <textarea className="clean-input" rows="2" style={{ padding: '0.5rem' }} value={balloon.content} onChange={e => {
+                                        const updated = activeBlock.defaultBalloons.map(b => b.id === balloon.id ? { ...b, content: e.target.value } : b);
+                                        updateActiveBlock({ defaultBalloons: updated });
+                                    }} placeholder="Texto longo falado..." />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {activeBlock.type === 'swipecards' && (
+                    <div className="prop-group">
+                        <div className="prop-group" style={{ marginBottom: '1rem' }}>
+                            <label>Instrução Inicial</label>
+                            <input className="clean-input" value={activeBlock.defaultInstruction || ''} onChange={e => updateActiveBlock({ defaultInstruction: e.target.value })} />
+                        </div>
+                        <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            Cartas (Deslizar Dir/Esq)
+                            <span className="add-opt-btn" onClick={() => {
+                                const newCards = [...(activeBlock.defaultCards || []), { id: `swp_${Date.now()}`, text: 'Nova carta...', correctIsRight: true, explanation: '' }];
+                                updateActiveBlock({ defaultCards: newCards });
+                            }}>+ Carta</span>
+                        </label>
+                        <div className="options-list">
+                            {(activeBlock.defaultCards || []).map((card, index) => (
+                                <div key={card.id} className="option-edit-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '0.5rem', background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderLeft: '3px solid #f59e0b' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>CARTA {index + 1}</span>
+                                        <button className="del-btn" onClick={() => updateActiveBlock({ defaultCards: activeBlock.defaultCards.filter(c => c.id !== card.id) })}><X size={14} /></button>
+                                    </div>
+                                    <textarea className="clean-input" rows="2" style={{ padding: '0.5rem' }} value={card.text} onChange={e => {
+                                        const updated = activeBlock.defaultCards.map(c => c.id === card.id ? { ...c, text: e.target.value } : c);
+                                        updateActiveBlock({ defaultCards: updated });
+                                    }} placeholder="Texto/Afirmação da carta..." />
+
+                                    <select className="clean-input" style={{ padding: '0.5rem' }} value={card.correctIsRight ? 'true' : 'false'} onChange={e => {
+                                        const updated = activeBlock.defaultCards.map(c => c.id === card.id ? { ...c, correctIsRight: e.target.value === 'true' } : c);
+                                        updateActiveBlock({ defaultCards: updated });
+                                    }}>
+                                        <option value="true">Gabarito: 👉 Direita (Verdade)</option>
+                                        <option value="false">Gabarito: 👈 Esquerda (Mito)</option>
+                                    </select>
+
+                                    <textarea className="clean-input" rows="2" style={{ padding: '0.5rem' }} value={card.explanation || ''} onChange={e => {
+                                        const updated = activeBlock.defaultCards.map(c => c.id === card.id ? { ...c, explanation: e.target.value } : c);
+                                        updateActiveBlock({ defaultCards: updated });
+                                    }} placeholder="Explicação/Feedback..." />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {activeBlock.type === 'drag_drop_sort' && (
+                    <div className="prop-group">
+                        <div className="prop-group" style={{ marginBottom: '1rem' }}>
+                            <label>Instrução do Desafio</label>
+                            <input className="clean-input" value={activeBlock.defaultInstruction || ''} onChange={e => updateActiveBlock({ defaultInstruction: e.target.value })} />
+                            <div className="warning-box" style={{ marginTop: '0.5rem', fontSize: '0.75rem', padding: '0.5rem' }}>A ordem que você definir aqui será considerada o gabarito.</div>
+                        </div>
+                        <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            Itens a Ordenar
+                            <span className="add-opt-btn" onClick={() => {
+                                const newSteps = [...(activeBlock.defaultStepsList || []), 'Novo item...'];
+                                updateActiveBlock({ defaultStepsList: newSteps });
+                            }}>+ Item</span>
+                        </label>
+                        <div className="options-list">
+                            {(activeBlock.defaultStepsList || []).map((stepTxt, index) => (
+                                <div key={`dd_${index}`} className="option-edit-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '0.5rem', background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderLeft: '3px solid #10b981' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>POSIÇÃO CORRETA {index + 1}</span>
+                                        <button className="del-btn" onClick={() => {
+                                            const updated = [...activeBlock.defaultStepsList];
+                                            updated.splice(index, 1);
+                                            updateActiveBlock({ defaultStepsList: updated });
+                                        }}><X size={14} /></button>
+                                    </div>
+                                    <textarea className="clean-input" rows="2" style={{ padding: '0.5rem' }} value={stepTxt} onChange={e => {
+                                        const updated = [...activeBlock.defaultStepsList];
+                                        updated[index] = e.target.value;
+                                        updateActiveBlock({ defaultStepsList: updated });
+                                    }} placeholder="Texto..." />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 )}
 
                 {activeBlock.type === 'carousel' && (

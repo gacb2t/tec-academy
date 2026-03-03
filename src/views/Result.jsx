@@ -59,20 +59,43 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
             try {
                 const percentage = Math.round((score / totalQuestions) * 100) || 0;
 
-                // 1. Save Progress Summary (upsert ensures no duplicate completions if they take it again)
-                const { data: progressRow, error: progressErr } = await supabase
+                // 1. Save Progress Summary (Bypass upsert constraint error with manual check)
+                const { data: existingProgress } = await supabase
                     .from('course_progress')
-                    .upsert({
-                        user_id: clerkUser.id,
-                        course_id: courseId,
-                        score: score,
-                        total_questions: totalQuestions,
-                        percentage: percentage
-                    }, { onConflict: 'user_id, course_id' })
                     .select('id')
-                    .single();
+                    .eq('user_id', clerkUser.id)
+                    .eq('course_id', courseId)
+                    .maybeSingle();
 
-                if (progressErr) throw progressErr;
+                let progressRow;
+                if (existingProgress) {
+                    const { data, error: progressErr } = await supabase
+                        .from('course_progress')
+                        .update({
+                            score: score,
+                            total_questions: totalQuestions,
+                            percentage: percentage
+                        })
+                        .eq('id', existingProgress.id)
+                        .select('id')
+                        .single();
+                    if (progressErr) throw progressErr;
+                    progressRow = data;
+                } else {
+                    const { data, error: progressErr } = await supabase
+                        .from('course_progress')
+                        .insert({
+                            user_id: clerkUser.id,
+                            course_id: courseId,
+                            score: score,
+                            total_questions: totalQuestions,
+                            percentage: percentage
+                        })
+                        .select('id')
+                        .single();
+                    if (progressErr) throw progressErr;
+                    progressRow = data;
+                }
 
                 // 2. Save individual answers tied to that progress id for Excel exports
                 if (progressRow && allAnswers.length > 0) {
@@ -130,8 +153,7 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
         saveToDatabase();
     }, [clerkUser.id, courseId, score, totalQuestions, allAnswers]);
 
-    const percentage = Math.round((score / totalQuestions) * 100) || 0;
-    const isApproved = percentage >= 90;
+    const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 
     return (
         <div className="result-view scale-in">
@@ -148,24 +170,20 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
                 a 15.9155 15.9155 0 0 1 0 31.831
                 a 15.9155 15.9155 0 0 1 0 -31.831"
                         />
-                        <path className={`circle ${!isApproved ? 'failed-circle' : ''}`}
+                        <path className="circle"
                             strokeDasharray={`${percentage}, 100`}
                             d="M18 2.0845
                 a 15.9155 15.9155 0 0 1 0 31.831
                 a 15.9155 15.9155 0 0 1 0 -31.831"
                         />
-                        <text x="18" y="20.35" className={`percentage ${!isApproved ? 'failed-text' : ''}`}>{percentage}%</text>
+                        <text x="18" y="20.35" className="percentage">{percentage}%</text>
                     </svg>
                 </div>
 
                 <div className="score-details">
                     <h3>Sua Pontuação</h3>
-                    <p>Você acertou <strong>{score}</strong> de <strong>{totalQuestions}</strong> questões.</p>
-                    {isApproved ? (
-                        <div className="perfect-badge">🌟 Treinamento Aprovado!</div>
-                    ) : (
-                        <div className="failed-badge" style={{ color: 'var(--danger, #ef4444)', fontWeight: 'bold', marginTop: '1rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem 1rem', borderRadius: '8px' }}>❌ Mínimo de 90% não atingido no momento.</div>
-                    )}
+                    <p>Você acertou <strong>{score}</strong> de <strong>{totalQuestions}</strong> questões possíveis.</p>
+                    <div className="perfect-badge">🌟 Treinamento Aprovado!</div>
                 </div>
             </div>
 
@@ -220,12 +238,7 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
             </div>
 
             <div className="result-actions" style={{ gap: '1rem', display: 'flex', justifyContent: 'center' }}>
-                {!isApproved && (
-                    <Button onClick={onRetry} variant="primary" style={{ background: 'transparent', border: '1px solid var(--danger, #ef4444)', color: 'var(--danger, #ef4444)' }}>
-                        Refazer Curso
-                    </Button>
-                )}
-                <Button onClick={onToHome} variant={isApproved ? "primary" : "secondary"}>
+                <Button onClick={onToHome} variant="primary">
                     Voltar ao Dashboard
                 </Button>
             </div>

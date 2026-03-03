@@ -27,11 +27,6 @@ const Timeline = ({ steps, onComplete }) => {
                 ))}
             </div>
 
-            <div className="timeline-actions">
-                <Button onClick={onComplete} variant="primary">
-                    Entendido ➡️
-                </Button>
-            </div>
         </div>
     );
 };

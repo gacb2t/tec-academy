@@ -9,7 +9,8 @@ export const courseService = {
         let query = supabase
             .from('courses')
             .select('*')
-            .eq('status', 'Published');
+            .eq('status', 'Published')
+            .order('order_index', { ascending: true });
 
         const { data: courses, error } = await query;
 
@@ -86,5 +87,26 @@ export const courseService = {
 
         if (error) throw error;
         return true;
+    },
+
+    /**
+     * Update the order index of multiple courses at once (Admin only)
+     */
+    async updateCourseOrder(coursesData) {
+        // coursesData should be an array of objects: { id: '...', order_index: 0 }
+        try {
+            const updatePromises = coursesData.map(course =>
+                supabase
+                    .from('courses')
+                    .update({ order_index: course.order_index })
+                    .eq('id', course.id)
+            );
+
+            await Promise.all(updatePromises);
+            return true;
+        } catch (error) {
+            console.error('Error updating course order:', error);
+            throw error;
+        }
     }
 };

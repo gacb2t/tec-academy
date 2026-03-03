@@ -7,16 +7,27 @@ import ScenarioSimulator from '../components/ScenarioSimulator';
 import Button from '../components/Button';
 import Carousel from '../components/Carousel';
 import OpenQuestion from '../components/OpenQuestion';
+import AccordionList from '../components/AccordionList';
+import AvatarBalloons from '../components/AvatarBalloons';
+import DragDropSort from '../components/DragDropSort';
+import SwipeCards from '../components/SwipeCards';
+import Timeline from '../components/Timeline';
+import WebhookForm from '../components/WebhookForm';
+import MythTruthCard from '../components/MythTruthCard';
 import { courseService } from '../services/courseService';
+import { supabase } from '../services/supabaseClient';
+import { useUser } from '@clerk/clerk-react';
 import './Training.css';
 
 const Training = ({ courseId, onComplete, onAbort }) => {
+    const { user: clerkUser } = useUser();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [score, setScore] = useState(0);
     const [allAnswers, setAllAnswers] = useState([]);
     const [animationKey, setAnimationKey] = useState(0);
 
     const rootRef = useRef(null);
+    const answeredRef = useRef(new Set());
     const [videoTimer, setVideoTimer] = useState(0);
     const [videoCanProceed, setVideoCanProceed] = useState(true);
 
@@ -28,6 +39,20 @@ const Training = ({ courseId, onComplete, onAbort }) => {
             try {
                 const data = await courseService.getCourseById(courseId);
                 setCourse(data);
+
+                // Check for existing progress to resume
+                if (clerkUser) {
+                    const { data: progressRow } = await supabase
+                        .from('course_progress')
+                        .select('current_step')
+                        .eq('user_id', clerkUser.id)
+                        .eq('course_id', courseId)
+                        .maybeSingle();
+
+                    if (progressRow && progressRow.current_step && progressRow.current_step > 0 && progressRow.current_step < (data.modules?.length || 0)) {
+                        setCurrentIndex(progressRow.current_step);
+                    }
+                }
             } catch (error) {
                 console.error("Failed to load course details:", error);
             } finally {
@@ -38,15 +63,21 @@ const Training = ({ courseId, onComplete, onAbort }) => {
         if (courseId) {
             fetchCourse();
         }
-    }, [courseId]);
+    }, [courseId, clerkUser]);
 
     useEffect(() => {
         if (!course) return;
         const currentModule = course.modules?.[currentIndex];
 
-        if (currentModule && currentModule.type === 'video' && currentModule.requireDelay) {
+        if (!currentModule) return;
+
+        // Suporte para versão plana antiga e versão aninhada nova
+        const blocks = currentModule.blocks ? currentModule.blocks : [currentModule];
+        const videoBlock = blocks.find(b => b.type === 'video' && b.requireDelay);
+
+        if (videoBlock) {
             setVideoCanProceed(false);
-            setVideoTimer(currentModule.requireDelay);
+            setVideoTimer(videoBlock.requireDelay);
         } else {
             setVideoCanProceed(true);
             setVideoTimer(0);
@@ -70,10 +101,13 @@ const Training = ({ courseId, onComplete, onAbort }) => {
     // Safety check: Prevent crashing if the course has no modules yet
     const trainingModules = course.modules || [];
 
-    // Calculate actual scorable questions to grade later (safe now)
-    const totalQuestions = trainingModules.filter(m =>
-        m.type === 'quiz' || m.type === 'scenario' || m.type === 'swipecards' || m.type === 'drag_drop_sort'
-    ).length;
+    // Calculate actual scorable questions to grade later (safe now, supports nested blocks and flat)
+    const totalQuestions = trainingModules.reduce((total, m) => {
+        const blocks = m.blocks ? m.blocks : [m];
+        return total + blocks.filter(b =>
+            b.type === 'quiz' || b.type === 'scenario' || b.type === 'swipecards' || b.type === 'drag_drop_sort' || b.type === 'open_question' || b.type === 'advanced_form'
+        ).length;
+    }, 0);
 
     if (trainingModules.length === 0) {
         return (
@@ -90,6 +124,11 @@ const Training = ({ courseId, onComplete, onAbort }) => {
     const currentStep = trainingModules[currentIndex];
     const totalSteps = trainingModules.length;
 
+    // Extract actual blocks to render (handle new nested and old flat formats)
+    const isFlat = currentStep && currentStep.type !== undefined && !currentStep.blocks;
+    const blocksToRender = isFlat ? [currentStep] : (currentStep?.blocks || []);
+    const stepTitle = isFlat ? null : currentStep?.title;
+
     // Check if step is complete (all interactive blocks handled)
     const canAdvanceStep = () => {
         // Find blocks that require interaction to proceed (quizzes, videos with delays, forms)
@@ -98,7 +137,7 @@ const Training = ({ courseId, onComplete, onAbort }) => {
         return true;
     };
 
-    const handleNextStep = (overrideScore, overrideAnswers) => {
+    const handleNextStep = async (overrideScore, overrideAnswers) => {
         const finalScore = typeof overrideScore === 'number' ? overrideScore : score;
         const finalAnswers = Array.isArray(overrideAnswers) ? overrideAnswers : allAnswers;
 
@@ -107,8 +146,35 @@ const Training = ({ courseId, onComplete, onAbort }) => {
         }
 
         if (currentIndex < totalSteps - 1) {
-            setCurrentIndex(prev => prev + 1);
+            const nextIdx = currentIndex + 1;
+            setCurrentIndex(nextIdx);
             setAnimationKey(prev => prev + 1);
+
+            // Auto-save checkpoint
+            if (clerkUser) {
+                try {
+                    const { data: existingProgress } = await supabase
+                        .from('course_progress')
+                        .select('id')
+                        .eq('user_id', clerkUser.id)
+                        .eq('course_id', courseId)
+                        .maybeSingle();
+
+                    if (existingProgress) {
+                        await supabase.from('course_progress').update({ current_step: nextIdx }).eq('id', existingProgress.id);
+                    } else {
+                        await supabase.from('course_progress').insert({
+                            user_id: clerkUser.id,
+                            course_id: courseId,
+                            current_step: nextIdx,
+                            score: 0,
+                            total_questions: totalQuestions,
+                            percentage: 0
+                        });
+                    }
+                } catch (err) { console.error("Checkpoint error:", err); }
+            }
+
         } else {
             const finalPercentage = totalQuestions > 0 ? (finalScore / totalQuestions) : 0;
             if (finalPercentage >= 0.9) {
@@ -120,24 +186,31 @@ const Training = ({ courseId, onComplete, onAbort }) => {
         }
     };
 
-    const recordAnswer = (isCorrect, answerText, questionText) => {
-        const newAnswerObj = { question: questionText, answer: answerText, correct: isCorrect };
-        const newAnswersList = [...allAnswers, newAnswerObj];
-        const newCalculatedScore = isCorrect ? score + 1 : score;
-        setAllAnswers(newAnswersList);
-        setScore(newCalculatedScore);
-        return { newCalculatedScore, newAnswersList };
+    const recordAnswer = (isCorrect, answerText, questionText, attempts = 1) => {
+        if (answeredRef.current.has(questionText)) return { newCalculatedScore: score, newAnswersList: allAnswers };
+        answeredRef.current.add(questionText);
+
+        const newAnswerObj = { question: questionText, answer: answerText, correct: isCorrect, attempts };
+        setAllAnswers(prev => [...prev, newAnswerObj]);
+
+        let newScore = score;
+        if (isCorrect) {
+            setScore(prev => {
+                newScore = prev + 1;
+                return newScore;
+            });
+        }
+
+        return { newCalculatedScore: newScore, newAnswersList: [...allAnswers, newAnswerObj] };
     };
 
     // Component-level handlers just record the answer but don't force-advance the entire page anymore
-    const handleQuizAnswer = (option, questionText) => {
-        recordAnswer(option.isCorrect, option.text, questionText);
+    const handleQuizAnswer = (option, questionText, attempts) => {
+        recordAnswer(option.isCorrect, option.text, questionText, attempts);
     };
 
-    const handleMythTruthAnswer = (isTruth, correctIsTruth, explanation, blockTitle) => {
-        const isCorrect = isTruth === correctIsTruth;
-        recordAnswer(isCorrect, isTruth ? 'Mito' : 'Verdade', blockTitle);
-        return isCorrect;
+    const handleMythTruthAnswer = (isCorrect, answerText, questionText, attempts) => {
+        recordAnswer(isCorrect, answerText, questionText, attempts);
     };
 
     const handleOpenQuestionComplete = (answerText, questionText) => {
@@ -184,6 +257,18 @@ const Training = ({ courseId, onComplete, onAbort }) => {
                         <Carousel slides={block.slides} onComplete={() => { }} />
                     </div>
                 );
+            case 'scenario':
+                return (
+                    <div key={block._id} className="scenario-module block-wrapper">
+                        <ScenarioSimulator
+                            context={block.context}
+                            question={block.question}
+                            options={block.options}
+                            onComplete={(isCorrect, answerText) => recordAnswer(isCorrect, answerText, block.title || block.question)}
+                            onNextStep={handleNextStep}
+                        />
+                    </div>
+                );
             case 'myth_truth':
                 return (
                     <div key={block._id} className="myth-module block-wrapper" style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -216,14 +301,70 @@ const Training = ({ courseId, onComplete, onAbort }) => {
                                 <div key={f.id} style={{ marginBottom: '1rem', display: 'flex', flexDirection: 'column' }}>
                                     <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>{f.label} {f.required && <span style={{ color: '#ef4444' }}>*</span>}</label>
                                     {f.type === 'textarea' ? (
-                                        <textarea name={f.label} required={f.required} rows={3} style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '0.75rem', borderRadius: '6px' }} />
+                                        <textarea name={f.label} required={f.required} rows={3} style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '0.75rem', borderRadius: '6px', width: '100%' }} />
+                                    ) : f.type === 'date' ? (
+                                        <input
+                                            type="text"
+                                            name={f.label}
+                                            required={f.required}
+                                            placeholder="DD/MM/AAAA"
+                                            maxLength="10"
+                                            onChange={(e) => {
+                                                let v = e.target.value.replace(/\D/g, '');
+                                                if (v.length > 8) v = v.slice(0, 8);
+                                                if (v.length >= 5) {
+                                                    e.target.value = `${v.slice(0, 2)}/${v.slice(2, 4)}/${v.slice(4)}`;
+                                                } else if (v.length >= 3) {
+                                                    e.target.value = `${v.slice(0, 2)}/${v.slice(2)}`;
+                                                } else {
+                                                    e.target.value = v;
+                                                }
+                                            }}
+                                            style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '0.75rem', borderRadius: '6px', width: '100%' }}
+                                        />
                                     ) : (
-                                        <input type={f.type} name={f.label} required={f.required} style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '0.75rem', borderRadius: '6px' }} />
+                                        <input type={f.type} name={f.label} required={f.required} style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '0.75rem', borderRadius: '6px', width: '100%' }} />
                                     )}
                                 </div>
                             ))}
                             <Button variant="primary" style={{ width: '100%', marginTop: '1rem' }}>Enviar Respostas</Button>
                         </form>
+                    </div>
+                );
+            case 'accordion':
+                return (
+                    <div key={block._id} className="accordion-module block-wrapper">
+                        <AccordionList title={block.title} instruction={block.defaultInstruction || block.instruction} items={block.defaultItems || block.items} />
+                    </div>
+                );
+            case 'timeline':
+                return (
+                    <div key={block._id} className="timeline-module block-wrapper">
+                        <Timeline title={block.title} instruction={block.defaultInstruction || block.instruction} steps={block.defaultSteps || block.steps} />
+                    </div>
+                );
+            case 'webhook_form':
+                return (
+                    <div key={block._id} className="webhook-module block-wrapper">
+                        <WebhookForm title={block.title} instruction={block.defaultInstruction || block.instruction} webhookUrl={block.defaultWebhookUrl || block.webhookUrl} />
+                    </div>
+                );
+            case 'avatar_balloons':
+                return (
+                    <div key={block._id} className="avatar-module block-wrapper">
+                        <AvatarBalloons title={block.title} instruction={block.defaultInstruction || block.instruction} avatarUrl={block.defaultAvatarUrl || block.avatarUrl} balloons={block.defaultBalloons || block.balloons} />
+                    </div>
+                );
+            case 'swipecards':
+                return (
+                    <div key={block._id} className="swipecard-module block-wrapper">
+                        <SwipeCards title={block.title} instruction={block.defaultInstruction || block.instruction} cards={block.defaultCards || block.cards} onComplete={(success, text, att) => recordAnswer(success, text, block.title || 'Mito/Verdade', att)} onNextStep={handleNextStep} />
+                    </div>
+                );
+            case 'drag_drop_sort':
+                return (
+                    <div key={block._id} className="drag-module block-wrapper">
+                        <DragDropSort title={block.title} instruction={block.defaultInstruction || block.instruction} steps={block.defaultStepsList || block.steps} onComplete={(success, att) => recordAnswer(success, 'Ordenação Concluída', block.title || 'Desafio de Lógica', att)} onNextStep={handleNextStep} />
                     </div>
                 );
             default:
@@ -244,16 +385,18 @@ const Training = ({ courseId, onComplete, onAbort }) => {
             <div className="training-body" key={animationKey}>
                 <div className="step-page-container slide-enter" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', width: '100%', maxWidth: '800px', margin: '0 auto' }}>
                     {/* Render Title of Step if exists */}
-                    {currentStep.title && <h2 className="step-main-title" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '1rem' }}>{currentStep.title}</h2>}
+                    {stepTitle && <h2 className="step-main-title" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '1rem' }}>{stepTitle}</h2>}
 
                     {/* Render all blocks stacked vertically */}
-                    {currentStep.blocks?.map((block, index) => renderBlock(block, index))}
+                    {blocksToRender.map((block, index) => renderBlock(block, index))}
 
-                    <div className="step-actions" style={{ display: 'flex', justifyContent: 'center', marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                        <Button onClick={handleNextStep} variant="primary" disabled={!canAdvanceStep()}>
-                            {currentIndex === totalSteps - 1 ? 'Concluir Treinamento 🏆' : 'Continuar para a Próxima Etapa ➡️'}
-                        </Button>
-                    </div>
+                    {!blocksToRender.some(b => ['scenario', 'quiz', 'carousel', 'myth_truth', 'swipecards', 'drag_drop_sort'].includes(b.type)) && (
+                        <div className="step-actions" style={{ display: 'flex', justifyContent: 'center', marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                            <Button onClick={handleNextStep} variant="primary" disabled={!canAdvanceStep()}>
+                                {currentIndex === totalSteps - 1 ? 'Concluir Treinamento 🏆' : 'Continuar para a Próxima Etapa ➡️'}
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

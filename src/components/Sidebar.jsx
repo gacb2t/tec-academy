@@ -126,14 +126,23 @@ const Sidebar = ({ currentView, onViewChange, department, onDepartmentChange }) 
 
                 {/* Hardcoded Admin check for MVP */}
                 {user?.primaryEmailAddress?.emailAddress === 'gac.b2t@gmail.com' && (
-                    <button
-                        className={`nav-item ${currentView === 'admin' ? 'active' : ''}`}
-                        onClick={() => onViewChange('admin')}
-                        style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}
-                    >
-                        <span className="nav-icon">⚙️</span>
-                        Administração
-                    </button>
+                    <>
+                        <button
+                            className={`nav-item ${currentView === 'rh' ? 'active' : ''}`}
+                            onClick={() => onViewChange('rh')}
+                            style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}
+                        >
+                            <span className="nav-icon">👥</span>
+                            RH
+                        </button>
+                        <button
+                            className={`nav-item ${currentView === 'admin' ? 'active' : ''}`}
+                            onClick={() => onViewChange('admin')}
+                        >
+                            <span className="nav-icon">⚙️</span>
+                            Administração
+                        </button>
+                    </>
                 )}
             </nav>
 

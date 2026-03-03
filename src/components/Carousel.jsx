@@ -2,14 +2,15 @@ import { useState } from 'react';
 import Button from './Button';
 import './Carousel.css';
 
-const Carousel = ({ slides, onComplete }) => {
+const Carousel = ({ slides, onComplete, onNextStep }) => {
     const [currentSlide, setCurrentSlide] = useState(0);
 
     const handleNext = () => {
         if (currentSlide < slides.length - 1) {
             setCurrentSlide(prev => prev + 1);
-        } else {
-            onComplete();
+        } else if (onNextStep) {
+            onComplete && onComplete();
+            onNextStep();
         }
     };
 
@@ -53,8 +54,8 @@ const Carousel = ({ slides, onComplete }) => {
                     ← Anterior
                 </button>
 
-                <Button onClick={handleNext} variant="primary">
-                    {currentSlide < slides.length - 1 ? 'Próximo →' : 'Concluir Leitura ➡️'}
+                <Button onClick={handleNext} variant={currentSlide === slides.length - 1 ? "success" : "primary"}>
+                    {currentSlide === slides.length - 1 ? 'Concluir Etapa ✅' : 'Próximo →'}
                 </Button>
             </div>
         </div>

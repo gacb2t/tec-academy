@@ -3,10 +3,11 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import Button from './Button';
 import './DragDropSort.css';
 
-const DragDropSort = ({ instruction, steps, onComplete }) => {
+const DragDropSort = ({ instruction, steps, onComplete, onNextStep }) => {
     const [items, setItems] = useState([]);
     const [isCorrect, setIsCorrect] = useState(false);
     const [hasChecked, setHasChecked] = useState(false);
+    const [attempts, setAttempts] = useState(1);
 
     // Initialize items with a shuffled version of the correct steps
     useEffect(() => {
@@ -59,10 +60,16 @@ const DragDropSort = ({ instruction, steps, onComplete }) => {
         if (isOrderCorrect) {
             // Wait a sec to show success state before proceeding completely
             setTimeout(() => {
-                onComplete();
+                onComplete(true, attempts);
             }, 1000);
+        } else {
+            setAttempts(prev => prev + 1);
         }
     };
+
+    const handleContinue = () => {
+        if (onNextStep) onNextStep();
+    }
 
     return (
         <div className="drag-drop-container">
@@ -111,13 +118,21 @@ const DragDropSort = ({ instruction, steps, onComplete }) => {
             )}
 
             <div className="action-area">
-                <Button
-                    variant="primary"
-                    onClick={handleCheckOrder}
-                    disabled={isCorrect} // Disable button once correct
-                >
-                    {isCorrect ? 'Validado ✔️' : 'Verificar Ordem'}
-                </Button>
+                {!isCorrect ? (
+                    <Button
+                        variant="primary"
+                        onClick={handleCheckOrder}
+                    >
+                        Verificar Ordem
+                    </Button>
+                ) : (
+                    <Button
+                        variant="success"
+                        onClick={handleContinue}
+                    >
+                        Continuar Etapa
+                    </Button>
+                )}
             </div>
         </div>
     );

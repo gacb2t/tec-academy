@@ -8,6 +8,7 @@ import Training from './views/Training';
 import Result from './views/Result';
 import AdminDashboard from './views/AdminDashboard';
 import CourseBuilder from './views/CourseBuilder';
+import RHDashboard from './views/RHDashboard';
 import Sidebar from './components/Sidebar';
 import './App.css';
 
@@ -24,7 +25,8 @@ function App() {
   // Results & Tracking
   const [recentResult, setRecentResult] = useState(null);
   const [userProgress, setUserProgress] = useState({
-    completedCourses: []
+    completedCourses: [],
+    inProgressCourses: []
   });
 
   // Load user specific data from Supabase on mount or authentication
@@ -66,7 +68,7 @@ function App() {
       } else {
         // Reset state if logged out
         setDepartment('');
-        setUserProgress({ completedCourses: [] });
+        setUserProgress({ completedCourses: [], inProgressCourses: [] });
       }
     }
 
@@ -172,7 +174,7 @@ function App() {
       )}
 
       <main className={`app-main-content ${currentView === 'course-builder' ? 'full-bleed' : ''}`}>
-        <div className={`content-wrapper ${currentView === 'course-builder' ? 'full-bleed' : 'glass-panel'}`}>
+        <div className={`content-wrapper ${currentView === 'course-builder' || currentView === 'rh' ? 'full-bleed' : 'glass-panel'}`}>
           {currentView === 'home' && (
             <HomeDashboard user={userData} progress={userProgress} onStartCourse={handleStartCourse} />
           )}
@@ -201,6 +203,10 @@ function App() {
             <AdminDashboard
               onViewChange={handleAdminViewChange}
             />
+          )}
+
+          {currentView === 'rh' && (
+            <RHDashboard />
           )}
 
           {currentView === 'course-builder' && (

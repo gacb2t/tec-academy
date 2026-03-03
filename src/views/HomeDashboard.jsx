@@ -60,14 +60,31 @@ const HomeDashboard = ({ user, progress, onStartCourse }) => {
             <div className="dashboard-section">
                 <h2 className="section-title">Meus Treinamentos</h2>
                 <div className="courses-list">
-                    {availableCourses.map(course => (
-                        <CourseCard
-                            key={course.id}
-                            course={course}
-                            isCompleted={progress.completedCourses.includes(course.id)}
-                            onStart={onStartCourse}
-                        />
-                    ))}
+                    {/* Render pending courses first */}
+                    {availableCourses
+                        .filter(course => !progress.completedCourses.includes(course.id))
+                        .sort((a, b) => a.title.localeCompare(b.title))
+                        .map(course => (
+                            <CourseCard
+                                key={course.id}
+                                course={course}
+                                isCompleted={false}
+                                isInProgress={progress.inProgressCourses?.includes(course.id)}
+                                onStart={onStartCourse}
+                            />
+                        ))}
+                    {/* Render completed courses last */}
+                    {availableCourses
+                        .filter(course => progress.completedCourses.includes(course.id))
+                        .sort((a, b) => a.title.localeCompare(b.title))
+                        .map(course => (
+                            <CourseCard
+                                key={course.id}
+                                course={course}
+                                isCompleted={true}
+                                onStart={onStartCourse}
+                            />
+                        ))}
                 </div>
             </div>
 

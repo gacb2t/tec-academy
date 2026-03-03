@@ -65,8 +65,10 @@
 
 .content-wrapper.full-bleed {
   max-width: 100%;
-  padding: 0;
+  padding: 2rem;
   margin: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 /* Base keyframes for page transitions */

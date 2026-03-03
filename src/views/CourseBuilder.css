@@ -163,6 +163,11 @@
     border-color: var(--primary);
 }
 
+.clean-input option {
+    background-color: #0f172a;
+    color: white;
+}
+
 .steps-list {
     display: flex;
     flex-direction: column;

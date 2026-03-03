@@ -49,6 +49,17 @@
     color: white;
 }
 
+.btn-danger {
+    background-color: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+    box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4), 0 4px 6px -2px rgba(239, 68, 68, 0.2);
+    transform: translateY(-2px);
+}
+
 .btn-glow {
     position: absolute;
     top: 0;
