@@ -1,9 +1,27 @@
-import { getAvailableCourses } from '../data/coursesData';
+import { useState, useEffect } from 'react';
+import { courseService } from '../services/courseService';
 import CourseCard from '../components/CourseCard';
 import './HomeDashboard.css';
 
-const HomeDashboard = ({ user, progress, onStartCourse }) => {
-    const availableCourses = getAvailableCourses(user.department);
+const HomeDashboard = ({ user, progress, onStartCourse, onRestartCourse }) => {
+    const [availableCourses, setAvailableCourses] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                const courses = await courseService.getAvailableCourses(user.department);
+                setAvailableCourses(courses);
+            } catch (error) {
+                console.error("Failed to load courses:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchCourses();
+    }, [user.department]);
+
     // Filter completed courses to ensure we only count active, existing courses
     const validCompletedCourses = progress.completedCourses.filter(courseId =>
         availableCourses.some(c => c.id === courseId)
@@ -14,6 +32,10 @@ const HomeDashboard = ({ user, progress, onStartCourse }) => {
     const overallPercentage = availableCourses.length > 0
         ? Math.round((completedCount / availableCourses.length) * 100)
         : 0;
+
+    if (isLoading) {
+        return <div className="loading-screen" style={{ height: '100%', minHeight: '300px' }}>Carregando treinamentos...</div>;
+    }
 
     return (
         <div className="home-dashboard fade-in">
@@ -38,14 +60,32 @@ const HomeDashboard = ({ user, progress, onStartCourse }) => {
             <div className="dashboard-section">
                 <h2 className="section-title">Meus Treinamentos</h2>
                 <div className="courses-list">
-                    {availableCourses.map(course => (
-                        <CourseCard
-                            key={course.id}
-                            course={course}
-                            isCompleted={progress.completedCourses.includes(course.id)}
-                            onStart={onStartCourse}
-                        />
-                    ))}
+                    {/* Render pending courses first */}
+                    {availableCourses
+                        .filter(course => !progress.completedCourses.includes(course.id))
+                        .map(course => (
+                            <CourseCard
+                                key={course.id}
+                                course={course}
+                                isCompleted={false}
+                                isInProgress={progress.inProgressCourses?.includes(course.id)}
+                                onStart={onStartCourse}
+                                onRestart={onRestartCourse}
+                            />
+                        ))}
+                    {/* Render completed courses last */}
+                    {availableCourses
+                        .filter(course => progress.completedCourses.includes(course.id))
+                        .sort((a, b) => a.title.localeCompare(b.title))
+                        .map(course => (
+                            <CourseCard
+                                key={course.id}
+                                course={course}
+                                isCompleted={true}
+                                onStart={onStartCourse}
+                                onRestart={onRestartCourse}
+                            />
+                        ))}
                 </div>
             </div>
 

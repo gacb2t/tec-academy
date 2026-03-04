@@ -4,7 +4,7 @@ import { CheckCircle2, Circle, ChevronDown, ChevronUp } from 'lucide-react';
 import Button from './Button';
 import './AccordionList.css';
 
-const AccordionList = ({ items, instruction, onComplete }) => {
+const AccordionList = ({ items, instruction, onComplete, onNextStep }) => {
     const [openIndex, setOpenIndex] = useState(0); // auto-open the first one
     const [readItems, setReadItems] = useState([0]); // track what is currently unlocked
     const [checkedItems, setCheckedItems] = useState([]); // track what has been marked as 'lido'
@@ -99,12 +99,13 @@ const AccordionList = ({ items, instruction, onComplete }) => {
                     );
                 })}
             </div>
-
-            <div className="module-actions" style={{ justifyContent: 'center', marginTop: '2.5rem' }}>
-                <Button onClick={onComplete} variant="primary" disabled={!allChecked}>
-                    {allChecked ? 'Continuar Treinamento ➡️' : `Leia ${items.length - checkedItems.length} item(ns) pendente(s)`}
-                </Button>
-            </div>
+            {allChecked && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
+                    <Button variant="primary" onClick={() => { onComplete && onComplete(); onNextStep && onNextStep(); }}>
+                        Continuar para a Próxima Etapa ➡️
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };

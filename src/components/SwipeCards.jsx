@@ -3,14 +3,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Button from './Button';
 import './SwipeCards.css';
 
-const SwipeCards = ({ cards, instruction, onComplete }) => {
+const SwipeCards = ({ cards, instruction, onComplete, onNextStep }) => {
     // Reverse the array so [0] is drawn last (on top)
     const [stack, setStack] = useState([...cards].reverse());
     const [results, setResults] = useState([]);
+    const [attempts, setAttempts] = useState(1);
 
-    const handleAnswer = (direction, isCorrect) => {
+    React.useEffect(() => {
+        if (results.length === cards.length) {
+            handleFinish();
+        }
+    }, [results, cards.length]);
+
+    const handleAnswer = (direction, card) => {
         const isRightSwipe = direction === 'right'; // Verdade
-        const earnedPoint = isRightSwipe === isCorrect;
+        // Suporta 'correctIsRight' (explícito) ou 'isCorrect' (true = Verdade = direita)
+        const correctIsRight = card.correctIsRight !== undefined ? card.correctIsRight : card.isCorrect;
+        const earnedPoint = isRightSwipe === correctIsRight;
 
         setResults(prev => [...prev, earnedPoint]);
         setStack(prev => prev.slice(0, prev.length - 1));
@@ -19,8 +28,20 @@ const SwipeCards = ({ cards, instruction, onComplete }) => {
     const handleFinish = () => {
         const correctCount = results.filter(r => r).length;
         const passed = correctCount === cards.length;
-        onComplete(passed, `Acertou ${correctCount} de ${cards.length} no Swipe`);
+        if (passed) {
+            onComplete(true, `Acertou ${correctCount} de ${cards.length} no Swipe`, attempts);
+        }
     };
+
+    const handleRetry = () => {
+        setAttempts(prev => prev + 1);
+        setStack([...cards].reverse());
+        setResults([]);
+    };
+
+    const handleContinue = () => {
+        if (onNextStep) onNextStep();
+    }
 
     return (
         <div className="swipecards-container slide-enter">
@@ -49,11 +70,9 @@ const SwipeCards = ({ cards, instruction, onComplete }) => {
                                             dragConstraints={{ left: 0, right: 0 }}
                                             onDragEnd={(e, { offset }) => {
                                                 if (offset.x > 100) {
-                                                    // Swiped Right -> Verdade
-                                                    handleAnswer('right', card.correctIsRight);
+                                                    handleAnswer('right', card);
                                                 } else if (offset.x < -100) {
-                                                    // Swiped Left -> Mito
-                                                    handleAnswer('left', card.correctIsRight);
+                                                    handleAnswer('left', card);
                                                 }
                                             }}
                                             whileDrag={{ scale: 1.05, cursor: 'grabbing' }}
@@ -70,13 +89,13 @@ const SwipeCards = ({ cards, instruction, onComplete }) => {
                         <div className="swipe-actions">
                             <button
                                 className="swipe-btn mito-btn"
-                                onClick={() => handleAnswer('left', stack[stack.length - 1].correctIsRight)}
+                                onClick={() => handleAnswer('left', stack[stack.length - 1])}
                             >
                                 👈 MITO
                             </button>
                             <button
                                 className="swipe-btn verdade-btn"
-                                onClick={() => handleAnswer('right', stack[stack.length - 1].correctIsRight)}
+                                onClick={() => handleAnswer('right', stack[stack.length - 1])}
                             >
                                 VERDADE 👉
                             </button>
@@ -84,11 +103,15 @@ const SwipeCards = ({ cards, instruction, onComplete }) => {
                     </>
                 ) : (
                     <div className="swipecards-end">
-                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎉</div>
-                        <h3>Você concluiu as Cartas!</h3>
-                        <p>Total de Acertos: {results.filter(r => r).length} de {cards.length}</p>
-                        <br />
-                        <Button onClick={handleFinish} variant="primary">Avançar ➡️</Button>
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{results.filter(r => r).length === cards.length ? '🎉' : '⚠️'}</div>
+                        <h3>{results.filter(r => r).length === cards.length ? 'Você concluiu as Cartas!' : 'Atenção ao Risco!'}</h3>
+                        <p style={{ marginBottom: '1.5rem' }}>Total de Acertos: {results.filter(r => r).length} de {cards.length}</p>
+
+                        {results.filter(r => r).length === cards.length ? (
+                            <Button variant="success" onClick={handleContinue}>Continuar Etapa</Button>
+                        ) : (
+                            <Button variant="outline" style={{ borderColor: '#ef4444', color: '#ef4444' }} onClick={handleRetry}>🔁 Refazer Cartas</Button>
+                        )}
                     </div>
                 )}
             </div>

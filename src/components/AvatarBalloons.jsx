@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Button from './Button';
 import './AvatarBalloons.css';
 
-const AvatarBalloons = ({ balloons, instruction, onComplete }) => {
+const AvatarBalloons = ({ balloons, instruction, onComplete, onNextStep }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     // 3 stages of avatar
@@ -24,7 +24,8 @@ const AvatarBalloons = ({ balloons, instruction, onComplete }) => {
         if (currentIndex < balloons.length - 1) {
             setCurrentIndex(prev => prev + 1);
         } else {
-            onComplete();
+            onComplete && onComplete();
+            onNextStep && onNextStep();
         }
     };
 
@@ -70,7 +71,7 @@ const AvatarBalloons = ({ balloons, instruction, onComplete }) => {
                             <div className="speech-footer">
                                 <span className="step-counter">Princípio {currentIndex + 1} de {balloons.length}</span>
                                 <Button onClick={handleNext} variant="primary">
-                                    {currentIndex === balloons.length - 1 ? 'Concluir Mentoria ✔️' : 'Próximo ➡️'}
+                                    {currentIndex < balloons.length - 1 ? 'Próximo ➡️' : 'Concluir Etapa ✅'}
                                 </Button>
                             </div>
                         </motion.div>

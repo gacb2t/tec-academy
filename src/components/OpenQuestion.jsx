@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Button from './Button';
 import './OpenQuestion.css';
 
-const OpenQuestion = ({ context, question, onComplete }) => {
+const OpenQuestion = ({ context, question, onComplete, onNextStep }) => {
     const [answer, setAnswer] = useState('');
 
     const handleSubmit = () => {
@@ -10,8 +10,8 @@ const OpenQuestion = ({ context, question, onComplete }) => {
             alert('Por favor, escreva uma resposta um pouco mais detalhada (mínimo 10 caracteres).');
             return;
         }
-        // Descriptive questions don't have "correctness", but we can mark it as true for completion sake
         onComplete(true, answer);
+        onNextStep && onNextStep();
     };
 
     return (

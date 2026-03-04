@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../services/supabaseClient';
 import Button from '../components/Button';
@@ -7,6 +7,7 @@ import './Result.css';
 const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, onRetry }) => {
     const { user: clerkUser } = useUser();
     const [status, setStatus] = useState('sending'); // sending, success, error
+    const hasSavedRef = useRef(false); // StrictMode guard — prevents double-save
 
     // Evaluation State
     const [rating, setRating] = useState(0);
@@ -55,24 +56,66 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
     };
 
     useEffect(() => {
+        if (hasSavedRef.current) return; // StrictMode: skip double-fire
+        hasSavedRef.current = true;
+
         async function saveToDatabase() {
             try {
                 const percentage = Math.round((score / totalQuestions) * 100) || 0;
 
-                // 1. Save Progress Summary (upsert ensures no duplicate completions if they take it again)
-                const { data: progressRow, error: progressErr } = await supabase
+                // 1. Save Progress Summary (Bypass upsert constraint error with manual check)
+                const { data: existingProgress } = await supabase
                     .from('course_progress')
-                    .upsert({
-                        user_id: clerkUser.id,
-                        course_id: courseId,
-                        score: score,
-                        total_questions: totalQuestions,
-                        percentage: percentage
-                    }, { onConflict: 'user_id, course_id' })
                     .select('id')
-                    .single();
+                    .eq('user_id', clerkUser.id)
+                    .eq('course_id', courseId)
+                    .maybeSingle();
 
-                if (progressErr) throw progressErr;
+                let progressRow;
+                if (existingProgress) {
+                    const { data, error: progressErr } = await supabase
+                        .from('course_progress')
+                        .update({
+                            score: score,
+                            total_questions: totalQuestions,
+                            percentage: percentage
+                        })
+                        .eq('id', existingProgress.id)
+                        .select('id')
+                        .single();
+                    if (progressErr) throw progressErr;
+                    progressRow = data;
+                } else {
+                    const { data, error: progressErr } = await supabase
+                        .from('course_progress')
+                        .insert({
+                            user_id: clerkUser.id,
+                            course_id: courseId,
+                            score: score,
+                            total_questions: totalQuestions,
+                            percentage: percentage
+                        })
+                        .select('id')
+                        .single();
+                    if (progressErr) throw progressErr;
+                    progressRow = data;
+                }
+
+                // Record this completion in the history table (never deleted on restart)
+                const { error: historyErr } = await supabase.from('course_completion_history').insert({
+                    user_id: clerkUser.id,
+                    course_id: courseId,
+                    score: score,
+                    total_questions: totalQuestions,
+                    percentage: percentage,
+                    answers: allAnswers.map(a => ({
+                        question: a.question,
+                        answer: a.answer,
+                        correct: a.correct,
+                        attempts: a.attempts || 1
+                    }))
+                });
+                if (historyErr) console.error('Erro ao salvar histórico de conclusão:', historyErr);
 
                 // 2. Save individual answers tied to that progress id for Excel exports
                 if (progressRow && allAnswers.length > 0) {
@@ -87,7 +130,8 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
                         progress_id: progressRow.id,
                         question_text: ans.question,
                         answer_text: ans.answer,
-                        is_correct: ans.correct
+                        is_correct: ans.correct,
+                        attempts: ans.attempts || 1
                     }));
 
                     const { error: answersErr } = await supabase
@@ -130,8 +174,7 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
         saveToDatabase();
     }, [clerkUser.id, courseId, score, totalQuestions, allAnswers]);
 
-    const percentage = Math.round((score / totalQuestions) * 100) || 0;
-    const isApproved = percentage >= 90;
+    const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 
     return (
         <div className="result-view scale-in">
@@ -148,24 +191,20 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
                 a 15.9155 15.9155 0 0 1 0 31.831
                 a 15.9155 15.9155 0 0 1 0 -31.831"
                         />
-                        <path className={`circle ${!isApproved ? 'failed-circle' : ''}`}
+                        <path className="circle"
                             strokeDasharray={`${percentage}, 100`}
                             d="M18 2.0845
                 a 15.9155 15.9155 0 0 1 0 31.831
                 a 15.9155 15.9155 0 0 1 0 -31.831"
                         />
-                        <text x="18" y="20.35" className={`percentage ${!isApproved ? 'failed-text' : ''}`}>{percentage}%</text>
+                        <text x="18" y="20.35" className="percentage">{percentage}%</text>
                     </svg>
                 </div>
 
                 <div className="score-details">
                     <h3>Sua Pontuação</h3>
-                    <p>Você acertou <strong>{score}</strong> de <strong>{totalQuestions}</strong> questões.</p>
-                    {isApproved ? (
-                        <div className="perfect-badge">🌟 Treinamento Aprovado!</div>
-                    ) : (
-                        <div className="failed-badge" style={{ color: 'var(--danger, #ef4444)', fontWeight: 'bold', marginTop: '1rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem 1rem', borderRadius: '8px' }}>❌ Mínimo de 90% não atingido no momento.</div>
-                    )}
+                    <p>Você acertou <strong>{score}</strong> de <strong>{totalQuestions}</strong> questões possíveis.</p>
+                    <div className="perfect-badge">🌟 Treinamento Aprovado!</div>
                 </div>
             </div>
 
@@ -220,12 +259,7 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
             </div>
 
             <div className="result-actions" style={{ gap: '1rem', display: 'flex', justifyContent: 'center' }}>
-                {!isApproved && (
-                    <Button onClick={onRetry} variant="primary" style={{ background: 'transparent', border: '1px solid var(--danger, #ef4444)', color: 'var(--danger, #ef4444)' }}>
-                        Refazer Curso
-                    </Button>
-                )}
-                <Button onClick={onToHome} variant={isApproved ? "primary" : "secondary"}>
+                <Button onClick={onToHome} variant="primary">
                     Voltar ao Dashboard
                 </Button>
             </div>

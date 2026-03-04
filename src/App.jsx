@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from './services/supabaseClient';
 import Welcome from './views/Welcome';
@@ -6,6 +6,9 @@ import Onboarding from './views/Onboarding';
 import HomeDashboard from './views/HomeDashboard';
 import Training from './views/Training';
 import Result from './views/Result';
+import AdminDashboard from './views/AdminDashboard';
+import CourseBuilder from './views/CourseBuilder';
+import RHDashboard from './views/RHDashboard';
 import Sidebar from './components/Sidebar';
 import './App.css';
 
@@ -16,59 +19,63 @@ function App() {
   // App Global State
   const [department, setDepartment] = useState('');
   const [activeCourseId, setActiveCourseId] = useState(null);
+  const [adminEditCourseId, setAdminEditCourseId] = useState(null); // Added for the Admin Builder
   const [isFetchingData, setIsFetchingData] = useState(false);
 
   // Results & Tracking
   const [recentResult, setRecentResult] = useState(null);
   const [userProgress, setUserProgress] = useState({
-    completedCourses: []
+    completedCourses: [],
+    inProgressCourses: []
   });
 
-  // Load user specific data from Supabase on mount or authentication
-  useEffect(() => {
-    async function fetchUserData() {
-      if (isSignedIn && user) {
-        setIsFetchingData(true);
-        try {
-          // 1. Fetch Department from Profile
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('department')
-            .eq('user_id', user.id)
-            .single();
-
-          if (profile) {
-            setDepartment(profile.department);
-          }
-
-          // 2. Fetch Completed Courses
-          // We look for courses where the user achieved 70% or more
-          const { data: progressLogs } = await supabase
-            .from('course_progress')
-            .select('course_id')
-            .eq('user_id', user.id)
-            .gte('percentage', 70);
-
-          if (progressLogs && progressLogs.length > 0) {
-            // Extract just the IDs into an array
-            const courseIds = progressLogs.map(log => log.course_id);
-            setUserProgress({ completedCourses: courseIds });
-          }
-
-        } catch (error) {
-          console.error("Erro carregando dados do Supabase:", error);
-        } finally {
-          setIsFetchingData(false);
-        }
-      } else {
-        // Reset state if logged out
-        setDepartment('');
-        setUserProgress({ completedCourses: [] });
-      }
+  // Load user specific data from Supabase — extracted so it can be called on demand
+  const refreshUserProgress = useCallback(async () => {
+    if (!isSignedIn || !user) {
+      setDepartment('');
+      setUserProgress({ completedCourses: [], inProgressCourses: [] });
+      return;
     }
+    try {
+      // 1. Fetch Department from Profile
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('department')
+        .eq('user_id', user.id)
+        .single();
 
-    fetchUserData();
+      if (profile) setDepartment(profile.department);
+
+      // 2. Fetch Completed Courses (>= 70%)
+      const { data: progressLogs } = await supabase
+        .from('course_progress')
+        .select('course_id')
+        .eq('user_id', user.id)
+        .gte('percentage', 70);
+
+      const completedIds = progressLogs?.map(log => log.course_id) ?? [];
+
+      // 3. Fetch In-Progress Courses (started but not yet 70%)
+      const { data: inProgressLogs } = await supabase
+        .from('course_progress')
+        .select('course_id')
+        .eq('user_id', user.id)
+        .gt('current_step', 0)
+        .lt('percentage', 70);
+
+      const inProgressIds = inProgressLogs?.map(log => log.course_id) ?? [];
+
+      setUserProgress({ completedCourses: completedIds, inProgressCourses: inProgressIds });
+    } catch (error) {
+      console.error("Erro carregando dados do Supabase:", error);
+    }
   }, [isSignedIn, user]);
+
+  // Run on mount / login change
+  useEffect(() => {
+    setIsFetchingData(true);
+    refreshUserProgress().finally(() => setIsFetchingData(false));
+  }, [refreshUserProgress]);
 
   const handleOnboardingComplete = (selectedDept) => {
     // Already saved to DB inside Onboarding component, just update local React state
@@ -105,11 +112,38 @@ function App() {
     setActiveCourseId(null);
     setRecentResult(null);
     setCurrentView('home');
+    // Re-fetch progress so dashboard shows updated Continuar/Refazer immediately
+    refreshUserProgress();
   };
 
   const handleRetryCourse = () => {
     setRecentResult(null);
     setCurrentView('training');
+  };
+
+  const handleRestartCourse = async (courseId) => {
+    // Reset progress to 0 without deleting — preserves the row for history tracking
+    await supabase
+      .from('course_progress')
+      .update({ current_step: 0, score: 0, percentage: 0 })
+      .eq('user_id', user.id)
+      .eq('course_id', courseId);
+
+    // Remove from local progress state so dashboard shows "Iniciar Treinamento" again
+    setUserProgress(prev => ({
+      completedCourses: prev.completedCourses.filter(id => id !== courseId),
+      inProgressCourses: (prev.inProgressCourses || []).filter(id => id !== courseId)
+    }));
+
+    setActiveCourseId(courseId);
+    setCurrentView('training');
+  };
+
+  const handleAdminViewChange = (view, data = {}) => {
+    if (view === 'course-builder') {
+      setAdminEditCourseId(data.courseId);
+    }
+    setCurrentView(view);
   };
 
   if (!isLoaded) {
@@ -151,18 +185,20 @@ function App() {
   };
 
   return (
-    <div className="app-layout">
-      <Sidebar
-        currentView={currentView}
-        onViewChange={setCurrentView}
-        department={department}
-        onDepartmentChange={setDepartment}
-      />
+    <div className={`app-layout ${currentView === 'course-builder' ? 'builder-mode' : ''}`}>
+      {currentView !== 'course-builder' && (
+        <Sidebar
+          currentView={currentView}
+          onViewChange={setCurrentView}
+          department={department}
+          onDepartmentChange={setDepartment}
+        />
+      )}
 
-      <main className="app-main-content">
-        <div className="content-wrapper glass-panel">
+      <main className={`app-main-content ${currentView === 'course-builder' ? 'full-bleed' : ''}`}>
+        <div className={`content-wrapper ${currentView === 'course-builder' || currentView === 'rh' ? 'full-bleed' : 'glass-panel'}`}>
           {currentView === 'home' && (
-            <HomeDashboard user={userData} progress={userProgress} onStartCourse={handleStartCourse} />
+            <HomeDashboard user={userData} progress={userProgress} onStartCourse={handleStartCourse} onRestartCourse={handleRestartCourse} />
           )}
 
           {currentView === 'training' && activeCourseId && (
@@ -182,6 +218,23 @@ function App() {
               allAnswers={recentResult.allAnswers}
               onToHome={handleBackToHome}
               onRetry={handleRetryCourse}
+            />
+          )}
+
+          {currentView === 'admin' && (
+            <AdminDashboard
+              onViewChange={handleAdminViewChange}
+            />
+          )}
+
+          {currentView === 'rh' && (
+            <RHDashboard />
+          )}
+
+          {currentView === 'course-builder' && (
+            <CourseBuilder
+              courseId={adminEditCourseId}
+              onViewChange={handleAdminViewChange}
             />
           )}
         </div>

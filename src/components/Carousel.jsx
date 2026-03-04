@@ -2,14 +2,15 @@ import { useState } from 'react';
 import Button from './Button';
 import './Carousel.css';
 
-const Carousel = ({ slides, onComplete }) => {
+const Carousel = ({ slides, onComplete, onNextStep }) => {
     const [currentSlide, setCurrentSlide] = useState(0);
 
     const handleNext = () => {
         if (currentSlide < slides.length - 1) {
             setCurrentSlide(prev => prev + 1);
-        } else {
-            onComplete();
+        } else if (onNextStep) {
+            onComplete && onComplete();
+            onNextStep();
         }
     };
 
@@ -37,10 +38,14 @@ const Carousel = ({ slides, onComplete }) => {
                     </div>
                 )}
 
-                <h3 className="carousel-title">{slides[currentSlide].title}</h3>
-
-                <div className="carousel-text">
-                    <p dangerouslySetInnerHTML={{ __html: slides[currentSlide].text }} />
+                <div className="carousel-slide-content">
+                    <h3
+                        className="carousel-title"
+                        dangerouslySetInnerHTML={{ __html: slides[currentSlide].title }}
+                    />
+                    <div className="carousel-text">
+                        <p dangerouslySetInnerHTML={{ __html: slides[currentSlide].text }} />
+                    </div>
                 </div>
             </div>
 
@@ -54,7 +59,7 @@ const Carousel = ({ slides, onComplete }) => {
                 </button>
 
                 <Button onClick={handleNext} variant="primary">
-                    {currentSlide < slides.length - 1 ? 'Próximo →' : 'Concluir Leitura ➡️'}
+                    {currentSlide === slides.length - 1 ? 'Concluir Etapa ✅' : 'Próximo →'}
                 </Button>
             </div>
         </div>
