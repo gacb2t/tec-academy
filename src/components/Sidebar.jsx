@@ -125,7 +125,8 @@ const Sidebar = ({ currentView, onViewChange, department, onDepartmentChange }) 
                 </button>
 
                 {/* Hardcoded Admin check for MVP */}
-                {user?.primaryEmailAddress?.emailAddress === 'gac.b2t@gmail.com' && (
+                {['gac.b2t@gmail.com', 'guilherme@tecb2.com.br', 'di.guimaraes@tecb2.com.br', 'ane.caroline@tecb2.com.br'].includes(user?.primaryEmailAddress?.emailAddress) && (
+
                     <>
                         <button
                             className={`nav-item ${currentView === 'rh' ? 'active' : ''}`}
