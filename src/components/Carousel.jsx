@@ -38,10 +38,14 @@ const Carousel = ({ slides, onComplete, onNextStep }) => {
                     </div>
                 )}
 
-                <h3 className="carousel-title">{slides[currentSlide].title}</h3>
-
-                <div className="carousel-text">
-                    <p dangerouslySetInnerHTML={{ __html: slides[currentSlide].text }} />
+                <div className="carousel-slide-content">
+                    <h3
+                        className="carousel-title"
+                        dangerouslySetInnerHTML={{ __html: slides[currentSlide].title }}
+                    />
+                    <div className="carousel-text">
+                        <p dangerouslySetInnerHTML={{ __html: slides[currentSlide].text }} />
+                    </div>
                 </div>
             </div>
 

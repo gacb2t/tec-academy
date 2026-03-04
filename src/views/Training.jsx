@@ -15,6 +15,7 @@ import Timeline from '../components/Timeline';
 import WebhookForm from '../components/WebhookForm';
 import MythTruthCard from '../components/MythTruthCard';
 import TextImagePanel from '../components/TextImagePanel';
+import MatchPairs from '../components/MatchPairs';
 import { courseService } from '../services/courseService';
 import { supabase } from '../services/supabaseClient';
 import { useUser } from '@clerk/clerk-react';
@@ -108,7 +109,8 @@ const Training = ({ courseId, onComplete, onAbort }) => {
     const totalQuestions = trainingModules.reduce((total, m) => {
         const blocks = m.blocks ? m.blocks : [m];
         return total + blocks.filter(b =>
-            b.type === 'quiz' || b.type === 'scenario' || b.type === 'swipecards' || b.type === 'drag_drop_sort'
+            b.type === 'quiz' || b.type === 'scenario' || b.type === 'swipecards' || b.type === 'drag_drop_sort' || b.type === 'match_pairs'
+
         ).length;
     }, 0);
 
@@ -390,6 +392,18 @@ const Training = ({ courseId, onComplete, onAbort }) => {
                         <DragDropSort title={block.title} instruction={block.defaultInstruction || block.instruction} steps={block.defaultStepsList || block.steps} onComplete={(success, att) => recordAnswer(success, 'Ordenação Concluída', block.title || 'Desafio de Lógica', att)} onNextStep={handleNextStep} />
                     </div>
                 );
+            case 'match_pairs':
+                return (
+                    <div key={block._id} className="match-module block-wrapper">
+                        <MatchPairs
+                            title={block.title}
+                            instruction={block.instruction}
+                            pairs={block.pairs}
+                            onComplete={(att) => recordAnswer(true, 'Combinação Concluída', block.title || 'Match de Ferramentas', att)}
+                            onNextStep={handleNextStep}
+                        />
+                    </div>
+                );
             default:
                 return null;
         }
@@ -413,7 +427,7 @@ const Training = ({ courseId, onComplete, onAbort }) => {
                     {/* Render all blocks stacked vertically */}
                     {blocksToRender.map((block, index) => renderBlock(block, index))}
 
-                    {!blocksToRender.some(b => ['scenario', 'quiz', 'carousel', 'myth_truth', 'swipecards', 'drag_drop_sort', 'avatar_balloons', 'open_question', 'accordion'].includes(b.type)) && (
+                    {!blocksToRender.some(b => ['scenario', 'quiz', 'carousel', 'myth_truth', 'swipecards', 'drag_drop_sort', 'avatar_balloons', 'open_question', 'accordion', 'match_pairs'].includes(b.type)) && (
                         <div className="step-actions" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                             <Button onClick={handleNextStep} variant="primary" disabled={!canAdvanceStep()}>
                                 {!videoCanProceed && videoTimer > 0

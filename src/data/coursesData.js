@@ -467,7 +467,8 @@
                 type: 'carousel',
                 title: 'O Ecossistema de Ferramentas',
                 slides: [
-                    { title: 'Simpledesk', text: 'Nossa ferramenta oficial para comunicação com nossos clientes. Com ela, centralizamos todas as conversas do WhatsApp em uma única plataforma, facilitando o dia a dia. É de uso exclusivo para relacionamento com clientes!' },
+                    { title: 'Simpledesk', image: '/images/courses/sys_simpledesk.png', text: 'Nossa ferramenta oficial para comunicação com nossos clientes. Com ela, centralizamos todas as conversas do WhatsApp em uma única plataforma, facilitando o dia a dia. É de uso exclusivo para relacionamento com clientes!' },
+
                     { title: 'Teams', text: 'Ferramenta oficial de comunicação interna. Conecta colaboradores, celebra conquistas e compartilha conhecimento. Uso restrito ao horário de expediente.' },
                     { title: 'Microsoft 365', text: 'Acesso ao e-mail corporativo, Excel, Word e diversas outras ferramentas essenciais. Segurança e foco: nunca compartilhe sua senha!' },
                     { title: 'TIS CRM', text: 'Nosso sistema de gestão exclusivo. Gerenciamento de clientes, contratos e chamados de forma integrada. O funil de vendas deve estar sempre atualizado aqui!' },
