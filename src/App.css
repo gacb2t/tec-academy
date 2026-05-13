@@ -16,7 +16,12 @@
   animation: pulse 1.5s infinite;
 }
 
-/* Centered Layout (For Welcome and Onboarding) */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Centered Layout (Welcome e Onboarding) */
 .app-container-centered {
   width: 100%;
   height: 100vh;
@@ -26,52 +31,77 @@
   padding: 1rem;
 }
 
-/* Corporate Layout (With Sidebar) */
-.app-layout {
-  display: flex;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-}
-
-/* Padding to account for the fixed sidebar from Layout Grid */
-.app-main-content {
-  flex: 1;
-  margin-left: 280px;
-  /* matches Sidebar width */
-  padding: 2.5rem;
-  overflow-y: auto;
-  min-height: 100vh;
+/* ====================================
+   LAYOUT HOTMART — Topbar + Conteúdo
+   ==================================== */
+.app-layout-hotmart {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
 }
 
-/* Base content box inside the main area */
-.content-wrapper {
+/* Conteúdo principal abaixo da topbar */
+.app-main {
+  margin-top: 60px; /* Altura da topbar */
   flex: 1;
+  overflow-y: auto;
+  min-height: calc(100vh - 60px);
+}
+
+.app-main.full-bleed {
+  margin-top: 0;
+}
+
+/* Container para Training e Result (com padding e max-width) */
+.training-container {
   max-width: 1000px;
   margin: 0 auto;
-  width: 100%;
-  padding: 3rem;
-  display: flex;
-  flex-direction: column;
-  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  padding: 2.5rem 3rem;
+  animation: slideUpFade 0.5s ease-out;
 }
 
-/* Base keyframes for page transitions */
+/* Container para Admin */
+.admin-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 3rem;
+  animation: slideUpFade 0.5s ease-out;
+}
+
+/* Builder mode: sem topbar, fullscreen */
+.app-layout-hotmart.builder-mode .app-main {
+  margin-top: 0;
+}
+
+/* Viewer fullscreen wrapper — topbar + material viewer */
+.viewer-fullscreen-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.viewer-fullscreen-wrapper .topbar {
+  position: relative;
+}
+
+.viewer-fullscreen-wrapper .material-viewer {
+  flex: 1;
+}
+
+/* Base keyframes */
 @keyframes slideUpFade {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* Legacy general helpers from previous code */
+/* Logo brand helper (legado) */
 .logo-brand {
   font-weight: 800;
   font-size: 1.25rem;
@@ -80,4 +110,12 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .training-container,
+  .admin-container {
+    padding: 1.5rem;
+  }
 }

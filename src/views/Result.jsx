@@ -59,7 +59,17 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
             try {
                 const percentage = Math.round((score / totalQuestions) * 100) || 0;
 
-                // 1. Save Progress Summary (upsert ensures no duplicate completions if they take it again)
+                // 1. Busca o registro existente para saber quantas tentativas já aconteceram
+                const { data: existingProgress } = await supabase
+                    .from('course_progress')
+                    .select('id, attempts_count')
+                    .eq('user_id', clerkUser.id)
+                    .eq('course_id', courseId)
+                    .single();
+
+                const newAttemptsCount = (existingProgress?.attempts_count || 0) + 1;
+
+                // Salva o progresso com contador de tentativas incrementado
                 const { data: progressRow, error: progressErr } = await supabase
                     .from('course_progress')
                     .upsert({
@@ -67,7 +77,8 @@ const Result = ({ user, courseId, score, totalQuestions, allAnswers, onToHome, o
                         course_id: courseId,
                         score: score,
                         total_questions: totalQuestions,
-                        percentage: percentage
+                        percentage: percentage,
+                        attempts_count: newAttemptsCount
                     }, { onConflict: 'user_id, course_id' })
                     .select('id')
                     .single();

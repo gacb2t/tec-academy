@@ -27,14 +27,15 @@ const Onboarding = ({ onComplete }) => {
 
         if (department.trim()) {
             try {
-                // Insert profile into database
+                // Inserir perfil no banco — role sempre inicia como 'colaborador'
                 const { error: sbError } = await supabase
                     .from('user_profiles')
                     .upsert({
                         user_id: user.id,
                         name: user.fullName || user.firstName,
                         email: email,
-                        department: department
+                        department: department,
+                        role: 'colaborador'
                     });
 
                 if (sbError) throw sbError;
@@ -63,12 +64,12 @@ const Onboarding = ({ onComplete }) => {
         <div className="onboarding-view fade-in">
             <div className="onboarding-header">
                 <h2>Bem-vindo, {user?.firstName}! 👋</h2>
-                <p>Para personalizar seus treinamentos, precisamos saber de qual área você é.</p>
+                <p>Para personalizar sua experiência, selecione seu cargo na TEC-B2.</p>
             </div>
 
             <form className="onboarding-form" onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="department">Qual o seu Setor na TEC-B2?</label>
+                    <label htmlFor="department">Qual o seu cargo na TEC-B2?</label>
                     <select
                         id="department"
                         value={department}
@@ -76,15 +77,10 @@ const Onboarding = ({ onComplete }) => {
                         required
                         className="gamified-input"
                     >
-                        <option value="" disabled>Selecione seu setor...</option>
-                        <option value="Time Hunter">Time Hunter</option>
-                        <option value="Time Farm">Time Farm</option>
-                        <option value="Time NOQ">Time NOQ</option>
-                        <option value="Suporte ao Cliente">Suporte ao Cliente</option>
+                        <option value="" disabled>Selecione seu cargo...</option>
+                        <option value="Consultor de Vendas">Consultor de Vendas</option>
+                        <option value="Gestor de Equipe">Gestor de Equipe</option>
                         <option value="Administrativo">Administrativo</option>
-                        <option value="Backoffice">Backoffice</option>
-                        <option value="RH">RH</option>
-                        <option value="Tecnologia">Tecnologia</option>
                     </select>
                 </div>
 

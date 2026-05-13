@@ -1,24 +1,2 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
+﻿‣潌獧氊杯ੳ⸪潬੧灮⵭敤畢⹧潬⩧礊牡⵮敤畢⹧潬⩧礊牡⵮牥潲⹲潬⩧瀊灮⵭敤畢⹧潬⩧氊牥慮搭扥杵氮杯ਪ渊摯彥潭畤敬ੳ楤瑳搊獩⵴獳ੲ⸪潬慣੬⌊䔠楤潴⁲楤敲瑣牯敩⁳湡⁤楦敬ੳ瘮捳摯⽥ਪ⸡獶潣敤支瑸湥楳湯⹳獪湯⸊摩慥⸊卄卟潴敲⨊献潵⨊渮癴⩳⨊渮獪牰橯⨊献湬⨊献㽷⨊⸀瀀搀昀ഀ਀
 node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
