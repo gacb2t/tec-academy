@@ -3,12 +3,14 @@ import { useUser } from '@clerk/clerk-react';
 import { supabase } from './services/supabaseClient';
 import Welcome from './views/Welcome';
 import Onboarding from './views/Onboarding';
-import HomeDashboard from './views/HomeDashboard';
+import MemberArea from './views/MemberArea';
+import MaterialViewer from './views/MaterialViewer';
 import Training from './views/Training';
 import Result from './views/Result';
-import AdminDashboard from './views/AdminDashboard';
+import AdminSettings from './views/AdminSettings';
 import CourseBuilder from './views/CourseBuilder';
-import Sidebar from './components/Sidebar';
+import Topbar from './components/Topbar';
+import SideDrawer from './components/SideDrawer';
 import './App.css';
 
 function App() {
@@ -18,8 +20,12 @@ function App() {
   // App Global State
   const [department, setDepartment] = useState('');
   const [activeCourseId, setActiveCourseId] = useState(null);
-  const [adminEditCourseId, setAdminEditCourseId] = useState(null); // Added for the Admin Builder
+  const [adminEditCourseId, setAdminEditCourseId] = useState(null);
   const [isFetchingData, setIsFetchingData] = useState(false);
+  const [role, setRole] = useState(null);
+
+  // Drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Results & Tracking
   const [recentResult, setRecentResult] = useState(null);
@@ -27,34 +33,32 @@ function App() {
     completedCourses: []
   });
 
-  // Load user specific data from Supabase on mount or authentication
+  // Carregar dados do usuário do Supabase
   useEffect(() => {
     async function fetchUserData() {
       if (isSignedIn && user) {
         setIsFetchingData(true);
         try {
-          // 1. Fetch Department from Profile
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('department')
-            .eq('user_id', user.id)
-            .single();
+          const [profileResponse, progressResponse] = await Promise.all([
+            supabase
+              .from('user_profiles')
+              .select('department, role')
+              .eq('user_id', user.id)
+              .single(),
+            supabase
+              .from('course_progress')
+              .select('course_id')
+              .eq('user_id', user.id)
+              .gte('percentage', 70)
+          ]);
 
-          if (profile) {
-            setDepartment(profile.department);
+          if (profileResponse.data) {
+            setDepartment(profileResponse.data.department);
+            setRole(profileResponse.data.role || 'colaborador');
           }
 
-          // 2. Fetch Completed Courses
-          // We look for courses where the user achieved 70% or more
-          const { data: progressLogs } = await supabase
-            .from('course_progress')
-            .select('course_id')
-            .eq('user_id', user.id)
-            .gte('percentage', 70);
-
-          if (progressLogs && progressLogs.length > 0) {
-            // Extract just the IDs into an array
-            const courseIds = progressLogs.map(log => log.course_id);
+          if (progressResponse.data && progressResponse.data.length > 0) {
+            const courseIds = progressResponse.data.map(log => log.course_id);
             setUserProgress({ completedCourses: courseIds });
           }
 
@@ -64,8 +68,8 @@ function App() {
           setIsFetchingData(false);
         }
       } else {
-        // Reset state if logged out
         setDepartment('');
+        setRole(null);
         setUserProgress({ completedCourses: [] });
       }
     }
@@ -74,7 +78,6 @@ function App() {
   }, [isSignedIn, user]);
 
   const handleOnboardingComplete = (selectedDept) => {
-    // Already saved to DB inside Onboarding component, just update local React state
     setDepartment(selectedDept);
   };
 
@@ -83,12 +86,16 @@ function App() {
     setCurrentView('training');
   };
 
+  // Abrir visualizador de material (Canva embed)
+  const handleViewMaterial = (materialId) => {
+    setCurrentView('material-viewer');
+  };
+
   const handleCompleteTraining = (resultData) => {
     setRecentResult({ ...resultData, courseId: activeCourseId });
 
     const passPercentage = Math.round((resultData.score / resultData.totalQuestions) * 100) || 0;
 
-    // Award Badge locally for instant feedback (DB is handled in Result.jsx)
     if (passPercentage >= 90) {
       setUserProgress(prev => {
         const newProgress = {
@@ -122,11 +129,22 @@ function App() {
     setCurrentView(view);
   };
 
+  // Drawer toggle
+  const handleMenuToggle = () => {
+    setDrawerOpen(prev => !prev);
+  };
+
+  // Navegação pelo drawer
+  const handleDrawerNavigate = (view) => {
+    setCurrentView(view);
+  };
+
+  // Loading screen
   if (!isLoaded) {
     return <div className="loading-screen">Carregando TEC-B2 Academy...</div>;
   }
 
-  // 1. Not signed in? Show Landing Page (Welcome)
+  // 1. Não autenticado → Landing Page
   if (!isSignedIn) {
     return (
       <div className="app-container-centered">
@@ -135,7 +153,7 @@ function App() {
     );
   }
 
-  // 1.5 Still checking the database for department?
+  // 1.5 Verificando dados no banco
   if (isFetchingData) {
     return (
       <div className="loading-screen">
@@ -144,7 +162,7 @@ function App() {
     );
   }
 
-  // 2. Signed in, but no department selected? Show Onboarding
+  // 2. Autenticado sem departamento → Onboarding
   if (!department) {
     return (
       <div className="app-container-centered">
@@ -153,39 +171,71 @@ function App() {
     );
   }
 
-  // 3. Authenticated and Onboarded: Show the Corporate Dashboard Layout
+  // 3. Autenticado e onboarded → Layout Hotmart
   const userData = {
     name: user.fullName || user.firstName,
     department: department,
+    role: role,
     email: user.primaryEmailAddress?.emailAddress
   };
 
+  // Verificar se está em modo imersivo (builder ou material viewer)
+  const isBuilderMode = currentView === 'course-builder';
+  const isImmersiveMode = isBuilderMode || currentView === 'material-viewer';
+
   return (
-    <div className={`app-layout ${currentView === 'course-builder' ? 'builder-mode' : ''}`}>
-      {currentView !== 'course-builder' && (
-        <Sidebar
+    <div className={`app-layout-hotmart ${isImmersiveMode ? 'builder-mode' : ''}`}>
+      {/* Drawer lateral (abre pelo hamburger) */}
+      {!isImmersiveMode && (
+        <SideDrawer
+          isOpen={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          role={role}
+          onNavigate={handleDrawerNavigate}
           currentView={currentView}
-          onViewChange={setCurrentView}
-          department={department}
-          onDepartmentChange={setDepartment}
         />
       )}
 
-      <main className={`app-main-content ${currentView === 'course-builder' ? 'full-bleed' : ''}`}>
-        <div className={`content-wrapper ${currentView === 'course-builder' ? 'full-bleed' : 'glass-panel'}`}>
-          {currentView === 'home' && (
-            <HomeDashboard user={userData} progress={userProgress} onStartCourse={handleStartCourse} />
-          )}
+      {/* Topbar visível em todas as views exceto builder/viewer */}
+      {!isImmersiveMode && (
+        <Topbar onMenuToggle={handleMenuToggle} />
+      )}
 
-          {currentView === 'training' && activeCourseId && (
+      <main className={`app-main ${isImmersiveMode ? 'full-bleed' : ''}`}>
+        {/* Home — MemberArea estilo Hotmart */}
+        {currentView === 'home' && (
+          <MemberArea
+            user={userData}
+            progress={userProgress}
+            onStartCourse={handleStartCourse}
+            onViewMaterial={handleViewMaterial}
+          />
+        )}
+
+        {/* Material Viewer — embed Canva com sidebar */}
+        {currentView === 'material-viewer' && (
+          <div className="viewer-fullscreen-wrapper">
+            <Topbar onMenuToggle={handleMenuToggle} />
+            <MaterialViewer
+              onBack={handleBackToHome}
+            />
+          </div>
+        )}
+
+        {/* Treinamento em andamento */}
+        {currentView === 'training' && activeCourseId && (
+          <div className="training-container">
             <Training
               courseId={activeCourseId}
               onComplete={handleCompleteTraining}
               onAbort={handleBackToHome}
             />
-          )}
+          </div>
+        )}
 
-          {currentView === 'result' && recentResult && (
+        {/* Resultado do treinamento */}
+        {currentView === 'result' && recentResult && (
+          <div className="training-container">
             <Result
               user={userData}
               courseId={recentResult.courseId}
@@ -195,21 +245,24 @@ function App() {
               onToHome={handleBackToHome}
               onRetry={handleRetryCourse}
             />
-          )}
+          </div>
+        )}
 
-          {currentView === 'admin' && (
-            <AdminDashboard
-              onViewChange={handleAdminViewChange}
-            />
-          )}
+        {/* Admin Settings — Painel estilo Hotmart (admin only) */}
+        {currentView === 'admin-settings' && role === 'admin' && (
+          <AdminSettings
+            onViewChange={handleAdminViewChange}
+            onBack={handleBackToHome}
+          />
+        )}
 
-          {currentView === 'course-builder' && (
-            <CourseBuilder
-              courseId={adminEditCourseId}
-              onViewChange={handleAdminViewChange}
-            />
-          )}
-        </div>
+        {/* Course Builder — fullscreen */}
+        {currentView === 'course-builder' && (
+          <CourseBuilder
+            courseId={adminEditCourseId}
+            onViewChange={handleAdminViewChange}
+          />
+        )}
       </main>
     </div>
   );

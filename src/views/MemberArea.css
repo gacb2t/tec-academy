@@ -1,0 +1,660 @@
+/* ============================================
+   MEMBER AREA — Estilo Hotmart
+   Área de membros com hero, tabs e grid
+   ============================================ */
+
+/* —— Loading State —— */
+.member-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    gap: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.member-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.08);
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: memberSpin 0.8s linear infinite;
+}
+
+@keyframes memberSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* —— Container principal —— */
+.member-area {
+    width: 100%;
+    animation: memberFadeIn 0.5s ease-out;
+}
+
+@keyframes memberFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ============================
+   HERO BANNER
+   ============================ */
+.member-hero {
+    background: linear-gradient(135deg, #2d1b69 0%, #4a1d96 30%, #5b21b6 60%, #3b0f7a 100%);
+    padding: 3.5rem 3rem 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Padrão de fundo decorativo */
+.member-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.member-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.member-hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 3rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* —— Hero texto —— */
+.member-hero-text {
+    flex: 1;
+    max-width: 600px;
+}
+
+.member-hero-title {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.03em;
+    line-height: 1.25;
+}
+
+.member-hero-description {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    max-height: 3.3em;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    margin-bottom: 0.25rem;
+}
+
+.member-hero-description.expanded {
+    max-height: 300px;
+}
+
+.member-hero-toggle {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 1.25rem;
+    font-family: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+}
+
+.member-hero-toggle:hover {
+    color: #fff;
+}
+
+/* Progresso no hero */
+.member-hero-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.member-hero-count {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.member-hero-progress-bar {
+    flex: 1;
+    max-width: 160px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.member-hero-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00e5a0, #00d4aa);
+    border-radius: 2px;
+    transition: width 0.6s ease;
+}
+
+/* CTA Button */
+.member-hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.75rem;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.25s;
+    backdrop-filter: blur(8px);
+}
+
+.member-hero-cta:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+/* —— Hero Logo/Brand —— */
+.member-hero-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.member-hero-logo {
+    width: 180px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-logo-text {
+    font-weight: 900;
+    font-size: 2.75rem;
+    background: linear-gradient(135deg, #00e5a0 0%, #00b4d8 50%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.04em;
+    opacity: 0.85;
+}
+
+/* ============================
+   TABS
+   ============================ */
+.member-tabs-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.member-tabs {
+    display: flex;
+    gap: 0;
+}
+
+.member-tab {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.92rem;
+    font-weight: 500;
+    font-family: inherit;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.member-tab:hover {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.member-tab.active {
+    color: #fff;
+    border-bottom-color: #3b82f6;
+}
+
+/* ============================
+   CONTENT AREA (Tab Conteúdos)
+   ============================ */
+.member-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 3rem 4rem;
+}
+
+.member-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.member-content-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.member-content-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Busca inline */
+.member-search-box {
+    position: relative;
+}
+
+.member-search-input {
+    width: 220px;
+    padding: 0.55rem 0.85rem 0.55rem 2.25rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.member-search-input:focus {
+    border-color: rgba(59, 130, 246, 0.4);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.member-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.member-search-icon {
+    position: absolute;
+    left: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.25);
+    pointer-events: none;
+}
+
+/* Toggle de visualização (lista / grid) */
+.member-view-toggle {
+    display: flex;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.view-toggle-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    padding: 0.45rem 0.6rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.view-toggle-btn:first-child {
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.view-toggle-btn.active {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.view-toggle-btn:hover:not(.active) {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* ============================
+   GRID DE CURSOS
+   ============================ */
+.member-courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.member-courses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* —— Card de Curso —— */
+.member-course-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.member-course-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Thumbnail */
+.course-card-thumbnail {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.course-card-thumb-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.course-card-emoji {
+    font-size: 3rem;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.course-card-placeholder-icon {
+    color: rgba(255, 255, 255, 0.15);
+}
+
+/* Badge "Grátis" */
+.course-card-badge {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.6rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* Overlay de hover com play */
+.course-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.member-course-card:hover .course-card-overlay {
+    opacity: 1;
+}
+
+/* Info abaixo do thumbnail */
+.course-card-info {
+    padding: 0.75rem 0.25rem;
+}
+
+/* Progresso no card */
+.course-card-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.course-card-progress-bar {
+    flex: 1;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.course-card-progress-fill {
+    height: 100%;
+    background: #3b82f6;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+.course-card-progress-fill.completed {
+    background: #10b981;
+}
+
+.course-card-percentage {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #3b82f6;
+    min-width: 28px;
+}
+
+.course-card-percentage.completed {
+    color: #10b981;
+}
+
+.course-card-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* —— Lista de cursos (list mode) —— */
+.member-courses-list .member-course-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.member-courses-list .member-course-card:hover {
+    transform: none;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.member-courses-list .course-card-thumbnail {
+    width: 120px;
+    min-width: 120px;
+    aspect-ratio: 16/10;
+    border-radius: 8px;
+}
+
+.member-courses-list .course-card-info {
+    flex: 1;
+    padding: 0;
+}
+
+/* —— Estado vazio —— */
+.member-empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* ============================
+   TAB SOBRE
+   ============================ */
+.member-about {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 3rem 4rem;
+}
+
+.member-about-content h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.25rem;
+}
+
+.member-about-content p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.75;
+    margin-bottom: 1rem;
+    max-width: 650px;
+}
+
+.about-highlights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
+    margin-top: 2rem;
+}
+
+.about-highlight-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.about-highlight-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.about-highlight-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.about-highlight-card h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.35rem;
+}
+
+.about-highlight-card p {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ============================
+   RESPONSIVO
+   ============================ */
+@media (max-width: 900px) {
+    .member-hero {
+        padding: 2.5rem 1.5rem 2rem;
+    }
+
+    .member-hero-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .member-hero-text {
+        max-width: 100%;
+    }
+
+    .member-hero-progress {
+        justify-content: center;
+    }
+
+    .member-hero-brand {
+        display: none;
+    }
+
+    .member-tabs-section,
+    .member-content,
+    .member-about {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .member-content-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .member-courses-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .member-hero-title {
+        font-size: 1.4rem;
+    }
+
+    .member-courses-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .member-search-input {
+        width: 160px;
+    }
+}

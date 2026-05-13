@@ -1,0 +1,178 @@
+/* ============================================
+   TOPBAR — Barra superior estilo Hotmart
+   ============================================ */
+
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: rgba(10, 10, 15, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.25rem;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* —— Lado esquerdo: Hamburger + Logo —— */
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.topbar-menu-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.topbar-menu-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.topbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+.topbar-logo {
+    font-weight: 800;
+    font-size: 1.35rem;
+    background: linear-gradient(135deg, #00e5a0, #00b4d8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.02em;
+}
+
+/* —— Lado direito: Busca + Notificações + Avatar —— */
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.topbar-icon-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.55rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.topbar-icon-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Ponto de notificação */
+.topbar-notification-dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 7px;
+    height: 7px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 2px solid rgba(10, 10, 15, 0.92);
+}
+
+/* Busca expandível */
+.topbar-search-wrapper {
+    position: relative;
+}
+
+.topbar-search-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 300px;
+    background: rgba(20, 20, 30, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 0.5rem;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    animation: searchDropIn 0.2s ease-out;
+}
+
+@keyframes searchDropIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.topbar-search-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 0.65rem 1rem;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.topbar-search-input:focus {
+    border-color: rgba(0, 229, 160, 0.4);
+}
+
+.topbar-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Avatar */
+.topbar-avatar {
+    margin-left: 0.25rem;
+}
+
+.topbar-avatar-box {
+    width: 34px;
+    height: 34px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transition: border-color 0.2s;
+}
+
+.topbar-avatar-box:hover {
+    border-color: rgba(0, 229, 160, 0.5);
+}
+
+/* —— Responsivo —— */
+@media (max-width: 768px) {
+    .topbar {
+        padding: 0 0.75rem;
+    }
+
+    .topbar-search-dropdown {
+        width: 250px;
+    }
+}

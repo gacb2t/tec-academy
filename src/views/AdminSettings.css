@@ -1,0 +1,914 @@
+/* ============================================
+   ADMIN SETTINGS — Painel estilo Hotmart
+   ============================================ */
+
+.admin-settings {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: asFadeIn 0.4s ease-out;
+}
+
+@keyframes asFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================
+   HEADER
+   ============================ */
+.as-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.as-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.as-back-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.as-back-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.as-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.as-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.as-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.78rem;
+}
+
+.as-meta-type {
+    color: var(--text-secondary);
+}
+
+.as-meta-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+}
+
+.as-meta-badge.active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+/* Ações do header */
+.as-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.as-action-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.55rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.as-action-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================
+   TABS PRINCIPAIS
+   ============================ */
+.as-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.as-tab {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: inherit;
+    padding: 0.9rem 1.25rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.as-tab:hover {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.as-tab.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+}
+
+/* ============================
+   SUB-TABS (Conteúdo)
+   ============================ */
+.as-content-tab {
+    padding: 0 2rem;
+}
+
+.as-subtabs-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 0;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.as-subtabs {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.as-subtab {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 500;
+    font-family: inherit;
+    padding: 0.45rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.as-subtab:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.as-subtab.active {
+    background: var(--text-primary);
+    color: #0f172a;
+    border-color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Ações das sub-tabs */
+.as-subtabs-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.as-search-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.as-search-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.as-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 500;
+    font-family: inherit;
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.as-upload-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.as-create-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    padding: 0.5rem 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+
+.as-create-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+/* ============================
+   SELECIONAR TODOS
+   ============================ */
+.as-select-all-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.as-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.as-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: #3b82f6;
+    cursor: pointer;
+}
+
+.as-expand-all-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.35rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.as-expand-all-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* ============================
+   MÓDULOS (Cursos)
+   ============================ */
+.as-modules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1rem 0 2rem;
+}
+
+.as-module-group {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.as-module-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    gap: 1rem;
+}
+
+.as-module-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.as-module-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.as-module-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+}
+
+.as-module-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.as-module-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
+.as-module-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.72rem;
+}
+
+.as-module-count {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.as-module-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.as-icon-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.45rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.as-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.as-chevron {
+    transition: transform 0.3s ease;
+}
+
+.as-chevron.collapsed {
+    transform: rotate(180deg);
+}
+
+/* ============================
+   ITENS DE CONTEÚDO
+   ============================ */
+.as-module-contents {
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 0.5rem 1rem;
+}
+
+.as-content-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 0.75rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+    gap: 1rem;
+}
+
+.as-content-item:hover {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.as-content-item-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.as-drag-handle {
+    cursor: grab;
+    color: rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    padding: 0.2rem;
+    border-radius: 4px;
+    transition: color 0.2s;
+}
+
+.as-drag-handle:hover {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.as-content-type-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8b5cf6;
+    flex-shrink: 0;
+}
+
+.as-content-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.as-content-name {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.as-content-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.as-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.as-content-item-right {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-shrink: 0;
+}
+
+/* Status badges */
+.as-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.65rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.as-status-badge.published {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.as-status-badge.draft {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.as-icon-btn-sm {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.as-icon-btn-sm:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Botão adicionar */
+.as-add-content-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: none;
+    border: 1px dashed rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
+    font-size: 0.82rem;
+    font-weight: 500;
+    font-family: inherit;
+    padding: 0.55rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 0.5rem 0.75rem;
+    transition: all 0.2s;
+}
+
+.as-add-content-btn:hover {
+    background: rgba(59, 130, 246, 0.06);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+/* ============================
+   TAB USUÁRIOS
+   ============================ */
+.as-tab-content {
+    padding: 1.5rem 2rem 3rem;
+}
+
+.as-users-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.as-users-header h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.as-users-count {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+.as-users-table-wrapper {
+    overflow-x: auto;
+}
+
+.as-users-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.as-users-table thead th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.as-users-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    transition: background 0.2s;
+}
+
+.as-users-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.as-users-table td {
+    padding: 0.85rem 1rem;
+    color: var(--text-secondary);
+}
+
+.as-user-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.as-user-avatar {
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.as-user-name {
+    display: block;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.as-user-email {
+    display: block;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.as-user-id {
+    display: block;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.25);
+    font-family: monospace;
+}
+
+.as-dept-tag {
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    padding: 0.15rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+/* Select de edição de role */
+.as-role-select-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.as-role-select {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 500;
+    font-family: inherit;
+    padding: 0.3rem 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+    appearance: auto;
+}
+
+.as-role-select:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.as-role-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.as-role-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.as-role-select option {
+    background: #0f172a;
+    color: #f8fafc;
+}
+
+/* Cores por tipo de role no select */
+.as-role-select.admin {
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.08);
+}
+
+.as-role-select.gestor {
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.08);
+}
+
+/* Feedback de salvamento */
+.as-role-saving {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    animation: asPulse 1s infinite;
+    white-space: nowrap;
+}
+
+@keyframes asPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.as-role-saved {
+    font-size: 0.85rem;
+    color: #10b981;
+    font-weight: 700;
+    animation: asSavedPop 0.3s ease-out;
+}
+
+@keyframes asSavedPop {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.3); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Badge estático de role (mantido para compatibilidade) */
+.as-role-badge {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-secondary);
+    padding: 0.15rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.as-role-badge.admin {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.as-date-cell {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================
+   PLACEHOLDER TABS
+   ============================ */
+.as-placeholder-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    min-height: 300px;
+}
+
+.as-placeholder-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+}
+
+.as-placeholder-tab h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem;
+}
+
+.as-placeholder-tab p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    max-width: 420px;
+    margin: 0;
+}
+
+.as-placeholder-hint {
+    margin-top: 0.75rem !important;
+    font-size: 0.82rem !important;
+    color: rgba(255, 255, 255, 0.25) !important;
+    font-style: italic;
+}
+
+/* ============================
+   LOADING / EMPTY
+   ============================ */
+.as-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    gap: 1rem;
+    color: var(--text-secondary);
+}
+
+.as-loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(255, 255, 255, 0.06);
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: asSpinner 0.7s linear infinite;
+}
+
+@keyframes asSpinner {
+    to { transform: rotate(360deg); }
+}
+
+.as-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 3rem;
+    color: var(--text-secondary);
+}
+
+/* ============================
+   RESPONSIVO
+   ============================ */
+@media (max-width: 768px) {
+    .as-header {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .as-tabs {
+        padding: 0 1rem;
+        overflow-x: auto;
+    }
+
+    .as-tab {
+        white-space: nowrap;
+        padding: 0.75rem 0.85rem;
+        font-size: 0.82rem;
+    }
+
+    .as-content-tab {
+        padding: 0 1rem;
+    }
+
+    .as-subtabs-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .as-module-header {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .as-module-header-right {
+        align-self: flex-end;
+    }
+
+    .as-content-item-left {
+        flex-wrap: wrap;
+    }
+
+    .as-tab-content {
+        padding: 1rem;
+    }
+}

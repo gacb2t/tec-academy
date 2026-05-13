@@ -1,11 +1,18 @@
 import { supabase } from './supabaseClient';
 
+let coursesCache = null;
+let lastDepartment = null;
+
 export const courseService = {
     /**
      * Fetch all courses from the database.
      * If a department is provided, it filters the courses.
      */
-    async getAvailableCourses(department) {
+    async getAvailableCourses(department, forceRefresh = false) {
+        if (!forceRefresh && coursesCache && lastDepartment === department) {
+            return coursesCache;
+        }
+
         let query = supabase
             .from('courses')
             .select('*')
@@ -18,15 +25,18 @@ export const courseService = {
             throw error;
         }
 
-        if (!department) {
-            return courses;
+        let filteredCourses = courses;
+        if (department) {
+            // Filter logic: Return courses that are for "Todos" or for the specific department
+            filteredCourses = courses.filter((course) => {
+                const depts = course.departments || [];
+                return depts.includes('Todos') || depts.includes(department);
+            });
         }
-
-        // Filter logic: Return courses that are for "Todos" or for the specific department
-        return courses.filter((course) => {
-            const depts = course.departments || [];
-            return depts.includes('Todos') || depts.includes(department);
-        });
+        
+        coursesCache = filteredCourses;
+        lastDepartment = department;
+        return filteredCourses;
     },
 
     /**
@@ -61,6 +71,7 @@ export const courseService = {
                 .single();
 
             if (error) throw error;
+            coursesCache = null; // Invalidate cache
             return data;
         } else {
             // Create new
@@ -71,6 +82,7 @@ export const courseService = {
                 .single();
 
             if (error) throw error;
+            coursesCache = null; // Invalidate cache
             return data;
         }
     },
@@ -85,6 +97,7 @@ export const courseService = {
             .eq('id', id);
 
         if (error) throw error;
+        coursesCache = null; // Invalidate cache
         return true;
     }
 };

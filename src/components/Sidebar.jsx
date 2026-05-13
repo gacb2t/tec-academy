@@ -47,7 +47,7 @@ const DepartmentSettings = ({ currentDept, onUpdate }) => {
                     <option value="Suporte ao Cliente">Suporte ao Cliente</option>
                     <option value="Administrativo">Administrativo</option>
                     <option value="Backoffice">Backoffice</option>
-                    <option value="RH">RH</option>
+                    <option value="Recursos Humanos">Recursos Humanos</option>
                     <option value="Tecnologia">Tecnologia</option>
                 </select>
 
@@ -75,7 +75,7 @@ const DepartmentSettings = ({ currentDept, onUpdate }) => {
 };
 
 
-const Sidebar = ({ currentView, onViewChange, department, onDepartmentChange }) => {
+const Sidebar = ({ currentView, onViewChange, department, role, onDepartmentChange }) => {
     const { user } = useUser();
     const { signOut } = useClerk();
 
@@ -124,8 +124,19 @@ const Sidebar = ({ currentView, onViewChange, department, onDepartmentChange }) 
                     Ajuda
                 </button>
 
-                {/* Hardcoded Admin check for MVP */}
-                {user?.primaryEmailAddress?.emailAddress === 'gac.b2t@gmail.com' && (
+                {/* Botão RH: visível para Recursos Humanos, Gestor e Admin */}
+                {(role === 'rh' || role === 'gestor' || role === 'admin' || department === 'Recursos Humanos') && (
+                    <button
+                        className={`nav-item ${currentView === 'rh' ? 'active' : ''}`}
+                        onClick={() => onViewChange('rh')}
+                    >
+                        <span className="nav-icon">👥</span>
+                        Recursos Humanos
+                    </button>
+                )}
+
+                {/* Administração: verificação por role admin */}
+                {role === 'admin' && (
                     <button
                         className={`nav-item ${currentView === 'admin' ? 'active' : ''}`}
                         onClick={() => onViewChange('admin')}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabaseClient';
+import { courseService } from '../services/courseService';
 import Button from '../components/Button';
 import './AdminDashboard.css';
 
@@ -29,6 +30,18 @@ const AdminDashboard = ({ onViewChange }) => {
 
     const handleEditCourse = (id) => {
         onViewChange('course-builder', { courseId: id });
+    };
+
+    const handleDeleteCourse = async (id) => {
+        if (window.confirm("Tem certeza que deseja excluir este treinamento? Esta ação não pode ser desfeita.")) {
+            try {
+                await courseService.deleteCourse(id);
+                setCourses(courses.filter(c => c.id !== id));
+            } catch (err) {
+                console.error("Erro ao excluir curso:", err);
+                alert("Não foi possível excluir o curso. Tente novamente.");
+            }
+        }
     };
 
     if (isLoading) return <div className="loading-screen">Carregando painel de administração...</div>;
@@ -78,7 +91,10 @@ const AdminDashboard = ({ onViewChange }) => {
                                         </span>
                                     </td>
                                     <td>
-                                        <Button variant="secondary" onClick={() => handleEditCourse(course.id)} className="edit-btn">Editar</Button>
+                                        <div className="admin-actions">
+                                            <Button variant="secondary" onClick={() => handleEditCourse(course.id)} className="edit-btn">Editar</Button>
+                                            <Button variant="danger" onClick={() => handleDeleteCourse(course.id)} className="delete-btn">Excluir</Button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

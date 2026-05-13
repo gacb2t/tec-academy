@@ -1,0 +1,614 @@
+/* =========================================
+   RH Dashboard — Painel Exclusivo RH / Admin
+   ========================================= */
+
+.rh-dashboard {
+    padding: 2rem;
+    animation: fade-in 0.4s ease;
+}
+
+/* ----- Header ----- */
+.rh-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.rh-header-left h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.rh-header-left p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0.25rem 0 0;
+}
+
+.rh-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(108, 99, 255, 0.15);
+    border: 1px solid rgba(108, 99, 255, 0.3);
+    color: var(--primary);
+    padding: 0.35rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* ----- Sub-abas principais ----- */
+.rh-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding-bottom: 0;
+}
+
+.rh-tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: -1px;
+}
+
+.rh-tab-btn:hover { color: var(--text-primary); }
+.rh-tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+/* ----- Stats bar ----- */
+.rh-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.rh-stat-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.rh-stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.rh-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ----- Filtros ----- */
+.rh-filters {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.rh-search-input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: var(--text-primary);
+    padding: 0.6rem 1rem;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s;
+    flex: 1;
+    min-width: 220px;
+}
+
+.rh-search-input:focus { border-color: var(--primary); }
+
+/* ----- Abas de departamento ----- */
+.dept-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.dept-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    padding: 0.45rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+
+.dept-tab-btn:hover {
+    border-color: rgba(108, 99, 255, 0.4);
+    color: var(--text-primary);
+}
+
+.dept-tab-btn.active {
+    background: rgba(108, 99, 255, 0.18);
+    border-color: rgba(108, 99, 255, 0.6);
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.dept-tab-count {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.dept-tab-btn.active .dept-tab-count {
+    background: rgba(108, 99, 255, 0.3);
+    color: var(--primary);
+}
+
+/* ----- Lista de usuários ----- */
+.users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* ----- Card de usuário ----- */
+.user-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.user-card:hover {
+    border-color: rgba(108, 99, 255, 0.3);
+}
+
+.user-card-open {
+    border-color: rgba(108, 99, 255, 0.45);
+    box-shadow: 0 0 0 1px rgba(108, 99, 255, 0.15);
+}
+
+/* Header do card — linha clicável */
+.user-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    flex-wrap: nowrap;
+}
+
+.user-card-header:hover { background: rgba(255,255,255,0.02); }
+
+/* Avatar com inicial */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), #9d97ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+}
+
+/* Info nome/email */
+.user-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.user-card-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-card-email {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Dept badge */
+.dept-badge {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: rgba(108, 99, 255, 0.15);
+    color: var(--primary);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Mini stats inline no card */
+.user-card-stats {
+    display: flex;
+    gap: 1.25rem;
+    flex-shrink: 0;
+}
+
+.user-mini-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.user-mini-val {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.user-mini-lbl {
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Chevron */
+.user-card-chevron {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    transform: rotate(0deg);
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.user-card-chevron.open {
+    transform: rotate(90deg);
+    color: var(--primary);
+}
+
+/* ----- Body do card expandido ----- */
+.user-card-body {
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding: 0.75rem 1.25rem 1rem;
+    animation: fade-in 0.2s ease;
+}
+
+/* Cabeçalho das colunas dentro do body */
+.cursos-header {
+    display: grid;
+    grid-template-columns: 1fr 80px 80px 140px 120px 100px;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 0.25rem;
+}
+
+/* ----- Linha de curso ----- */
+.curso-row {
+    border-radius: 10px;
+    margin-bottom: 0.35rem;
+    border-left: 3px solid transparent;
+    background: rgba(255,255,255,0.02);
+    transition: background 0.15s;
+}
+
+.curso-row:hover { background: rgba(255,255,255,0.04); }
+.curso-row-ok   { border-left-color: var(--accent); }
+.curso-row-fail { border-left-color: var(--danger); }
+
+/* Linha principal do curso */
+.curso-row-main {
+    display: grid;
+    grid-template-columns: 1fr 80px 80px 140px 120px 100px;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 0.75rem;
+}
+
+/* Wrapper único para ícone + info (ocupa o 1fr) */
+.curso-row-curso {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0; /* permite truncar */
+    overflow: hidden;
+}
+
+.curso-row-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.curso-row-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.curso-row-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: default; /* o title nativo mostra tooltip */
+}
+
+.curso-row-date {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.curso-row-score {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+/* Célula de tentativas */
+.curso-row-attempts {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    cursor: default;
+}
+
+.attempts-icon {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.attempts-count {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Barra de percentual */
+.curso-row-pct {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.mini-progress {
+    flex: 1;
+    height: 5px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 99px;
+}
+
+.mini-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--primary);
+    transition: width 0.4s ease;
+}
+
+.mini-progress-fill.high { background: var(--accent); }
+.mini-progress-fill.low  { background: var(--danger); }
+
+.pct-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-width: 36px;
+    text-align: right;
+    color: var(--text-primary);
+}
+
+/* Badge de aprovação */
+.approval-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.approval-badge.approved {
+    background: rgba(0, 212, 170, 0.12);
+    color: var(--accent);
+}
+
+.approval-badge.failed {
+    background: rgba(255, 77, 109, 0.12);
+    color: var(--danger);
+}
+
+/* Botão ver/ocultar respostas */
+.btn-answers-toggle {
+    background: rgba(108, 99, 255, 0.1);
+    border: 1px solid rgba(108, 99, 255, 0.2);
+    color: var(--primary);
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.btn-answers-toggle:hover { background: rgba(108, 99, 255, 0.22); }
+
+/* ----- Respostas expandidas na linha do curso ----- */
+.curso-row-answers {
+    padding: 0.75rem 0.75rem 0.75rem 1.75rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    animation: fade-in 0.2s ease;
+}
+
+.answers-empty {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.answer-item {
+    padding: 0.7rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 0.5rem;
+    background: rgba(255,255,255,0.02);
+}
+
+.answer-item:last-child { margin-bottom: 0; }
+
+.answer-question {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.3rem;
+}
+
+.answer-response {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.answer-correct { border-left: 3px solid var(--accent); }
+.answer-wrong   { border-left: 3px solid var(--danger); }
+
+/* ----- CRM Inscrições ----- */
+.crm-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-secondary);
+}
+
+.crm-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.crm-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    transition: border-color 0.2s;
+}
+
+.crm-card:hover { border-color: rgba(108, 99, 255, 0.3); }
+
+.crm-card-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.crm-card-name  { font-weight: 700; font-size: 1rem; color: var(--text-primary); }
+.crm-card-email { font-size: 0.82rem; color: var(--accent); font-family: monospace; }
+.crm-card-date  { font-size: 0.78rem; color: var(--text-secondary); }
+
+.crm-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.crm-status-badge.pending { background: rgba(255, 190, 11, 0.15); color: #FFBE0B; }
+.crm-status-badge.done    { background: rgba(0, 212, 170, 0.15);  color: var(--accent); }
+
+/* ----- Estados genéricos ----- */
+.rh-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 3rem;
+    color: var(--text-secondary);
+}
+
+.rh-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(108,99,255,0.2);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.rh-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}

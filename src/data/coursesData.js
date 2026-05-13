@@ -176,7 +176,7 @@ export const coursesData = [
         description: "Processos internos, folha e gestão de benefícios da TEC-B2.",
         duration: "20 min",
         icon: "👥",
-        departments: ["RH"], // Apenas para quem logar como RH
+        departments: ["Recursos Humanos"], // Apenas para quem logar como Recursos Humanos
         modules: [
             {
                 type: 'content',
