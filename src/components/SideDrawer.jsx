@@ -51,6 +51,36 @@ const SideDrawer = ({ isOpen, onClose, role, onNavigate, currentView }) => {
                         <span>Início</span>
                     </button>
 
+                    {isAdmin && (
+                        <>
+                            <button
+                                className={`drawer-nav-item ${currentView === 'campaigns' ? 'active' : ''}`}
+                                onClick={() => handleNav('campaigns')}
+                                id="drawer-nav-campaigns"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                                </svg>
+                                <span>Campanhas</span>
+                            </button>
+
+                            <button
+                                className={`drawer-nav-item ${currentView === 'audits' ? 'active' : ''}`}
+                                onClick={() => handleNav('audits')}
+                                id="drawer-nav-audits"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                                <span>Auditorias</span>
+                            </button>
+                        </>
+                    )}
+
                     {/* Separador admin */}
                     {isAdmin && (
                         <>

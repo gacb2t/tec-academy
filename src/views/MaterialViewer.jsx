@@ -22,17 +22,85 @@ const MODULES_DATA = [
                 embedSrc: 'https://www.canva.com/design/DAGaarY_2jE/TyEellWU6VpH8NSSWXSnGQ/view?embed',
                 type: 'presentation',
             },
+        ],
+    },
+    {
+        id: 'mod-sistemas',
+        title: 'Sistemas e Negociações',
+        materials: [
             {
                 id: 'mat-sistemas',
-                title: '02 - Sistemas, Ferramentas e Funis',
-                embedSrc: 'https://www.canva.com/design/DAHI5QpwfrA/73to2LCgQRjCHkC1e_j9zQ/view?embed',
+                title: '01 - Sistemas, Ferramentas e Diário de Bordo',
+                embedSrc: 'https://www.canva.com/design/DAHJkJ0W-wQ/PraOlv0XggvUIbRP5R2HBA/view?embed',
+                type: 'presentation',
+            },
+            {
+                id: 'mat-carteira',
+                title: '02 - Carteira de Clientes e CRM',
+                embedSrc: 'https://www.canva.com/design/DAHJmIIH8yw/Nx24AbZtVDpUXagwfE-Rfg/view?embed',
+                type: 'presentation',
+            },
+            {
+                id: 'mat-funis',
+                title: '03 - Funis de Venda e Contratos',
+                embedSrc: 'https://www.canva.com/design/DAHJmDa3H-8/aDQFHYmEkjFJOhacJQpLSw/view?embed',
+                type: 'presentation',
+            },
+        ],
+    },
+    {
+        id: 'mod-rotina',
+        title: 'Rotina e Funil de Vendas',
+        materials: [
+            {
+                id: 'mat-basico',
+                title: '01 - Módulo Básico',
+                embedSrc: 'https://www.canva.com/design/DAHJmLwPUpc/EF8GdtkHaDG3ldethhVNZQ/view?embed',
+                type: 'presentation',
+            },
+            {
+                id: 'mat-avancado',
+                title: '02 - Módulo Avançado',
+                embedSrc: 'https://www.canva.com/design/DAHJmEbjk2I/3JuztyVS--8ilj0oUQ6Cvg/view?embed',
+                type: 'presentation',
+            },
+        ],
+    },
+    {
+        id: 'mod-produtos',
+        title: 'Produtos',
+        materials: [
+            {
+                id: 'mat-ftth',
+                title: '01 - FTTH (Banda Larga)',
+                embedSrc: 'https://www.canva.com/design/DAGaa9yUmzo/yiYUdpPKq1qiW8yP3Zx5Qw/view?embed',
+                type: 'presentation',
+            },
+            {
+                id: 'mat-moveis',
+                title: '02 - Móveis',
+                embedSrc: 'https://www.canva.com/design/DAGaa4a3TYQ/M9nxuRzdJvC6Mj7LemzVtw/view?embed',
+                type: 'presentation',
+            },
+            {
+                id: 'mat-vvn',
+                title: '03 - Vivo Voz Negócio (VVN)',
+                embedSrc: 'https://www.canva.com/design/DAGaaz4K1NY/9KvtsWK2E48B3MjR1UHRyw/view?embed',
                 type: 'presentation',
             },
         ],
     },
 ];
 
-const MaterialViewer = ({ courseId, materialId: initialMaterialId, onBack }) => {
+const MaterialViewer = ({ 
+    courseId, 
+    materialId: initialMaterialId, 
+    onBack, 
+    completedMaterials = [], 
+    onComplete, 
+    completedModules = [], 
+    role = 'colaborador' 
+}) => {
     const { user: clerkUser } = useUser();
 
     // Estado do material ativo
@@ -76,11 +144,21 @@ const MaterialViewer = ({ courseId, materialId: initialMaterialId, onBack }) => 
         );
     }, [sidebarSearch]);
 
+    // Lógica de desbloqueio de módulo
+    const isModuleUnlocked = (modId) => {
+        if (role === 'admin') return true;
+        const modIndex = MODULES_DATA.findIndex(m => m.id === modId);
+        if (modIndex <= 0) return true; // Primeiro módulo sempre liberado
+        const previousMod = MODULES_DATA[modIndex - 1];
+        return completedModules?.includes(previousMod.id);
+    };
+
     // Progresso por módulo (visual, local)
     const getModuleProgress = useCallback((mod) => {
-        // Futuramente: calcular com base no progresso real do banco
-        return 0;
-    }, []);
+        if (!mod.materials || mod.materials.length === 0) return 0;
+        const completedCount = mod.materials.filter(m => completedMaterials.includes(m.id)).length;
+        return Math.round((completedCount / mod.materials.length) * 100);
+    }, [completedMaterials]);
 
     // Navegação entre materiais
     const allMaterials = useMemo(() => {
@@ -190,8 +268,18 @@ const MaterialViewer = ({ courseId, materialId: initialMaterialId, onBack }) => 
                         </div>
                     </div>
                     <div className="mv-actions-right">
-                        <button className="mv-conclude-btn">
-                            Concluir
+                        <button 
+                            className={`mv-conclude-btn ${completedMaterials.includes(activeMaterial.id) ? 'completed' : ''}`}
+                            onClick={() => {
+                                if (onComplete) {
+                                    const currentMod = MODULES_DATA.find(m => m.id === activeMaterial.moduleId);
+                                    const isLast = currentMod.materials[currentMod.materials.length - 1].id === activeMaterial.id;
+                                    onComplete(activeMaterial.id, activeMaterial.moduleId, isLast);
+                                }
+                                handleNext();
+                            }}
+                        >
+                            {completedMaterials.includes(activeMaterial.id) ? 'Concluído' : 'Concluir'}
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="20 6 9 17 4 12" />
                             </svg>
@@ -289,17 +377,28 @@ const MaterialViewer = ({ courseId, materialId: initialMaterialId, onBack }) => 
 
                 {/* Lista de módulos */}
                 <div className="mv-sidebar-modules">
-                    {filteredModules.map((mod, modIdx) => (
-                        <div key={mod.id} className="mv-sidebar-module">
+                    {filteredModules.map((mod, modIdx) => {
+                        const unlocked = isModuleUnlocked(mod.id);
+                        return (
+                        <div key={mod.id} className={`mv-sidebar-module ${!unlocked ? 'locked' : ''}`}>
                             {/* Header do módulo */}
                             <button
                                 className="mv-sidebar-module-header"
-                                onClick={() => toggleModule(mod.id)}
+                                onClick={() => unlocked && toggleModule(mod.id)}
+                                style={{ cursor: unlocked ? 'pointer' : 'not-allowed', opacity: unlocked ? 1 : 0.6 }}
                             >
                                 <div className="mv-sidebar-module-info">
                                     <span className="mv-sidebar-module-number">{modIdx + 1}</span>
                                     <div>
-                                        <span className="mv-sidebar-module-title">{mod.title}</span>
+                                        <span className="mv-sidebar-module-title">
+                                            {mod.title}
+                                            {!unlocked && (
+                                                <svg style={{ marginLeft: 6, display: 'inline' }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                                </svg>
+                                            )}
+                                        </span>
                                         <div className="mv-sidebar-module-progress-row">
                                             <span className="mv-sidebar-module-percent">{getModuleProgress(mod)}%</span>
                                             <div className="mv-sidebar-module-progress-bar">
@@ -308,9 +407,11 @@ const MaterialViewer = ({ courseId, materialId: initialMaterialId, onBack }) => 
                                         </div>
                                     </div>
                                 </div>
-                                <svg className={`mv-sidebar-chevron ${expandedModules[mod.id] ? '' : 'collapsed'}`} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="18 15 12 9 6 15" />
-                                </svg>
+                                {unlocked && (
+                                    <svg className={`mv-sidebar-chevron ${expandedModules[mod.id] ? '' : 'collapsed'}`} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="18 15 12 9 6 15" />
+                                    </svg>
+                                )}
                             </button>
 
                             {/* Lista de materiais */}
@@ -342,7 +443,7 @@ const MaterialViewer = ({ courseId, materialId: initialMaterialId, onBack }) => 
                                                     )}
                                                 </div>
                                                 <span className="mv-sidebar-mat-title">{mat.title}</span>
-                                                <svg className="mv-sidebar-mat-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <svg className={`mv-sidebar-mat-check ${completedMaterials.includes(mat.id) ? 'completed' : ''}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={completedMaterials.includes(mat.id) ? '#10b981' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                     <circle cx="12" cy="12" r="10" />
                                                     <polyline points="16 10 11 15 8 12" />
                                                 </svg>
@@ -352,7 +453,7 @@ const MaterialViewer = ({ courseId, materialId: initialMaterialId, onBack }) => 
                                 </div>
                             )}
                         </div>
-                    ))}
+                    )})}
                 </div>
             </aside>
 

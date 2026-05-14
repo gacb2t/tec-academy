@@ -442,6 +442,43 @@
     opacity: 1;
 }
 
+/* Overlay de Módulo Bloqueado */
+.course-card-locked-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 15, 0.8);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.7);
+    gap: 0.5rem;
+    z-index: 2;
+}
+
+.course-card-locked-overlay span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Modificadores de estado bloqueado */
+.member-course-card.locked {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.member-course-card.locked:hover {
+    transform: none;
+}
+
+.course-card-thumbnail.locked-thumb {
+    filter: grayscale(80%);
+}
+
 /* Info abaixo do thumbnail */
 .course-card-info {
     padding: 0.75rem 0.25rem;

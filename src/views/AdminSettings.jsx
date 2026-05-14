@@ -108,7 +108,35 @@ const AdminSettings = ({ onViewChange, onBack }) => {
             icon: '🏢',
             materials: [
                 { id: 'mat-rh', title: '01 - Recursos Humanos', type: 'Apresentação Canva', status: 'Publicado' },
-                { id: 'mat-sistemas', title: '02 - Sistemas, Ferramentas e Funis', type: 'Apresentação Canva', status: 'Publicado' },
+            ],
+        },
+        {
+            id: 'mod-sistemas',
+            title: 'Sistemas e Negociações',
+            icon: '💻',
+            materials: [
+                { id: 'mat-sistemas', title: '01 - Sistemas, Ferramentas e Diário de Bordo', type: 'Apresentação Canva', status: 'Publicado' },
+                { id: 'mat-carteira', title: '02 - Carteira de Clientes e CRM', type: 'Apresentação Canva', status: 'Publicado' },
+                { id: 'mat-funis', title: '03 - Funis de Venda e Contratos', type: 'Apresentação Canva', status: 'Publicado' },
+            ],
+        },
+        {
+            id: 'mod-rotina',
+            title: 'Rotina e Funil de Vendas',
+            icon: '📈',
+            materials: [
+                { id: 'mat-basico', title: '01 - Módulo Básico', type: 'Apresentação Canva', status: 'Publicado' },
+                { id: 'mat-avancado', title: '02 - Módulo Avançado', type: 'Apresentação Canva', status: 'Publicado' },
+            ],
+        },
+        {
+            id: 'mod-produtos',
+            title: 'Produtos',
+            icon: '📦',
+            materials: [
+                { id: 'mat-ftth', title: '01 - FTTH (Banda Larga)', type: 'Apresentação Canva', status: 'Publicado' },
+                { id: 'mat-moveis', title: '02 - Móveis', type: 'Apresentação Canva', status: 'Publicado' },
+                { id: 'mat-vvn', title: '03 - Vivo Voz Negócio (VVN)', type: 'Apresentação Canva', status: 'Publicado' },
             ],
         },
     ];
