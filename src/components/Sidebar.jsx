@@ -41,14 +41,9 @@ const DepartmentSettings = ({ currentDept, onUpdate }) => {
                     className="department-select"
                 >
                     <option value="" disabled>Selecione seu setor...</option>
-                    <option value="Time Hunter">Time Hunter</option>
-                    <option value="Time Farm">Time Farm</option>
-                    <option value="Time NOQ">Time NOQ</option>
-                    <option value="Suporte ao Cliente">Suporte ao Cliente</option>
+                    <option value="Consultor de Vendas">Consultor de Vendas</option>
+                    <option value="Gestor de Equipe">Gestor de Equipe</option>
                     <option value="Administrativo">Administrativo</option>
-                    <option value="Backoffice">Backoffice</option>
-                    <option value="Recursos Humanos">Recursos Humanos</option>
-                    <option value="Tecnologia">Tecnologia</option>
                 </select>
 
                 <button

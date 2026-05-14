@@ -14,12 +14,37 @@ const MODULES = [
         id: 'mod-welcome',
         title: 'Bem-vindo(a) a TEC-B2!',
         icon: '🏢',
+        materialsCount: 1,
+        progress: 0,
+        firstMaterialId: 'mat-rh'
+    },
+    {
+        id: 'mod-sistemas',
+        title: 'Sistemas e Negociações',
+        icon: '💻',
+        materialsCount: 3,
+        progress: 0,
+        firstMaterialId: 'mat-sistemas'
+    },
+    {
+        id: 'mod-rotina',
+        title: 'Rotina e Funil de Vendas',
+        icon: '📈',
         materialsCount: 2,
         progress: 0,
+        firstMaterialId: 'mat-basico'
     },
+    {
+        id: 'mod-produtos',
+        title: 'Produtos',
+        icon: '📦',
+        materialsCount: 3,
+        progress: 0,
+        firstMaterialId: 'mat-ftth'
+    }
 ];
 
-const MemberArea = ({ user, progress, onViewMaterial }) => {
+const MemberArea = ({ user, progress, onViewMaterial, completedModules, role }) => {
     const [activeTab, setActiveTab] = useState('conteudos');
     const [searchQuery, setSearchQuery] = useState('');
     const [viewMode, setViewMode] = useState('grid');
@@ -33,6 +58,15 @@ const MemberArea = ({ user, progress, onViewMaterial }) => {
             m.title.toLowerCase().includes(q)
         );
     }, [searchQuery]);
+
+    // Lógica de desbloqueio de módulo
+    const isModuleUnlocked = (modId) => {
+        if (role === 'admin') return true;
+        const modIndex = MODULES.findIndex(m => m.id === modId);
+        if (modIndex <= 0) return true; // Primeiro módulo sempre liberado
+        const previousMod = MODULES[modIndex - 1];
+        return completedModules?.includes(previousMod.id);
+    };
 
     // Contagem total de materiais e progresso geral
     const totalMaterials = MODULES.reduce((sum, m) => sum + m.materialsCount, 0);
@@ -74,7 +108,7 @@ const MemberArea = ({ user, progress, onViewMaterial }) => {
 
                         <button
                             className="member-hero-cta"
-                            onClick={() => onViewMaterial && onViewMaterial()}
+                            onClick={() => onViewMaterial && onViewMaterial(MODULES[0].firstMaterialId)}
                             id="hero-cta-btn"
                         >
                             Assistir
@@ -167,25 +201,41 @@ const MemberArea = ({ user, progress, onViewMaterial }) => {
                         </div>
                     ) : (
                         <div className={`member-courses-${viewMode}`} id="courses-container">
-                            {filteredModules.map(mod => (
+                            {filteredModules.map(mod => {
+                                const unlocked = isModuleUnlocked(mod.id);
+                                return (
                                 <article
                                     key={mod.id}
-                                    className="member-course-card"
-                                    onClick={() => onViewMaterial && onViewMaterial()}
+                                    className={`member-course-card ${!unlocked ? 'locked' : ''}`}
+                                    onClick={() => {
+                                        if (unlocked && onViewMaterial) {
+                                            onViewMaterial(mod.firstMaterialId);
+                                        }
+                                    }}
                                     id={`module-card-${mod.id}`}
                                 >
-                                    <div className="course-card-thumbnail">
+                                    <div className={`course-card-thumbnail ${!unlocked ? 'locked-thumb' : ''}`}>
                                         <div className="course-card-thumb-inner">
                                             <span className="course-card-emoji">{mod.icon}</span>
                                         </div>
-                                        <span className="course-card-badge">Grátis</span>
+                                        {unlocked && <span className="course-card-badge">Grátis</span>}
 
-                                        {/* Overlay de hover */}
-                                        <div className="course-card-overlay">
-                                            <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
-                                                <polygon points="5 3 19 12 5 21 5 3" />
-                                            </svg>
-                                        </div>
+                                        {/* Overlay de hover ou bloqueado */}
+                                        {unlocked ? (
+                                            <div className="course-card-overlay">
+                                                <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
+                                                    <polygon points="5 3 19 12 5 21 5 3" />
+                                                </svg>
+                                            </div>
+                                        ) : (
+                                            <div className="course-card-locked-overlay">
+                                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                                </svg>
+                                                <span>Módulo Bloqueado</span>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="course-card-info">
@@ -203,7 +253,8 @@ const MemberArea = ({ user, progress, onViewMaterial }) => {
                                         <h3 className="course-card-title">{mod.title}</h3>
                                     </div>
                                 </article>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </section>

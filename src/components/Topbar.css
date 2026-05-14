@@ -166,6 +166,47 @@
     border-color: rgba(0, 229, 160, 0.5);
 }
 
+.topbar-view-as {
+    display: flex;
+    align-items: center;
+    margin-right: 12px;
+}
+
+.view-as-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 14px;
+    padding-right: 32px;
+}
+
+.view-as-select:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.view-as-select:focus {
+    border-color: rgba(0, 229, 160, 0.4);
+}
+
+.view-as-select option {
+    background: #1a1a2e;
+    color: #fff;
+}
+
 /* —— Responsivo —— */
 @media (max-width: 768px) {
     .topbar {
@@ -174,5 +215,9 @@
 
     .topbar-search-dropdown {
         width: 250px;
+    }
+
+    .topbar-view-as {
+        display: none; /* Esconder em telas pequenas para economizar espaço */
     }
 }

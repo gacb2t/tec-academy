@@ -6,7 +6,7 @@ import './Topbar.css';
  * Topbar — Barra de navegação superior estilo Hotmart
  * Hamburger menu (futuro drawer), logo TEC-B2, busca, notificações, avatar do usuário
  */
-const Topbar = ({ onMenuToggle }) => {
+const Topbar = ({ onMenuToggle, realRole, effectiveRole, onRoleChange }) => {
     const { user } = useUser();
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -45,6 +45,22 @@ const Topbar = ({ onMenuToggle }) => {
             </div>
 
             <div className="topbar-right">
+                {/* View As Selector */}
+                {realRole === 'admin' && (
+                    <div className="topbar-view-as">
+                        <select
+                            value={effectiveRole || 'colaborador'}
+                            onChange={(e) => onRoleChange(e.target.value)}
+                            className="view-as-select"
+                            id="view-as-select"
+                        >
+                            <option value="admin">Ver como: Administrador</option>
+                            <option value="gestor">Ver como: Gestor</option>
+                            <option value="colaborador">Ver como: Colaborador</option>
+                        </select>
+                    </div>
+                )}
+
                 {/* Busca */}
                 <div className={`topbar-search-wrapper ${searchOpen ? 'open' : ''}`} ref={searchRef}>
                     <button

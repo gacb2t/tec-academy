@@ -9,6 +9,8 @@ import Training from './views/Training';
 import Result from './views/Result';
 import AdminSettings from './views/AdminSettings';
 import CourseBuilder from './views/CourseBuilder';
+import Campaigns from './views/Campaigns';
+import Audits from './views/Audits';
 import Topbar from './components/Topbar';
 import SideDrawer from './components/SideDrawer';
 import './App.css';
@@ -22,7 +24,8 @@ function App() {
   const [activeCourseId, setActiveCourseId] = useState(null);
   const [adminEditCourseId, setAdminEditCourseId] = useState(null);
   const [isFetchingData, setIsFetchingData] = useState(false);
-  const [role, setRole] = useState(null);
+  const [realRole, setRealRole] = useState(null);
+  const [effectiveRole, setEffectiveRole] = useState(null);
 
   // Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -54,7 +57,9 @@ function App() {
 
           if (profileResponse.data) {
             setDepartment(profileResponse.data.department);
-            setRole(profileResponse.data.role || 'colaborador');
+            const userRole = profileResponse.data.role || 'colaborador';
+            setRealRole(userRole);
+            setEffectiveRole(userRole);
           }
 
           if (progressResponse.data && progressResponse.data.length > 0) {
@@ -69,7 +74,8 @@ function App() {
         }
       } else {
         setDepartment('');
-        setRole(null);
+        setRealRole(null);
+        setEffectiveRole(null);
         setUserProgress({ completedCourses: [] });
       }
     }
@@ -86,8 +92,11 @@ function App() {
     setCurrentView('training');
   };
 
+  const [activeMaterialId, setActiveMaterialId] = useState(null);
+
   // Abrir visualizador de material (Canva embed)
   const handleViewMaterial = (materialId) => {
+    setActiveMaterialId(materialId);
     setCurrentView('material-viewer');
   };
 
@@ -127,6 +136,29 @@ function App() {
       setAdminEditCourseId(data.courseId);
     }
     setCurrentView(view);
+  };
+
+  // Tracking modules and materials progress locally for prototype
+  const [completedMaterials, setCompletedMaterials] = useState(() => {
+    const saved = localStorage.getItem('completedMaterials');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [completedModules, setCompletedModules] = useState(() => {
+    const saved = localStorage.getItem('completedModules');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const handleMaterialComplete = (materialId, moduleId, isLastInModule) => {
+    if (!completedMaterials.includes(materialId)) {
+      const newMats = [...completedMaterials, materialId];
+      setCompletedMaterials(newMats);
+      localStorage.setItem('completedMaterials', JSON.stringify(newMats));
+    }
+    if (isLastInModule && !completedModules.includes(moduleId)) {
+      const newMods = [...completedModules, moduleId];
+      setCompletedModules(newMods);
+      localStorage.setItem('completedModules', JSON.stringify(newMods));
+    }
   };
 
   // Drawer toggle
@@ -175,7 +207,7 @@ function App() {
   const userData = {
     name: user.fullName || user.firstName,
     department: department,
-    role: role,
+    role: effectiveRole,
     email: user.primaryEmailAddress?.emailAddress
   };
 
@@ -190,7 +222,7 @@ function App() {
         <SideDrawer
           isOpen={drawerOpen}
           onClose={() => setDrawerOpen(false)}
-          role={role}
+          role={effectiveRole}
           onNavigate={handleDrawerNavigate}
           currentView={currentView}
         />
@@ -198,7 +230,12 @@ function App() {
 
       {/* Topbar visível em todas as views exceto builder/viewer */}
       {!isImmersiveMode && (
-        <Topbar onMenuToggle={handleMenuToggle} />
+        <Topbar 
+          onMenuToggle={handleMenuToggle} 
+          realRole={realRole}
+          effectiveRole={effectiveRole}
+          onRoleChange={setEffectiveRole}
+        />
       )}
 
       <main className={`app-main ${isImmersiveMode ? 'full-bleed' : ''}`}>
@@ -209,15 +246,37 @@ function App() {
             progress={userProgress}
             onStartCourse={handleStartCourse}
             onViewMaterial={handleViewMaterial}
+            completedModules={completedModules}
+            role={effectiveRole}
           />
+        )}
+
+        {/* Campanhas — Feed de postagens (Comunidades) */}
+        {currentView === 'campaigns' && effectiveRole === 'admin' && (
+          <Campaigns user={userData} />
+        )}
+
+        {/* Auditorias — Gestão e IA (admin only) */}
+        {currentView === 'audits' && effectiveRole === 'admin' && (
+          <Audits user={userData} />
         )}
 
         {/* Material Viewer — embed Canva com sidebar */}
         {currentView === 'material-viewer' && (
           <div className="viewer-fullscreen-wrapper">
-            <Topbar onMenuToggle={handleMenuToggle} />
+            <Topbar 
+              onMenuToggle={handleMenuToggle} 
+              realRole={realRole}
+              effectiveRole={effectiveRole}
+              onRoleChange={setEffectiveRole}
+            />
             <MaterialViewer
+              materialId={activeMaterialId}
               onBack={handleBackToHome}
+              completedMaterials={completedMaterials}
+              onComplete={handleMaterialComplete}
+              completedModules={completedModules}
+              role={effectiveRole}
             />
           </div>
         )}
@@ -249,7 +308,7 @@ function App() {
         )}
 
         {/* Admin Settings — Painel estilo Hotmart (admin only) */}
-        {currentView === 'admin-settings' && role === 'admin' && (
+        {currentView === 'admin-settings' && effectiveRole === 'admin' && (
           <AdminSettings
             onViewChange={handleAdminViewChange}
             onBack={handleBackToHome}
