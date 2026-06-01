@@ -90,6 +90,42 @@ const MODULES_DATA = [
             },
         ],
     },
+    {
+        id: 'mod-manual-dados',
+        title: 'Serviços Avançados Dados',
+        materials: [
+            {
+                id: 'mat-manual-dados',
+                title: '01 - Serviços Avançados Dados',
+                embedSrc: 'https://www.canva.com/design/DAHJjxD52qA/nxen8DPvqy21caqBuQu5Tw/view?embed',
+                type: 'presentation',
+            },
+        ],
+    },
+    {
+        id: 'mod-manual-licencas',
+        title: 'Licenças Digitais',
+        materials: [
+            {
+                id: 'mat-manual-licencas',
+                title: '01 - Licenças Digitais',
+                embedSrc: 'https://www.canva.com/design/DAHJeNnWg88/9f-azxxxuo85jZeiefDliw/view?embed',
+                type: 'presentation',
+            },
+        ],
+    },
+    {
+        id: 'mod-manual-0800',
+        title: '0800 e 0300',
+        materials: [
+            {
+                id: 'mat-manual-0800',
+                title: '01 - 0800 e 0300',
+                embedSrc: 'https://www.canva.com/design/DAHJwIbkyro/Zmyes03e87nZe130QxNjIw/view?embed',
+                type: 'presentation',
+            },
+        ],
+    },
 ];
 
 const MaterialViewer = ({ 
