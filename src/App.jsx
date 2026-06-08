@@ -10,6 +10,7 @@ import Result from './views/Result';
 import AdminSettings from './views/AdminSettings';
 import CourseBuilder from './views/CourseBuilder';
 import Campaigns from './views/Campaigns';
+import Marketplace from './views/Marketplace';
 import Audits from './views/Audits';
 import Topbar from './components/Topbar';
 import SideDrawer from './components/SideDrawer';
@@ -205,6 +206,7 @@ function App() {
 
   // 3. Autenticado e onboarded → Layout Hotmart
   const userData = {
+    id: user.id,
     name: user.fullName || user.firstName,
     department: department,
     role: effectiveRole,
@@ -253,7 +255,12 @@ function App() {
 
         {/* Campanhas — Feed de postagens (Comunidades) */}
         {currentView === 'campaigns' && effectiveRole === 'admin' && (
-          <Campaigns user={userData} />
+          <Campaigns user={userData} onNavigate={handleDrawerNavigate} />
+        )}
+
+        {/* Marketplace */}
+        {currentView === 'marketplace' && (
+          <Marketplace user={userData} onNavigate={handleDrawerNavigate} />
         )}
 
         {/* Auditorias — Gestão e IA (admin only) */}

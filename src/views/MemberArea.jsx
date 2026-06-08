@@ -41,6 +41,30 @@ const MODULES = [
         materialsCount: 3,
         progress: 0,
         firstMaterialId: 'mat-ftth'
+    },
+    {
+        id: 'mod-manual-dados',
+        title: 'Serviços Avançados Dados',
+        icon: '🌐',
+        materialsCount: 1,
+        progress: 0,
+        firstMaterialId: 'mat-manual-dados'
+    },
+    {
+        id: 'mod-manual-licencas',
+        title: 'Licenças Digitais',
+        icon: '🔑',
+        materialsCount: 1,
+        progress: 0,
+        firstMaterialId: 'mat-manual-licencas'
+    },
+    {
+        id: 'mod-manual-0800',
+        title: '0800 e 0300',
+        icon: '📞',
+        materialsCount: 1,
+        progress: 0,
+        firstMaterialId: 'mat-manual-0800'
     }
 ];
 
