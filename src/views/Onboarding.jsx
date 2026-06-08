@@ -4,10 +4,17 @@ import { supabase } from '../services/supabaseClient';
 import Button from '../components/Button';
 import './Onboarding.css';
 
+const DEPARTMENTS = {
+    'Vendas': ['Time Farm', 'Time Hunter'],
+    'Administrativo': ['Backoffice', 'Recursos Humanos'],
+    'Suporte': ['Suporte ao cliente', 'Time NOQ']
+};
+
 const Onboarding = ({ onComplete }) => {
     const { user } = useUser();
     const { signOut } = useClerk();
     const [department, setDepartment] = useState('');
+    const [team, setTeam] = useState('');
     const [error, setError] = useState('');
 
     const email = user?.primaryEmailAddress?.emailAddress || '';
@@ -21,11 +28,16 @@ const Onboarding = ({ onComplete }) => {
         }
     }, [email, isTecB2]);
 
+    // Limpar o time sempre que mudar o departamento
+    useEffect(() => {
+        setTeam('');
+    }, [department]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!isTecB2) return;
 
-        if (department.trim()) {
+        if (department.trim() && team.trim()) {
             try {
                 // Inserir perfil no banco — role sempre inicia como 'colaborador'
                 const { error: sbError } = await supabase
@@ -35,6 +47,7 @@ const Onboarding = ({ onComplete }) => {
                         name: user.fullName || user.firstName,
                         email: email,
                         department: department,
+                        team: team,
                         role: 'colaborador'
                     });
 
@@ -42,7 +55,7 @@ const Onboarding = ({ onComplete }) => {
                 onComplete(department);
             } catch (err) {
                 console.error("Erro ao salvar perfil:", err);
-                setError("Ocorreu um erro ao salvar seu setor. Tente novamente.");
+                setError("Ocorreu um erro ao salvar suas informações. Verifique com um administrador se a coluna 'team' foi criada no banco.");
             }
         }
     };
@@ -50,7 +63,7 @@ const Onboarding = ({ onComplete }) => {
     if (error) {
         return (
             <div className="onboarding-view error-state fade-in">
-                <h2>Acesso Negado 🛑</h2>
+                <h2>Acesso Negado ou Erro 🛑</h2>
                 <p>{error}</p>
                 <p className="email-display">Tentativa com: <strong>{email}</strong></p>
                 <Button variant="secondary" onClick={() => signOut()}>
@@ -64,12 +77,12 @@ const Onboarding = ({ onComplete }) => {
         <div className="onboarding-view fade-in">
             <div className="onboarding-header">
                 <h2>Bem-vindo, {user?.firstName}! 👋</h2>
-                <p>Para personalizar sua experiência, selecione seu cargo na TEC-B2.</p>
+                <p>Para personalizar sua experiência, selecione sua área na TEC-B2.</p>
             </div>
 
             <form className="onboarding-form" onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="department">Qual o seu cargo na TEC-B2?</label>
+                    <label htmlFor="department">Qual o seu Departamento?</label>
                     <select
                         id="department"
                         value={department}
@@ -77,16 +90,36 @@ const Onboarding = ({ onComplete }) => {
                         required
                         className="gamified-input"
                     >
-                        <option value="" disabled>Selecione seu cargo...</option>
-                        <option value="Consultor de Vendas">Consultor de Vendas</option>
-                        <option value="Gestor de Equipe">Gestor de Equipe</option>
-                        <option value="Administrativo">Administrativo</option>
+                        <option value="" disabled>Selecione seu departamento...</option>
+                        {Object.keys(DEPARTMENTS).map(dept => (
+                            <option key={dept} value={dept}>{dept}</option>
+                        ))}
                     </select>
                 </div>
 
-                <Button type="submit" variant="primary" fullWidth disabled={!department}>
-                    Acessar Academy 🚀
-                </Button>
+                {department && (
+                    <div className="form-group fade-in" style={{ marginTop: '1rem' }}>
+                        <label htmlFor="team">E de qual Time você faz parte?</label>
+                        <select
+                            id="team"
+                            value={team}
+                            onChange={(e) => setTeam(e.target.value)}
+                            required
+                            className="gamified-input"
+                        >
+                            <option value="" disabled>Selecione seu time...</option>
+                            {DEPARTMENTS[department].map(t => (
+                                <option key={t} value={t}>{t}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+
+                <div style={{ marginTop: '1.5rem' }}>
+                    <Button type="submit" variant="primary" fullWidth disabled={!department || !team}>
+                        Acessar Academy 🚀
+                    </Button>
+                </div>
             </form>
         </div>
     );

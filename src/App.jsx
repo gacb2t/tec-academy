@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
-import { supabase } from './services/supabaseClient';
+import { useUser, useSession } from '@clerk/clerk-react';
+import { supabase, setClerkSession } from './services/supabaseClient';
 import Welcome from './views/Welcome';
 import Onboarding from './views/Onboarding';
 import MemberArea from './views/MemberArea';
@@ -12,12 +12,14 @@ import CourseBuilder from './views/CourseBuilder';
 import Campaigns from './views/Campaigns';
 import Marketplace from './views/Marketplace';
 import Audits from './views/Audits';
+import Candidates from './views/Candidates';
 import Topbar from './components/Topbar';
 import SideDrawer from './components/SideDrawer';
 import './App.css';
 
 function App() {
   const { isSignedIn, user, isLoaded } = useUser();
+  const { session } = useSession();
   const [currentView, setCurrentView] = useState('home');
 
   // App Global State
@@ -37,10 +39,13 @@ function App() {
     completedCourses: []
   });
 
+  // Remover o useEffect isolado do setClerkSession
+
   // Carregar dados do usuário do Supabase
   useEffect(() => {
     async function fetchUserData() {
-      if (isSignedIn && user) {
+      if (isSignedIn && user && session) {
+        setClerkSession(session); // Garante que a sessão tá setada ANTES do banco
         setIsFetchingData(true);
         try {
           const [profileResponse, progressResponse] = await Promise.all([
@@ -55,6 +60,10 @@ function App() {
               .eq('user_id', user.id)
               .gte('percentage', 70)
           ]);
+
+          if (profileResponse.error) {
+             alert("Erro no Supabase: " + profileResponse.error.message + " | Details: " + JSON.stringify(profileResponse.error));
+          }
 
           if (profileResponse.data) {
             setDepartment(profileResponse.data.department);
@@ -266,6 +275,11 @@ function App() {
         {/* Auditorias — Gestão e IA (admin only) */}
         {currentView === 'audits' && effectiveRole === 'admin' && (
           <Audits user={userData} />
+        )}
+
+        {/* Candidatos — Pipeline (admin only) */}
+        {currentView === 'candidates' && effectiveRole === 'admin' && (
+          <Candidates />
         )}
 
         {/* Material Viewer — embed Canva com sidebar */}
