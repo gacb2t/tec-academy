@@ -20,11 +20,17 @@ const getRoleLabel = (role) => {
     return found ? found.label : 'Colaborador';
 };
 
+const DEPARTMENTS = {
+    'Vendas': ['Time Farm', 'Time Hunter'],
+    'Administrativo': ['Backoffice', 'Recursos Humanos'],
+    'Suporte': ['Suporte ao cliente', 'Time NOQ']
+};
+
 /**
  * UserRow — Linha individual da tabela de usuários
  * Permite edição de role via select dropdown
  */
-const UserRow = ({ user: u, onRoleUpdated }) => {
+const UserRow = ({ user: u, onRoleUpdated, onEdit, onDelete }) => {
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
 
@@ -65,7 +71,9 @@ const UserRow = ({ user: u, onRoleUpdated }) => {
                 </div>
             </td>
             <td>
-                <span className="as-dept-tag">{u.department || '—'}</span>
+                <span className="as-dept-tag">
+                    {u.department || '—'} {u.team ? `- ${u.team}` : ''}
+                </span>
             </td>
             <td>
                 <div className="as-role-select-wrapper">
@@ -86,6 +94,12 @@ const UserRow = ({ user: u, onRoleUpdated }) => {
             <td className="as-date-cell">
                 {u.created_at ? new Date(u.created_at).toLocaleDateString('pt-BR') : '—'}
             </td>
+            <td>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button className="as-icon-btn-sm" onClick={() => onEdit(u)} title="Editar">✏️</button>
+                    <button className="as-icon-btn-sm" onClick={() => onDelete(u)} title="Excluir">🗑️</button>
+                </div>
+            </td>
         </tr>
     );
 };
@@ -99,6 +113,10 @@ const AdminSettings = ({ onViewChange, onBack }) => {
     // Dados
     const [users, setUsers] = useState([]);
     const [expandedModules, setExpandedModules] = useState({ 'mod-welcome': true });
+    
+    // Edição de usuário
+    const [editingUser, setEditingUser] = useState(null);
+    const [editFormData, setEditFormData] = useState({ name: '', email: '', password: '', department: '', team: '' });
 
     // Materiais Canva — módulos estáticos (mesma fonte do MaterialViewer)
     const ADMIN_MODULES = [
@@ -159,6 +177,60 @@ const AdminSettings = ({ onViewChange, onBack }) => {
         fetchUsers();
     }, [fetchUsers]);
 
+    // Ações de Usuário
+    const handleDeleteUser = async (userToDelete) => {
+        if (!window.confirm(`Tem certeza que deseja excluir o usuário ${userToDelete.name || userToDelete.email}?`)) return;
+        try {
+            const { error } = await supabase.from('user_profiles').delete().eq('user_id', userToDelete.user_id);
+            if (error) throw error;
+            setUsers(users.filter(u => u.user_id !== userToDelete.user_id));
+        } catch (err) {
+            console.error("Erro ao deletar usuário:", err);
+            alert("Erro ao excluir usuário.");
+        }
+    };
+
+    const handleOpenEditUser = (u) => {
+        setEditingUser(u);
+        setEditFormData({ name: u.name || '', email: u.email || '', password: '', department: u.department || '', team: u.team || '' });
+    };
+
+    const handleSaveEditUser = async () => {
+        try {
+            // 1. Atualizar a tabela de perfis
+            const { error } = await supabase.from('user_profiles').update({
+                name: editFormData.name,
+                email: editFormData.email,
+                department: editFormData.department,
+                team: editFormData.team,
+            }).eq('user_id', editingUser.user_id);
+
+            if (error) throw error;
+
+            // 2. Tentar atualizar as credenciais no Clerk via Edge Function
+            if (editFormData.password || editFormData.email !== editingUser.email) {
+                const { error: edgeError } = await supabase.functions.invoke('update-clerk-user', {
+                    body: {
+                        userId: editingUser.user_id,
+                        email: editFormData.email !== editingUser.email ? editFormData.email : undefined,
+                        password: editFormData.password || undefined
+                    }
+                });
+
+                if (edgeError) {
+                    console.warn("Edge Function falhou (pode faltar configurar a CLERK_SECRET_KEY):", edgeError);
+                    alert("O Perfil foi atualizado com sucesso, mas a senha/email no Clerk não pôde ser alterada. Verifique se o Edge Function está deployado e com a SECRET_KEY configurada.");
+                }
+            }
+
+            setUsers(users.map(u => u.user_id === editingUser.user_id ? { ...u, ...editFormData, password: undefined } : u));
+            setEditingUser(null);
+        } catch (err) {
+            console.error("Erro ao atualizar usuário:", err);
+            alert("Erro ao salvar alterações.");
+        }
+    };
+
     // Toggle expansão de módulo
     const toggleModule = (moduleId) => {
         setExpandedModules(prev => ({
@@ -181,7 +253,7 @@ const AdminSettings = ({ onViewChange, onBack }) => {
     // Tabs config
     const mainTabs = [
         { key: 'conteudo', label: 'Conteúdo' },
-        { key: 'turmas', label: 'Turmas' },
+        { key: 'times', label: 'Times' },
         { key: 'usuarios', label: 'Usuários' },
         { key: 'comentarios', label: 'Comentários' },
         { key: 'certificado', label: 'Certificado' },
@@ -196,9 +268,18 @@ const AdminSettings = ({ onViewChange, onBack }) => {
     // Contagem total de materiais
     const totalContents = ADMIN_MODULES.reduce((sum, m) => sum + m.materials.length, 0);
 
+    // Agrupar usuários por time
+    const groupedByTeam = users.reduce((acc, user) => {
+        const team = user.team || 'Sem Time';
+        if (!acc[team]) acc[team] = [];
+        acc[team].push(user);
+        return acc;
+    }, {});
+    const sortedTeams = Object.keys(groupedByTeam).sort();
+
     return (
         <div className="admin-settings" id="admin-settings">
-            {/* Header do painel */}
+            {/* ====== HEADER ====== */}
             <header className="as-header">
                 <div className="as-header-left">
                     <button className="as-back-btn" onClick={onBack} aria-label="Voltar" id="admin-back-btn">
@@ -443,14 +524,69 @@ const AdminSettings = ({ onViewChange, onBack }) => {
                 </div>
             )}
 
-            {/* ====== TAB TURMAS ====== */}
-            {activeTab === 'turmas' && (
+            {/* ====== TAB TIMES ====== */}
+            {activeTab === 'times' && (
                 <div className="as-tab-content">
-                    <div className="as-placeholder-tab">
-                        <div className="as-placeholder-icon">👥</div>
-                        <h3>Turmas</h3>
-                        <p>Gerencie turmas e organize os colaboradores em grupos de aprendizado.</p>
-                        <p className="as-placeholder-hint">Defina prazos, acompanhe o desempenho coletivo e envie comunicados por turma.</p>
+                    <div className="as-users-header">
+                        <h2>Gestão de Times</h2>
+                        <span className="as-users-count">{users.length} colaboradores distribuídos em {sortedTeams.length} times</span>
+                    </div>
+
+                    <div className="as-modules-list">
+                        {sortedTeams.map(teamName => {
+                            const teamUsers = groupedByTeam[teamName];
+                            const teamId = `team-${teamName}`;
+                            
+                            return (
+                                <div key={teamName} className="as-module-group">
+                                    <div className="as-module-header" onClick={() => toggleModule(teamId)} style={{ cursor: 'pointer' }}>
+                                        <div className="as-module-header-left">
+                                            <div className="as-module-icon">📁</div>
+                                            <div className="as-module-info">
+                                                <h4 className="as-module-title">{teamName}</h4>
+                                                <div className="as-module-meta">
+                                                    <span className="as-module-badge">{teamUsers.length} usuários</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="as-module-header-right">
+                                            <button className={`as-icon-btn as-chevron ${expandedModules[teamId] ? '' : 'collapsed'}`}>
+                                                ▼
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {expandedModules[teamId] && (
+                                        <div className="as-module-contents">
+                                            {teamUsers.length === 0 ? (
+                                                <div style={{ padding: '1rem', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>Nenhum usuário neste time.</div>
+                                            ) : (
+                                                teamUsers.map(u => (
+                                                    <div key={u.user_id} className="as-content-item">
+                                                        <div className="as-content-item-left">
+                                                            <div className="as-user-avatar" style={{ width: 32, height: 32, fontSize: '0.8rem' }}>
+                                                                {u.name ? u.name.charAt(0).toUpperCase() : '@'}
+                                                            </div>
+                                                            <div className="as-content-info">
+                                                                <span className="as-content-name">{u.name || 'Sem Nome'}</span>
+                                                                <div className="as-content-stats">
+                                                                    <span className="as-stat">{u.email}</span>
+                                                                    {u.department && <span className="as-stat">• {u.department}</span>}
+                                                                    <span className="as-stat">• {getRoleLabel(u.role)}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="as-content-item-right">
+                                                            <button className="as-icon-btn-sm" onClick={() => handleOpenEditUser(u)} title="Editar Usuário">✏️</button>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             )}
@@ -474,9 +610,10 @@ const AdminSettings = ({ onViewChange, onBack }) => {
                                 <thead>
                                     <tr>
                                         <th>Usuário</th>
-                                        <th>Cargo</th>
+                                        <th>Cargo / Time</th>
                                         <th>Permissão</th>
                                         <th>Cadastro</th>
+                                        <th>Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -491,6 +628,8 @@ const AdminSettings = ({ onViewChange, onBack }) => {
                                                         : usr
                                                 ));
                                             }}
+                                            onEdit={handleOpenEditUser}
+                                            onDelete={handleDeleteUser}
                                         />
                                     ))}
                                 </tbody>
@@ -520,6 +659,76 @@ const AdminSettings = ({ onViewChange, onBack }) => {
                         <h3>Certificados</h3>
                         <p>Configure modelos de certificado emitidos ao concluir os treinamentos.</p>
                         <p className="as-placeholder-hint">Personalize a identidade visual, dados exibidos e regras de emissão.</p>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal de Edição de Usuário */}
+            {editingUser && (
+                <div className="welcome-login-box" style={{
+                    position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                    zIndex: 1000, background: '#1e293b', padding: '2rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#fff' }}>Editar Usuário</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div className="form-group">
+                            <label style={{ color: '#ccc', fontSize: '0.85rem' }}>Nome</label>
+                            <input
+                                className="gamified-input"
+                                value={editFormData.name}
+                                onChange={e => setEditFormData({ ...editFormData, name: e.target.value })}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label style={{ color: '#ccc', fontSize: '0.85rem' }}>E-mail</label>
+                            <input
+                                className="gamified-input"
+                                type="email"
+                                value={editFormData.email}
+                                onChange={e => setEditFormData({ ...editFormData, email: e.target.value })}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label style={{ color: '#ccc', fontSize: '0.85rem' }}>Nova Senha (deixe em branco para não alterar)</label>
+                            <input
+                                className="gamified-input"
+                                type="password"
+                                value={editFormData.password}
+                                onChange={e => setEditFormData({ ...editFormData, password: e.target.value })}
+                                placeholder="Nova senha (mínimo 8 caracteres)"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label style={{ color: '#ccc', fontSize: '0.85rem' }}>Departamento</label>
+                            <select
+                                className="gamified-input"
+                                value={editFormData.department}
+                                onChange={e => setEditFormData({ ...editFormData, department: e.target.value, team: '' })}
+                            >
+                                <option value="" disabled>Selecione...</option>
+                                {Object.keys(DEPARTMENTS).map(dept => (
+                                    <option key={dept} value={dept}>{dept}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label style={{ color: '#ccc', fontSize: '0.85rem' }}>Time</label>
+                            <select
+                                className="gamified-input"
+                                value={editFormData.team}
+                                onChange={e => setEditFormData({ ...editFormData, team: e.target.value })}
+                                disabled={!editFormData.department}
+                            >
+                                <option value="" disabled>Selecione o time...</option>
+                                {editFormData.department && DEPARTMENTS[editFormData.department]?.map(t => (
+                                    <option key={t} value={t}>{t}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'flex-end' }}>
+                            <button className="as-tab" onClick={() => setEditingUser(null)}>Cancelar</button>
+                            <button className="as-create-btn" onClick={handleSaveEditUser}>Salvar</button>
+                        </div>
                     </div>
                 </div>
             )}
