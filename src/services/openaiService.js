@@ -59,8 +59,9 @@ PARTE 2: Realizar a Auditoria do Atendimento.
 - Se o cliente possuir fidelidade com a concorrência e quiser cancelar, o vendedor DEVE oferecer abertura de um chamado para suporte.
 
 Regras de Preenchimento:
-- Dê nota de 1 a 10 para cada critério.
-- NENHUM campo de texto ou lista pode ficar vazio. Se não houver, preencha OBRIGATORIAMENTE com "Não apresentou".
+- Dê nota de 1 a 10 para cada critério, sendo 1 (péssimo) a 10 (excelente). Seja crítico, realista e analítico na avaliação.
+- ATENÇÃO: Se um critério NÃO SE APLICAR à ligação (ex: a ligação caiu antes do fechamento), atribua OBRIGATORIAMENTE a nota 0. A nota 0 indica "Não Aplicável" e não vai prejudicar a média do vendedor.
+- NENHUM campo de texto ou lista pode ficar vazio. Se não houver informação, preencha OBRIGATORIAMENTE com "Não apresentou".
 - O nome do vendedor é EXATAMENTE: "${collaboratorName}". Preencha o campo nome_vendedor com este valor.
 - Se a transcrição NÃO possuir contexto para um ponto de atenção, NÃO relate a ausência. Apenas preencha com "Não apresentou".
 
@@ -131,7 +132,7 @@ Você DEVE retornar a resposta EXATAMENTE no formato JSON descrito pelo schema, 
                     { role: "system", content: systemPrompt },
                     { role: "user", content: `Transcrição bruta da ligação:\n\n${rawTranscription}` }
                 ],
-                temperature: 0.2,
+                temperature: 0.3,
                 response_format: {
                     type: "json_schema",
                     json_schema: {
@@ -160,13 +161,19 @@ Você DEVE retornar a resposta EXATAMENTE no formato JSON descrito pelo schema, 
                 let count = 0;
                 for (const key in jsonResult.criterios_vendedor) {
                     const criterio = jsonResult.criterios_vendedor[key];
-                    if (criterio && typeof criterio.nota === 'number') {
-                        total += criterio.nota;
-                        count++;
+                    if (criterio && criterio.nota !== undefined) {
+                        const parsedNota = parseFloat(criterio.nota);
+                        // Notas 0 significam "Não Aplicável" segundo nosso novo prompt
+                        if (!isNaN(parsedNota) && parsedNota > 0) {
+                            total += parsedNota;
+                            count++;
+                        }
                     }
                 }
                 if (count > 0) {
                     jsonResult.nota_geral_vendedor = Math.round((total / count) * 10) / 10;
+                } else {
+                    jsonResult.nota_geral_vendedor = 0;
                 }
             }
             

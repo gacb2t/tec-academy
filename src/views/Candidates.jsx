@@ -24,6 +24,7 @@ const Candidates = () => {
     
     // Novos estados
     const [showWebhook, setShowWebhook] = useState(false);
+    const [selectedCandidate, setSelectedCandidate] = useState(null);
     const [showNewModal, setShowNewModal] = useState(false);
     const [newCandidate, setNewCandidate] = useState({ name: '', email: '', phone: '', stage: STAGES[0] });
     const [isCreating, setIsCreating] = useState(false);
@@ -77,6 +78,23 @@ const Candidates = () => {
         if (error) {
             console.error("Erro ao mover candidato:", error);
             fetchCandidates(); // Reverte em caso de erro
+        }
+    };
+
+    const handleDeleteCandidate = async (e, cand) => {
+        e.preventDefault();
+        if (window.confirm(`Tem certeza que deseja deletar a inscrição de ${cand.name}?`)) {
+            const { error } = await supabase
+                .from('job_applications')
+                .delete()
+                .eq('id', cand.id);
+            
+            if (error) {
+                console.error("Erro ao deletar:", error);
+                alert("Erro ao deletar inscrição.");
+            } else {
+                fetchCandidates();
+            }
         }
     };
 
@@ -173,6 +191,8 @@ const Candidates = () => {
                                                                 ref={provided.innerRef}
                                                                 {...provided.draggableProps}
                                                                 {...provided.dragHandleProps}
+                                                                onClick={() => setSelectedCandidate(cand)}
+                                                                onContextMenu={(e) => handleDeleteCandidate(e, cand)}
                                                             >
                                                                 <h4>{cand.name}</h4>
                                                                 <div className="k-card-info">
@@ -198,6 +218,38 @@ const Candidates = () => {
                         })}
                     </DragDropContext>
                 </div>
+            )}
+
+            {/* Modal Detalhes do Candidato */}
+            {selectedCandidate && (
+                <>
+                    <div className="as-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 999 }} onClick={() => setSelectedCandidate(null)} />
+                    <div className="welcome-login-box" style={{
+                        position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                        zIndex: 1000, background: '#1e293b', padding: '2rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', width: '600px', maxWidth: '90vw', maxHeight: '80vh', overflowY: 'auto'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <h3 style={{ margin: 0, color: '#fff' }}>Detalhes da Inscrição</h3>
+                            <button onClick={() => setSelectedCandidate(null)} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '1.5rem' }}>&times;</button>
+                        </div>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', color: '#ccc' }}>
+                            <p style={{ margin: 0 }}><strong>Nome:</strong> {selectedCandidate.name}</p>
+                            <p style={{ margin: 0 }}><strong>E-mail:</strong> {selectedCandidate.email || 'Não informado'}</p>
+                            <p style={{ margin: 0 }}><strong>Telefone:</strong> {selectedCandidate.phone || 'Não informado'}</p>
+                            <p style={{ margin: 0 }}><strong>Time:</strong> {selectedCandidate.team}</p>
+                            <p style={{ margin: 0 }}><strong>Etapa Atual:</strong> {selectedCandidate.stage}</p>
+                            <p style={{ margin: 0 }}><strong>Data de Inscrição:</strong> {new Date(selectedCandidate.created_at).toLocaleString('pt-BR')}</p>
+                            
+                            <hr style={{ borderColor: 'rgba(255,255,255,0.1)', margin: '1rem 0' }} />
+                            
+                            <h4 style={{ margin: 0, color: '#fff' }}>Payload Completo (Dados do Banco)</h4>
+                            <pre style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '6px', overflowX: 'auto', fontSize: '0.85rem' }}>
+                                {JSON.stringify(selectedCandidate, null, 2)}
+                            </pre>
+                        </div>
+                    </div>
+                </>
             )}
 
             {/* Modal de Nova Inscrição */}
