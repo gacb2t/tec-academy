@@ -13,11 +13,17 @@ if (!PUBLISHABLE_KEY) {
   throw new Error("Missing Publishable Key");
 }
 
+const customPtBR = {
+  ...ptBR,
+  formFieldLabel__optional: '',
+  formFieldLabelRow__optional: '',
+};
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ClerkProvider
       publishableKey={PUBLISHABLE_KEY}
-      localization={ptBR}
+      localization={customPtBR}
       appearance={{
         baseTheme: dark,
         variables: {

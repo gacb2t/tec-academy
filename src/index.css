@@ -86,3 +86,6 @@ h3 { font-size: 1.5rem; }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+.cl-formFieldOptional { display: none !important; }
+.clerk-formFieldOptional { display: none !important; }
