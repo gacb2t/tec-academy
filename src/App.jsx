@@ -53,7 +53,7 @@ function App() {
               .from('user_profiles')
               .select('department, role')
               .eq('user_id', user.id)
-              .single(),
+              .maybeSingle(),
             supabase
               .from('course_progress')
               .select('course_id')
@@ -61,8 +61,8 @@ function App() {
               .gte('percentage', 70)
           ]);
 
-          if (profileResponse.error) {
-             alert("Erro no Supabase: " + profileResponse.error.message + " | Details: " + JSON.stringify(profileResponse.error));
+          if (profileResponse.error && profileResponse.error.code !== 'PGRST116') {
+             console.error("Erro no Supabase: ", profileResponse.error);
           }
 
           if (profileResponse.data) {
