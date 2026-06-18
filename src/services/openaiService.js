@@ -1,4 +1,4 @@
-const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+const API_KEY = import.meta.env.VITE_OPENAI_API_KEY ? import.meta.env.VITE_OPENAI_API_KEY.trim().replace(/^"|"$/g, '') : null;
 
 export const openaiService = {
     /**
