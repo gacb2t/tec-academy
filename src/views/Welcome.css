@@ -171,4 +171,4 @@
         opacity: 1;
         transform: translateY(0);
     }
-}
+}.clerk-form-optional { display: none !important; }

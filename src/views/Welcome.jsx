@@ -4,11 +4,18 @@ import { useState, useEffect } from 'react';
 import './Welcome.css';
 
 const Welcome = () => {
-    const [isSignUp, setIsSignUp] = useState(window.location.hash.includes('sign-up'));
+    const [isSignUp, setIsSignUp] = useState(
+        window.location.hash.includes('sign-up') || window.location.hash.includes('verify-email-address')
+    );
 
     useEffect(() => {
         const handleHashChange = () => {
-            setIsSignUp(window.location.hash.includes('sign-up'));
+            const hash = window.location.hash;
+            if (hash.includes('sign-up') || hash.includes('verify-email-address')) {
+                setIsSignUp(true);
+            } else if (hash.includes('sign-in')) {
+                setIsSignUp(false);
+            }
         };
         window.addEventListener('hashchange', handleHashChange);
         return () => window.removeEventListener('hashchange', handleHashChange);
@@ -30,7 +37,8 @@ const Welcome = () => {
             socialButtonsBlockButton: 'clerk-social-btn',
             formButtonPrimary: 'clerk-primary-btn',
             footerActionLink: 'clerk-footer-link',
-            formFieldInput: 'clerk-input'
+            formFieldInput: 'clerk-input',
+            formFieldOptional: 'clerk-form-optional'
         }
     };
 
