@@ -18,8 +18,8 @@ const Onboarding = ({ onComplete }) => {
     const [error, setError] = useState('');
 
     const email = user?.primaryEmailAddress?.emailAddress || '';
-    // Restrição de domínio para ambiente de produção
-    const isTecB2 = email.endsWith('@tecb2.com.br');
+    // Bypass temporário da restrição de domínio para permitir testes (solicitado pelo usuário)
+    const isTecB2 = true; // email.endsWith('@tecb2.com.br');
 
     useEffect(() => {
         // Domain restriction check (Currently bypassed)
