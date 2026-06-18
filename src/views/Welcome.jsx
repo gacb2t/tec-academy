@@ -1,8 +1,39 @@
-import { SignIn } from '@clerk/clerk-react';
+import { SignIn, SignUp } from '@clerk/clerk-react';
 import { dark } from '@clerk/themes';
+import { useState, useEffect } from 'react';
 import './Welcome.css';
 
 const Welcome = () => {
+    const [isSignUp, setIsSignUp] = useState(window.location.hash.includes('sign-up'));
+
+    useEffect(() => {
+        const handleHashChange = () => {
+            setIsSignUp(window.location.hash.includes('sign-up'));
+        };
+        window.addEventListener('hashchange', handleHashChange);
+        return () => window.removeEventListener('hashchange', handleHashChange);
+    }, []);
+
+    const clerkAppearance = {
+        baseTheme: dark,
+        variables: {
+            colorPrimary: '#6C63FF',
+            colorBackground: 'transparent',
+            colorInputBackground: 'rgba(255, 255, 255, 0.05)',
+            colorInputText: '#ffffff',
+            borderRadius: '12px',
+        },
+        elements: {
+            card: 'glass-clerk-card',
+            headerTitle: 'clerk-header-title',
+            headerSubtitle: 'clerk-header-subtitle',
+            socialButtonsBlockButton: 'clerk-social-btn',
+            formButtonPrimary: 'clerk-primary-btn',
+            footerActionLink: 'clerk-footer-link',
+            formFieldInput: 'clerk-input'
+        }
+    };
+
     return (
         <div className="welcome-view fade-in">
             <div className="welcome-background-glow"></div>
@@ -20,29 +51,21 @@ const Welcome = () => {
                 </div>
 
                 <div className="clerk-container">
-                    <SignIn 
-                        routing="hash" 
-                        forceRedirectUrl="/" 
-                        appearance={{
-                            baseTheme: dark,
-                            variables: {
-                                colorPrimary: '#6C63FF',
-                                colorBackground: 'transparent',
-                                colorInputBackground: 'rgba(255, 255, 255, 0.05)',
-                                colorInputText: '#ffffff',
-                                borderRadius: '12px',
-                            },
-                            elements: {
-                                card: 'glass-clerk-card',
-                                headerTitle: 'clerk-header-title',
-                                headerSubtitle: 'clerk-header-subtitle',
-                                socialButtonsBlockButton: 'clerk-social-btn',
-                                formButtonPrimary: 'clerk-primary-btn',
-                                footerActionLink: 'clerk-footer-link',
-                                formFieldInput: 'clerk-input'
-                            }
-                        }}
-                    />
+                    {isSignUp ? (
+                        <SignUp 
+                            routing="hash" 
+                            signInUrl="/#sign-in"
+                            forceRedirectUrl="/" 
+                            appearance={clerkAppearance}
+                        />
+                    ) : (
+                        <SignIn 
+                            routing="hash" 
+                            signUpUrl="/#sign-up"
+                            forceRedirectUrl="/" 
+                            appearance={clerkAppearance}
+                        />
+                    )}
                 </div>
             </div>
         </div>
