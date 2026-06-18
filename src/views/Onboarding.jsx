@@ -18,8 +18,8 @@ const Onboarding = ({ onComplete }) => {
     const [error, setError] = useState('');
 
     const email = user?.primaryEmailAddress?.emailAddress || '';
-    // Bypass temporário da restrição de domínio para permitir testes com contas Microsoft pessoais
-    const isTecB2 = true; // email.endsWith('@tecb2.com.br');
+    // Restrição de domínio para ambiente de produção
+    const isTecB2 = email.endsWith('@tecb2.com.br');
 
     useEffect(() => {
         // Domain restriction check (Currently bypassed)
@@ -44,7 +44,9 @@ const Onboarding = ({ onComplete }) => {
                     .from('user_profiles')
                     .upsert({
                         user_id: user.id,
-                        name: user.fullName || user.firstName,
+                        name: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+                        first_name: user.firstName,
+                        last_name: user.lastName,
                         email: email,
                         department: department,
                         team: team,
