@@ -43,35 +43,19 @@
    HERO BANNER
    ============================ */
 .member-hero {
-    background: linear-gradient(135deg, #2d1b69 0%, #4a1d96 30%, #5b21b6 60%, #3b0f7a 100%);
+    background: url('/banner-academy.svg') center/cover no-repeat;
     padding: 3.5rem 3rem 3rem;
     position: relative;
     overflow: hidden;
 }
 
-/* Padrão de fundo decorativo */
+/* Padrão de fundo decorativo removido para dar destaque ao novo banner SVG */
 .member-hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
+    display: none;
 }
 
 .member-hero::after {
-    content: '';
-    position: absolute;
-    bottom: -30%;
-    left: -5%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
+    display: none;
 }
 
 .member-hero-content {
