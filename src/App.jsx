@@ -49,18 +49,11 @@ function App() {
         setClerkSession(session); // Garante que a sessão tá setada ANTES do banco
         setIsFetchingData(true);
         try {
-          const [profileResponse, progressResponse] = await Promise.all([
-            supabase
+          const profileResponse = await supabase
               .from('user_profiles')
               .select('department, role')
               .eq('user_id', user.id)
-              .maybeSingle(),
-            supabase
-              .from('course_progress')
-              .select('course_id')
-              .eq('user_id', user.id)
-              .gte('percentage', 70)
-          ]);
+              .maybeSingle();
 
           if (profileResponse.error && profileResponse.error.code !== 'PGRST116') {
              console.error("Erro no Supabase: ", profileResponse.error);
@@ -73,10 +66,8 @@ function App() {
             setEffectiveRole(userRole);
           }
 
-          if (progressResponse.data && progressResponse.data.length > 0) {
-            const courseIds = progressResponse.data.map(log => log.course_id);
-            setUserProgress({ completedCourses: courseIds });
-          }
+          // (curso_progress temporariamente desabilitado na v2)
+          setUserProgress({ completedCourses: [] });
 
         } catch (error) {
           console.error("Erro carregando dados do Supabase:", error);
