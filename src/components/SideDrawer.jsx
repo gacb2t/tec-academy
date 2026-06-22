@@ -28,7 +28,7 @@ const SideDrawer = ({ isOpen, onClose, role, onNavigate, currentView }) => {
             <aside className={`side-drawer ${isOpen ? 'open' : ''}`} id="side-drawer">
                 {/* Header do drawer */}
                 <div className="drawer-header">
-                    <span className="drawer-logo">Tec-B2</span>
+                    <img src="/logo-tec.webp" alt="Tec-B2" className="drawer-logo-img" style={{ height: '28px', width: 'auto' }} />
                     <button className="drawer-close-btn" onClick={onClose} aria-label="Fechar menu">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18" />

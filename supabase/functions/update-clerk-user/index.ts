@@ -1,5 +1,7 @@
+// @ts-ignore
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
+// @ts-ignore
 const CLERK_SECRET_KEY = Deno.env.get('CLERK_SECRET_KEY')
 
 const corsHeaders = {
@@ -7,7 +9,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
   // Tratar preflight request (CORS)
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -78,8 +80,9 @@ serve(async (req) => {
       }
     )
   } catch (error) {
+    const err = error as Error;
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: err.message }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 

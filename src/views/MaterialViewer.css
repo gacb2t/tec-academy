@@ -53,7 +53,7 @@
     cursor: pointer;
     padding: 0.4rem 0.6rem;
     border-radius: 8px;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .mv-back-btn:hover {
@@ -76,7 +76,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .mv-nav-btn:hover:not(:disabled) {
@@ -156,7 +156,7 @@
     padding: 0.4rem 0.85rem;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .mv-conclude-btn:hover {
@@ -362,7 +362,7 @@
     border-radius: 6px;
     display: flex;
     align-items: center;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .mv-sidebar-icon-btn:hover {
@@ -604,7 +604,7 @@
     border-radius: 8px 0 0 8px;
     display: flex;
     align-items: center;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
     z-index: 10;
 }
 

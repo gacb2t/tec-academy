@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useUser, useSession } from '@clerk/clerk-react';
 import { supabase, setClerkSession } from './services/supabaseClient';
+import { webhookService } from './services/webhookService';
 import Welcome from './views/Welcome';
 import Onboarding from './views/Onboarding';
 import MemberArea from './views/MemberArea';
@@ -168,6 +169,28 @@ function App() {
       const newMods = [...completedModules, moduleId];
       setCompletedModules(newMods);
       localStorage.setItem('completedModules', JSON.stringify(newMods));
+
+      // Dispara webhook de curso concluído
+      const userEmail = user?.primaryEmailAddress?.emailAddress || 'sem-email';
+      const userName = user?.fullName || user?.firstName || 'sem-nome';
+      webhookService.triggerEvent('curso_concluido', {
+        userId: user?.id,
+        userEmail,
+        userName,
+        moduleId,
+        materialId
+      });
+    } else if (isLastInModule && completedModules.includes(moduleId)) {
+      // Dispara webhook de curso refeito
+      const userEmail = user?.primaryEmailAddress?.emailAddress || 'sem-email';
+      const userName = user?.fullName || user?.firstName || 'sem-nome';
+      webhookService.triggerEvent('curso_refeito', {
+        userId: user?.id,
+        userEmail,
+        userName,
+        moduleId,
+        materialId
+      });
     }
   };
 

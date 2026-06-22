@@ -40,7 +40,7 @@ const Topbar = ({ onMenuToggle, realRole, effectiveRole, onRoleChange }) => {
                 </button>
 
                 <div className="topbar-brand" id="topbar-brand">
-                    <span className="topbar-logo">Tec-B2</span>
+                    <img src="/logo-tec.webp" alt="Tec-B2" className="topbar-logo-img" style={{ height: '28px', width: 'auto' }} />
                 </div>
             </div>
 

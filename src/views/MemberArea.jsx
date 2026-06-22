@@ -1,102 +1,60 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { moduleService } from '../services/moduleService';
 import './MemberArea.css';
 
 /**
  * MemberArea — Área de membros estilo Hotmart
  * Hero banner roxo + grid de módulos baseados em embeds do Canva.
- * Não depende mais de cursos do banco — os materiais são gerenciados
- * via MODULES_DATA (embeds do Canva) no MaterialViewer.
+ * Agora puxa dados dinamicamente do banco via moduleService.
  */
 
-// Módulos disponíveis — espelha a estrutura do MaterialViewer
-const MODULES = [
-    {
-        id: 'mod-welcome',
-        title: 'Bem-vindo(a) a TEC-B2!',
-        icon: '🏢',
-        materialsCount: 1,
-        progress: 0,
-        firstMaterialId: 'mat-rh'
-    },
-    {
-        id: 'mod-sistemas',
-        title: 'Sistemas e Negociações',
-        icon: '💻',
-        materialsCount: 3,
-        progress: 0,
-        firstMaterialId: 'mat-sistemas'
-    },
-    {
-        id: 'mod-rotina',
-        title: 'Rotina e Funil de Vendas',
-        icon: '📈',
-        materialsCount: 2,
-        progress: 0,
-        firstMaterialId: 'mat-basico'
-    },
-    {
-        id: 'mod-produtos',
-        title: 'Produtos',
-        icon: '📦',
-        materialsCount: 3,
-        progress: 0,
-        firstMaterialId: 'mat-ftth'
-    },
-    {
-        id: 'mod-manual-dados',
-        title: 'Serviços Avançados Dados',
-        icon: '🌐',
-        materialsCount: 1,
-        progress: 0,
-        firstMaterialId: 'mat-manual-dados'
-    },
-    {
-        id: 'mod-manual-licencas',
-        title: 'Licenças Digitais',
-        icon: '🔑',
-        materialsCount: 1,
-        progress: 0,
-        firstMaterialId: 'mat-manual-licencas'
-    },
-    {
-        id: 'mod-manual-0800',
-        title: '0800 e 0300',
-        icon: '📞',
-        materialsCount: 1,
-        progress: 0,
-        firstMaterialId: 'mat-manual-0800'
-    }
-];
-
 const MemberArea = ({ user, progress, onViewMaterial, completedModules, role }) => {
+    const [modulesData, setModulesData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     const [activeTab, setActiveTab] = useState('conteudos');
     const [searchQuery, setSearchQuery] = useState('');
     const [viewMode, setViewMode] = useState('grid');
     const [heroExpanded, setHeroExpanded] = useState(false);
 
+    useEffect(() => {
+        async function fetchModules() {
+            try {
+                const data = await moduleService.getModulesWithMaterials();
+                setModulesData(data);
+            } catch (err) {
+                console.error("Erro ao carregar modulos", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchModules();
+    }, []);
+
     // Módulos filtrados pela busca
     const filteredModules = useMemo(() => {
-        if (!searchQuery.trim()) return MODULES;
+        if (!searchQuery.trim()) return modulesData;
         const q = searchQuery.toLowerCase();
-        return MODULES.filter(m =>
+        return modulesData.filter(m =>
             m.title.toLowerCase().includes(q)
         );
-    }, [searchQuery]);
+    }, [searchQuery, modulesData]);
 
     // Lógica de desbloqueio de módulo
     const isModuleUnlocked = (modId) => {
         if (role === 'admin') return true;
-        const modIndex = MODULES.findIndex(m => m.id === modId);
+        const modIndex = modulesData.findIndex(m => m.id === modId);
         if (modIndex <= 0) return true; // Primeiro módulo sempre liberado
-        const previousMod = MODULES[modIndex - 1];
+        const previousMod = modulesData[modIndex - 1];
         return completedModules?.includes(previousMod.id);
     };
 
     // Contagem total de materiais e progresso geral
-    const totalMaterials = MODULES.reduce((sum, m) => sum + m.materialsCount, 0);
-    const overallProgress = MODULES.length > 0
-        ? Math.round(MODULES.reduce((sum, m) => sum + m.progress, 0) / MODULES.length)
+    const totalMaterials = modulesData.reduce((sum, m) => sum + m.materialsCount, 0);
+    const overallProgress = modulesData.length > 0
+        ? Math.round(modulesData.reduce((sum, m) => sum + m.progress, 0) / modulesData.length)
         : 0;
+
 
     // Descrição do produto para o hero
     const productDescription = "Criamos este ambiente exclusivo para reunir todo o nosso acervo de treinamentos, manuais operacionais e processos estratégicos em um só lugar. Aqui, cada colaborador da TEC-B2 pode aprender no seu ritmo e evoluir profissionalmente com conteúdos curados pela nossa equipe.";
@@ -132,16 +90,21 @@ const MemberArea = ({ user, progress, onViewMaterial, completedModules, role }) 
 
                         <button
                             className="member-hero-cta"
-                            onClick={() => onViewMaterial && onViewMaterial(MODULES[0].firstMaterialId)}
+                            onClick={() => {
+                                if (modulesData.length > 0 && modulesData[0].firstMaterialId && onViewMaterial) {
+                                    onViewMaterial(modulesData[0].firstMaterialId);
+                                }
+                            }}
                             id="hero-cta-btn"
+                            disabled={loading || modulesData.length === 0}
                         >
-                            Assistir
+                            {loading ? 'Carregando...' : 'Assistir'}
                         </button>
                     </div>
 
                     <div className="member-hero-brand">
                         <div className="member-hero-logo">
-                            <span className="hero-logo-text">Tec-B2</span>
+                            <img src="/logo-tec.webp" alt="TEC-B2" className="hero-logo-img" style={{ height: '64px', width: 'auto' }} />
                         </div>
                     </div>
                 </div>
@@ -219,7 +182,11 @@ const MemberArea = ({ user, progress, onViewMaterial, completedModules, role }) 
                     </div>
 
                     {/* Grid / Lista de módulos */}
-                    {filteredModules.length === 0 ? (
+                    {loading ? (
+                        <div className="member-empty-state">
+                            <p>Carregando conteúdos...</p>
+                        </div>
+                    ) : filteredModules.length === 0 ? (
                         <div className="member-empty-state">
                             <p>Nenhum conteúdo encontrado.</p>
                         </div>

@@ -1,132 +1,15 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { courseService } from '../services/courseService';
 import { supabase } from '../services/supabaseClient';
+import { moduleService } from '../services/moduleService';
 import { useUser } from '@clerk/clerk-react';
 import './MaterialViewer.css';
 
 /**
  * MaterialViewer — Tela de visualização de material estilo Hotmart
  * Layout: conteúdo principal (embed + comentários) + sidebar de navegação
- * Materiais são exibidos via embed do Canva
+ * Agora puxa dados dinamicamente do banco via moduleService.
  */
 
-// Dados fixos dos materiais — cada módulo contém materiais com embeds do Canva
-const MODULES_DATA = [
-    {
-        id: 'mod-welcome',
-        title: 'Bem-vindo(a) a TEC-B2',
-        materials: [
-            {
-                id: 'mat-rh',
-                title: '01 - Recursos Humanos',
-                embedSrc: 'https://www.canva.com/design/DAGaarY_2jE/TyEellWU6VpH8NSSWXSnGQ/view?embed',
-                type: 'presentation',
-            },
-        ],
-    },
-    {
-        id: 'mod-sistemas',
-        title: 'Sistemas e Negociações',
-        materials: [
-            {
-                id: 'mat-sistemas',
-                title: '01 - Sistemas, Ferramentas e Diário de Bordo',
-                embedSrc: 'https://www.canva.com/design/DAHJkJ0W-wQ/PraOlv0XggvUIbRP5R2HBA/view?embed',
-                type: 'presentation',
-            },
-            {
-                id: 'mat-carteira',
-                title: '02 - Carteira de Clientes e CRM',
-                embedSrc: 'https://www.canva.com/design/DAHJmIIH8yw/Nx24AbZtVDpUXagwfE-Rfg/view?embed',
-                type: 'presentation',
-            },
-            {
-                id: 'mat-funis',
-                title: '03 - Funis de Venda e Contratos',
-                embedSrc: 'https://www.canva.com/design/DAHJmDa3H-8/aDQFHYmEkjFJOhacJQpLSw/view?embed',
-                type: 'presentation',
-            },
-        ],
-    },
-    {
-        id: 'mod-rotina',
-        title: 'Rotina e Funil de Vendas',
-        materials: [
-            {
-                id: 'mat-basico',
-                title: '01 - Módulo Básico',
-                embedSrc: 'https://www.canva.com/design/DAHJmLwPUpc/EF8GdtkHaDG3ldethhVNZQ/view?embed',
-                type: 'presentation',
-            },
-            {
-                id: 'mat-avancado',
-                title: '02 - Módulo Avançado',
-                embedSrc: 'https://www.canva.com/design/DAHJmEbjk2I/3JuztyVS--8ilj0oUQ6Cvg/view?embed',
-                type: 'presentation',
-            },
-        ],
-    },
-    {
-        id: 'mod-produtos',
-        title: 'Produtos',
-        materials: [
-            {
-                id: 'mat-ftth',
-                title: '01 - FTTH (Banda Larga)',
-                embedSrc: 'https://www.canva.com/design/DAGaa9yUmzo/yiYUdpPKq1qiW8yP3Zx5Qw/view?embed',
-                type: 'presentation',
-            },
-            {
-                id: 'mat-moveis',
-                title: '02 - Móveis',
-                embedSrc: 'https://www.canva.com/design/DAGaa4a3TYQ/M9nxuRzdJvC6Mj7LemzVtw/view?embed',
-                type: 'presentation',
-            },
-            {
-                id: 'mat-vvn',
-                title: '03 - Vivo Voz Negócio (VVN)',
-                embedSrc: 'https://www.canva.com/design/DAGaaz4K1NY/9KvtsWK2E48B3MjR1UHRyw/view?embed',
-                type: 'presentation',
-            },
-        ],
-    },
-    {
-        id: 'mod-manual-dados',
-        title: 'Serviços Avançados Dados',
-        materials: [
-            {
-                id: 'mat-manual-dados',
-                title: '01 - Serviços Avançados Dados',
-                embedSrc: 'https://www.canva.com/design/DAHJjxD52qA/nxen8DPvqy21caqBuQu5Tw/view?embed',
-                type: 'presentation',
-            },
-        ],
-    },
-    {
-        id: 'mod-manual-licencas',
-        title: 'Licenças Digitais',
-        materials: [
-            {
-                id: 'mat-manual-licencas',
-                title: '01 - Licenças Digitais',
-                embedSrc: 'https://www.canva.com/design/DAHJeNnWg88/9f-azxxxuo85jZeiefDliw/view?embed',
-                type: 'presentation',
-            },
-        ],
-    },
-    {
-        id: 'mod-manual-0800',
-        title: '0800 e 0300',
-        materials: [
-            {
-                id: 'mat-manual-0800',
-                title: '01 - 0800 e 0300',
-                embedSrc: 'https://www.canva.com/design/DAHJwIbkyro/Zmyes03e87nZe130QxNjIw/view?embed',
-                type: 'presentation',
-            },
-        ],
-    },
-];
 
 const MaterialViewer = ({ 
     courseId, 
@@ -139,38 +22,75 @@ const MaterialViewer = ({
 }) => {
     const { user: clerkUser } = useUser();
 
+    // Estado dos dados dinâmicos
+    const [modulesData, setModulesData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     // Estado do material ativo
-    const [activeModuleId, setActiveModuleId] = useState(MODULES_DATA[0]?.id || '');
-    const [activeMaterialId, setActiveMaterialId] = useState(
-        initialMaterialId || MODULES_DATA[0]?.materials[0]?.id || ''
-    );
+    const [activeModuleId, setActiveModuleId] = useState('');
+    const [activeMaterialId, setActiveMaterialId] = useState('');
 
     // Sidebar
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [sidebarSearch, setSidebarSearch] = useState('');
-    const [expandedModules, setExpandedModules] = useState(() => {
-        const initial = {};
-        MODULES_DATA.forEach(m => { initial[m.id] = true; });
-        return initial;
-    });
+    const [expandedModules, setExpandedModules] = useState({});
 
     // Comentários (preparado para futuro)
     const [commentText, setCommentText] = useState('');
 
+    useEffect(() => {
+        async function loadData() {
+            try {
+                const data = await moduleService.getModulesWithMaterials();
+                setModulesData(data);
+                
+                // Initialize active module and material
+                if (data.length > 0) {
+                    let initialModule = data[0];
+                    let initialMaterial = data[0].materials?.[0];
+
+                    if (initialMaterialId) {
+                        for (const mod of data) {
+                            const foundMat = mod.materials?.find(m => m.id === initialMaterialId);
+                            if (foundMat) {
+                                initialModule = mod;
+                                initialMaterial = foundMat;
+                                break;
+                            }
+                        }
+                    }
+
+                    setActiveModuleId(initialModule?.id || '');
+                    setActiveMaterialId(initialMaterial?.id || '');
+
+                    // Initialize expanded states
+                    const initialExpanded = {};
+                    data.forEach(m => { initialExpanded[m.id] = true; });
+                    setExpandedModules(initialExpanded);
+                }
+            } catch (error) {
+                console.error("Erro ao carregar materiais", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        loadData();
+    }, [initialMaterialId]);
+
     // Material ativo
     const activeMaterial = useMemo(() => {
-        for (const mod of MODULES_DATA) {
+        for (const mod of modulesData) {
             const mat = mod.materials.find(m => m.id === activeMaterialId);
             if (mat) return { ...mat, moduleTitle: mod.title, moduleId: mod.id };
         }
         return null;
-    }, [activeMaterialId]);
+    }, [activeMaterialId, modulesData]);
 
     // Filtro de busca na sidebar
     const filteredModules = useMemo(() => {
-        if (!sidebarSearch.trim()) return MODULES_DATA;
+        if (!sidebarSearch.trim()) return modulesData;
         const q = sidebarSearch.toLowerCase();
-        return MODULES_DATA.map(mod => ({
+        return modulesData.map(mod => ({
             ...mod,
             materials: mod.materials.filter(m =>
                 m.title.toLowerCase().includes(q)
@@ -178,14 +98,14 @@ const MaterialViewer = ({
         })).filter(mod =>
             mod.title.toLowerCase().includes(q) || mod.materials.length > 0
         );
-    }, [sidebarSearch]);
+    }, [sidebarSearch, modulesData]);
 
     // Lógica de desbloqueio de módulo
     const isModuleUnlocked = (modId) => {
         if (role === 'admin') return true;
-        const modIndex = MODULES_DATA.findIndex(m => m.id === modId);
+        const modIndex = modulesData.findIndex(m => m.id === modId);
         if (modIndex <= 0) return true; // Primeiro módulo sempre liberado
-        const previousMod = MODULES_DATA[modIndex - 1];
+        const previousMod = modulesData[modIndex - 1];
         return completedModules?.includes(previousMod.id);
     };
 
@@ -199,13 +119,13 @@ const MaterialViewer = ({
     // Navegação entre materiais
     const allMaterials = useMemo(() => {
         const all = [];
-        MODULES_DATA.forEach(mod => {
+        modulesData.forEach(mod => {
             mod.materials.forEach(mat => {
                 all.push({ ...mat, moduleTitle: mod.title, moduleId: mod.id });
             });
         });
         return all;
-    }, []);
+    }, [modulesData]);
 
     const currentIndex = allMaterials.findIndex(m => m.id === activeMaterialId);
 
@@ -236,6 +156,14 @@ const MaterialViewer = ({
             [moduleId]: !prev[moduleId]
         }));
     };
+
+    if (loading) {
+        return (
+            <div className="mv-error">
+                <p>Carregando materiais...</p>
+            </div>
+        );
+    }
 
     if (!activeMaterial) {
         return (
@@ -308,7 +236,7 @@ const MaterialViewer = ({
                             className={`mv-conclude-btn ${completedMaterials.includes(activeMaterial.id) ? 'completed' : ''}`}
                             onClick={() => {
                                 if (onComplete) {
-                                    const currentMod = MODULES_DATA.find(m => m.id === activeMaterial.moduleId);
+                                    const currentMod = modulesData.find(m => m.id === activeMaterial.moduleId);
                                     const isLast = currentMod.materials[currentMod.materials.length - 1].id === activeMaterial.id;
                                     onComplete(activeMaterial.id, activeMaterial.moduleId, isLast);
                                 }

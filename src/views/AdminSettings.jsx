@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../services/supabaseClient';
+import { moduleService } from '../services/moduleService';
+import { webhookService } from '../services/webhookService';
 import './AdminSettings.css';
 
 /**
@@ -112,70 +114,44 @@ const AdminSettings = ({ onViewChange, onBack }) => {
 
     // Dados
     const [users, setUsers] = useState([]);
-    const [expandedModules, setExpandedModules] = useState({ 'mod-welcome': true });
+    const [modulesData, setModulesData] = useState([]);
+    const [webhooksData, setWebhooksData] = useState([]);
+    const [loadingAdmin, setLoadingAdmin] = useState(true);
+    const [expandedModules, setExpandedModules] = useState({});
     
     // Edição de usuário
     const [editingUser, setEditingUser] = useState(null);
     const [editFormData, setEditFormData] = useState({ name: '', email: '', password: '', department: '', team: '' });
 
-    // Materiais Canva — módulos estáticos (mesma fonte do MaterialViewer)
-    const ADMIN_MODULES = [
-        {
-            id: 'mod-welcome',
-            title: 'Bem-vindo(a) a TEC-B2!',
-            icon: '🏢',
-            materials: [
-                { id: 'mat-rh', title: '01 - Recursos Humanos', type: 'Apresentação Canva', status: 'Publicado' },
-            ],
-        },
-        {
-            id: 'mod-sistemas',
-            title: 'Sistemas e Negociações',
-            icon: '💻',
-            materials: [
-                { id: 'mat-sistemas', title: '01 - Sistemas, Ferramentas e Diário de Bordo', type: 'Apresentação Canva', status: 'Publicado' },
-                { id: 'mat-carteira', title: '02 - Carteira de Clientes e CRM', type: 'Apresentação Canva', status: 'Publicado' },
-                { id: 'mat-funis', title: '03 - Funis de Venda e Contratos', type: 'Apresentação Canva', status: 'Publicado' },
-            ],
-        },
-        {
-            id: 'mod-rotina',
-            title: 'Rotina e Funil de Vendas',
-            icon: '📈',
-            materials: [
-                { id: 'mat-basico', title: '01 - Módulo Básico', type: 'Apresentação Canva', status: 'Publicado' },
-                { id: 'mat-avancado', title: '02 - Módulo Avançado', type: 'Apresentação Canva', status: 'Publicado' },
-            ],
-        },
-        {
-            id: 'mod-produtos',
-            title: 'Produtos',
-            icon: '📦',
-            materials: [
-                { id: 'mat-ftth', title: '01 - FTTH (Banda Larga)', type: 'Apresentação Canva', status: 'Publicado' },
-                { id: 'mat-moveis', title: '02 - Móveis', type: 'Apresentação Canva', status: 'Publicado' },
-                { id: 'mat-vvn', title: '03 - Vivo Voz Negócio (VVN)', type: 'Apresentação Canva', status: 'Publicado' },
-            ],
-        },
-    ];
-
-    // Carregar usuários
-    const fetchUsers = useCallback(async () => {
+    // Carregar dados (Usuários, Módulos, Webhooks)
+    const fetchAdminData = useCallback(async () => {
+        setLoadingAdmin(true);
         try {
-            const { data, error } = await supabase
-                .from('user_profiles')
-                .select('*')
-                .order('created_at', { ascending: false });
-            if (error) throw error;
-            setUsers(data || []);
+            const [usersData, modulesResp, webhooksResp] = await Promise.all([
+                supabase.from('user_profiles').select('*').order('created_at', { ascending: false }),
+                moduleService.getModulesWithMaterials(),
+                webhookService.getWebhooks()
+            ]);
+            
+            if (usersData.error) throw usersData.error;
+            
+            setUsers(usersData.data || []);
+            setModulesData(modulesResp || []);
+            setWebhooksData(webhooksResp || []);
+            
+            const exp = {};
+            (modulesResp || []).forEach(m => exp[m.id] = true);
+            setExpandedModules(exp);
         } catch (err) {
-            console.error("Erro ao carregar usuários:", err);
+            console.error("Erro ao carregar dados admin:", err);
+        } finally {
+            setLoadingAdmin(false);
         }
     }, []);
 
     useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);
+        fetchAdminData();
+    }, [fetchAdminData]);
 
     // Ações de Usuário
     const handleDeleteUser = async (userToDelete) => {
@@ -255,6 +231,7 @@ const AdminSettings = ({ onViewChange, onBack }) => {
         { key: 'conteudo', label: 'Conteúdo' },
         { key: 'times', label: 'Times' },
         { key: 'usuarios', label: 'Usuários' },
+        { key: 'webhooks', label: 'Webhooks' },
         { key: 'comentarios', label: 'Comentários' },
         { key: 'certificado', label: 'Certificado' },
     ];
@@ -266,7 +243,7 @@ const AdminSettings = ({ onViewChange, onBack }) => {
     ];
 
     // Contagem total de materiais
-    const totalContents = ADMIN_MODULES.reduce((sum, m) => sum + m.materials.length, 0);
+    const totalContents = modulesData.reduce((sum, m) => sum + (m.materials?.length || 0), 0);
 
     // Agrupar usuários por time
     const groupedByTeam = users.reduce((acc, user) => {
@@ -393,30 +370,33 @@ const AdminSettings = ({ onViewChange, onBack }) => {
                             </div>
 
                             {/* Lista de módulos com materiais */}
-                            <div className="as-modules-list">
-                                {ADMIN_MODULES.map((mod) => (
-                                    <div key={mod.id} className="as-module-group" id={`admin-module-${mod.id}`}>
-                                        {/* Cabeçalho do módulo */}
-                                        <div className="as-module-header">
-                                            <div className="as-module-header-left">
-                                                <span className="as-module-icon">{mod.icon}</span>
-                                                <div className="as-module-info">
-                                                    <h3 className="as-module-title">{mod.title}</h3>
-                                                    <div className="as-module-meta">
-                                                        <span className="as-module-badge">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                                                                <line x1="8" y1="21" x2="16" y2="21" />
-                                                                <line x1="12" y1="17" x2="12" y2="21" />
-                                                            </svg>
-                                                            Módulo principal
-                                                        </span>
-                                                        <span className="as-module-count">
-                                                            {mod.materials.length} conteúdo{mod.materials.length !== 1 ? 's' : ''}
-                                                        </span>
+                            {loadingAdmin ? (
+                                <div style={{ padding: '2rem', textAlign: 'center', color: '#ccc' }}>Carregando conteúdos...</div>
+                            ) : (
+                                <div className="as-modules-list">
+                                    {modulesData.map((mod) => (
+                                        <div key={mod.id} className="as-module-group" id={`admin-module-${mod.id}`}>
+                                            {/* Cabeçalho do módulo */}
+                                            <div className="as-module-header">
+                                                <div className="as-module-header-left">
+                                                    <span className="as-module-icon">{mod.icon}</span>
+                                                    <div className="as-module-info">
+                                                        <h3 className="as-module-title">{mod.title}</h3>
+                                                        <div className="as-module-meta">
+                                                            <span className="as-module-badge">
+                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                                                    <line x1="8" y1="21" x2="16" y2="21" />
+                                                                    <line x1="12" y1="17" x2="12" y2="21" />
+                                                                </svg>
+                                                                Módulo principal
+                                                            </span>
+                                                            <span className="as-module-count">
+                                                                {mod.materials?.length || 0} conteúdo{(mod.materials?.length || 0) !== 1 ? 's' : ''}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
                                             <div className="as-module-header-right">
                                                 <button className="as-icon-btn" aria-label="Adicionar" title="Adicionar material">
@@ -447,7 +427,7 @@ const AdminSettings = ({ onViewChange, onBack }) => {
                                         {/* Lista de materiais dentro do módulo */}
                                         {expandedModules[mod.id] !== false && (
                                             <div className="as-module-contents">
-                                                {mod.materials.map((mat, idx) => (
+                                                {mod.materials?.map((mat, idx) => (
                                                     <div key={mat.id} className="as-content-item">
                                                         <div className="as-content-item-left">
                                                             <div className="as-drag-handle" aria-label="Arrastar">
@@ -474,7 +454,7 @@ const AdminSettings = ({ onViewChange, onBack }) => {
                                                         </div>
 
                                                         <div className="as-content-item-right">
-                                                            <span className="as-status-badge published">{mat.status}</span>
+                                                            <span className="as-status-badge published">Publicado</span>
                                                             <button className="as-icon-btn-sm" aria-label="Mais opções">
                                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                                     <circle cx="12" cy="12" r="1" />
@@ -499,6 +479,7 @@ const AdminSettings = ({ onViewChange, onBack }) => {
                                     </div>
                                 ))}
                             </div>
+                            )}
                         </div>
                     )}
 
@@ -659,6 +640,78 @@ const AdminSettings = ({ onViewChange, onBack }) => {
                         <h3>Certificados</h3>
                         <p>Configure modelos de certificado emitidos ao concluir os treinamentos.</p>
                         <p className="as-placeholder-hint">Personalize a identidade visual, dados exibidos e regras de emissão.</p>
+                    </div>
+                </div>
+            )}
+
+            {/* ====== TAB WEBHOOKS ====== */}
+            {activeTab === 'webhooks' && (
+                <div className="as-tab-content">
+                    <div className="as-users-header">
+                        <h2>Integrações (Webhooks)</h2>
+                        <button className="as-create-btn" onClick={() => {
+                            const url = prompt("Qual a URL do webhook (ex: Zapier/Make)?");
+                            if (!url) return;
+                            const event = prompt("Qual evento? (curso_concluido, curso_refeito, inscricao_recebida)", "curso_concluido");
+                            if (!event) return;
+                            const name = prompt("Dê um nome para este webhook:", "Meu Webhook");
+                            if (!name) return;
+                            
+                            webhookService.saveWebhook({ name, url, event, isActive: 1 })
+                                .then(newWebhook => setWebhooksData([newWebhook, ...webhooksData]))
+                                .catch(err => {
+                                    console.error(err);
+                                    alert("Erro ao salvar webhook. Verifique o console.");
+                                });
+                        }}>
+                            Criar Webhook
+                        </button>
+                    </div>
+
+                    <div className="as-users-table-wrapper">
+                        <table className="as-users-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Evento</th>
+                                    <th>URL</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {webhooksData.map(w => (
+                                    <tr key={w.id}>
+                                        <td>{w.name}</td>
+                                        <td><span className="as-dept-tag">{w.event}</span></td>
+                                        <td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{w.url}</td>
+                                        <td>
+                                            <span className={`as-status-badge ${w.isActive === 1 ? 'published' : 'draft'}`}>
+                                                {w.isActive === 1 ? 'Ativo' : 'Inativo'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                <button className="as-icon-btn-sm" title={w.isActive === 1 ? "Pausar" : "Ativar"} onClick={() => {
+                                                    webhookService.saveWebhook({ ...w, isActive: w.isActive === 1 ? 0 : 1 })
+                                                        .then(updated => setWebhooksData(webhooksData.map(xw => xw.id === w.id ? updated : xw)));
+                                                }}>
+                                                    {w.isActive === 1 ? '⏸️' : '▶️'}
+                                                </button>
+                                                <button className="as-icon-btn-sm" title="Excluir" onClick={() => {
+                                                    if(window.confirm("Excluir webhook?")) {
+                                                        webhookService.deleteWebhook(w.id).then(() => setWebhooksData(webhooksData.filter(xw => xw.id !== w.id)));
+                                                    }
+                                                }}>🗑️</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {webhooksData.length === 0 && (
+                                    <tr><td colSpan="5" style={{textAlign: 'center', padding: '2rem', color: '#ccc'}}>Nenhum webhook configurado.</td></tr>
+                                )}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             )}

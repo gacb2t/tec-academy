@@ -40,7 +40,7 @@
     border-radius: 8px;
     display: flex;
     align-items: center;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .as-back-btn:hover {
@@ -106,7 +106,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .as-action-btn:hover {
@@ -135,7 +135,7 @@
     padding: 0.9rem 1.25rem;
     cursor: pointer;
     border-bottom: 2px solid transparent;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
     position: relative;
 }
 
@@ -179,7 +179,7 @@
     padding: 0.45rem 1rem;
     border-radius: 20px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .as-subtab:hover {
@@ -210,7 +210,7 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .as-search-btn:hover {
@@ -231,7 +231,7 @@
     padding: 0.45rem 0.9rem;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .as-upload-btn:hover {
@@ -253,7 +253,7 @@
     padding: 0.5rem 1.1rem;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
 }
 
@@ -299,7 +299,7 @@
     border-radius: 6px;
     display: flex;
     align-items: center;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .as-expand-all-btn:hover {
@@ -401,7 +401,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .as-icon-btn:hover {
@@ -544,7 +544,7 @@
     border-radius: 6px;
     display: flex;
     align-items: center;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .as-icon-btn-sm:hover {
@@ -567,7 +567,7 @@
     border-radius: 8px;
     cursor: pointer;
     margin: 0.5rem 0.75rem;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .as-add-content-btn:hover {
@@ -702,7 +702,7 @@
     border-radius: 6px;
     cursor: pointer;
     outline: none;
-    transition: all 0.2s;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
     appearance: auto;
 }
 

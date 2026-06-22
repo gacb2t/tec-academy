@@ -86,7 +86,7 @@
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .tab-btn:hover {
@@ -112,7 +112,7 @@
   border: 1px solid var(--border-color);
   border-radius: 16px;
   overflow: hidden;
-  transition: all 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
   display: flex;
   flex-direction: column;
 }
@@ -196,7 +196,7 @@
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .btn-redeem:hover:not(:disabled) {
@@ -295,7 +295,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .btn-icon:hover {
