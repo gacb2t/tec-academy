@@ -1,0 +1,739 @@
+﻿import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../services/supabaseClient';
+import './AdminSettings.css';
+
+/**
+ * AdminSettings ÔÇö Painel de administra├º├úo estilo Hotmart
+ * Tabs: Conte├║do, Turmas, Usu├írios, Coment├írios, Certificado
+ * Sub-tabs (Conte├║do): Principal, Adicional, Trilhas
+ */
+
+// Mapeamento de roles para labels amig├íveis
+const ROLE_OPTIONS = [
+    { value: 'colaborador', label: 'Colaborador' },
+    { value: 'gestor', label: 'Gestor' },
+    { value: 'admin', label: 'Administrador' },
+];
+
+const getRoleLabel = (role) => {
+    const found = ROLE_OPTIONS.find(r => r.value === role);
+    return found ? found.label : 'Colaborador';
+};
+
+const DEPARTMENTS = {
+    'Vendas': ['Time Farm', 'Time Hunter'],
+    'Administrativo': ['Backoffice', 'Recursos Humanos'],
+    'Suporte': ['Suporte ao cliente', 'Time NOQ']
+};
+
+/**
+ * UserRow ÔÇö Linha individual da tabela de usu├írios
+ * Permite edi├º├úo de role via select dropdown
+ */
+const UserRow = ({ user: u, onRoleUpdated, onEdit, onDelete }) => {
+    const [saving, setSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
+
+    const handleRoleChange = async (newRole) => {
+        if (newRole === (u.role || 'colaborador')) return;
+
+        setSaving(true);
+        try {
+            const { error } = await supabase
+                .from('user_profiles')
+                .update({ role: newRole })
+                .eq('user_id', u.user_id);
+
+            if (error) throw error;
+
+            onRoleUpdated(u.id || u.user_id, newRole);
+            setSaved(true);
+            setTimeout(() => setSaved(false), 2000);
+        } catch (err) {
+            console.error("Erro ao atualizar role:", err);
+            alert("Erro ao atualizar permiss├úo do usu├írio.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <tr>
+            <td>
+                <div className="as-user-cell">
+                    <div className="as-user-avatar">
+                        {(u.name || u.full_name || u.email || '?').charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <span className="as-user-name">{u.name || u.full_name || 'Sem nome'}</span>
+                        <span className="as-user-email">{u.email || 'ÔÇö'}</span>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <span className="as-dept-tag">
+                    {u.department || 'ÔÇö'} {u.team ? `- ${u.team}` : ''}
+                </span>
+            </td>
+            <td>
+                <div className="as-role-select-wrapper">
+                    <select
+                        className={`as-role-select ${u.role === 'admin' ? 'admin' : u.role === 'gestor' ? 'gestor' : ''}`}
+                        value={u.role || 'colaborador'}
+                        onChange={(e) => handleRoleChange(e.target.value)}
+                        disabled={saving}
+                    >
+                        {ROLE_OPTIONS.map(opt => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                    </select>
+                    {saving && <span className="as-role-saving">Salvando...</span>}
+                    {saved && <span className="as-role-saved">Ô£ô</span>}
+                </div>
+            </td>
+            <td className="as-date-cell">
+                {u.created_at ? new Date(u.created_at).toLocaleDateString('pt-BR') : 'ÔÇö'}
+            </td>
+            <td>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button className="as-icon-btn-sm" onClick={() => onEdit(u)} title="Editar">Ô£Å´©Å</button>
+                    <button className="as-icon-btn-sm" onClick={() => onDelete(u)} title="Excluir">­ƒùæ´©Å</button>
+                </div>
+            </td>
+        </tr>
+    );
+};
+
+const AdminSettings = ({ onViewChange, onBack }) => {
+    // Tabs principais
+    const [activeTab, setActiveTab] = useState('conteudo');
+    // Sub-tabs de Conte├║do
+    const [contentSubTab, setContentSubTab] = useState('principal');
+
+    // Dados
+    const [users, setUsers] = useState([]);
+    const [expandedModules, setExpandedModules] = useState({ 'mod-welcome': true });
+    
+    // Edi├º├úo de usu├írio
+    const [editingUser, setEditingUser] = useState(null);
+    const [editFormData, setEditFormData] = useState({ name: '', email: '', password: '', department: '', team: '' });
+
+    // Materiais Canva ÔÇö m├│dulos est├íticos (mesma fonte do MaterialViewer)
+    const ADMIN_MODULES = [
+        {
+            id: 'mod-welcome',
+            title: 'Bem-vindo(a) a TEC-B2!',
+            icon: '­ƒÅó',
+            materials: [
+                { id: 'mat-rh', title: '01 - Recursos Humanos', type: 'Apresenta├º├úo Canva', status: 'Publicado' },
+            ],
+        },
+        {
+            id: 'mod-sistemas',
+            title: 'Sistemas e Negocia├º├Áes',
+            icon: '­ƒÆ╗',
+            materials: [
+                { id: 'mat-sistemas', title: '01 - Sistemas, Ferramentas e Di├írio de Bordo', type: 'Apresenta├º├úo Canva', status: 'Publicado' },
+                { id: 'mat-carteira', title: '02 - Carteira de Clientes e CRM', type: 'Apresenta├º├úo Canva', status: 'Publicado' },
+                { id: 'mat-funis', title: '03 - Funis de Venda e Contratos', type: 'Apresenta├º├úo Canva', status: 'Publicado' },
+            ],
+        },
+        {
+            id: 'mod-rotina',
+            title: 'Rotina e Funil de Vendas',
+            icon: '­ƒôê',
+            materials: [
+                { id: 'mat-basico', title: '01 - M├│dulo B├ísico', type: 'Apresenta├º├úo Canva', status: 'Publicado' },
+                { id: 'mat-avancado', title: '02 - M├│dulo Avan├ºado', type: 'Apresenta├º├úo Canva', status: 'Publicado' },
+            ],
+        },
+        {
+            id: 'mod-produtos',
+            title: 'Produtos',
+            icon: '­ƒôª',
+            materials: [
+                { id: 'mat-ftth', title: '01 - FTTH (Banda Larga)', type: 'Apresenta├º├úo Canva', status: 'Publicado' },
+                { id: 'mat-moveis', title: '02 - M├│veis', type: 'Apresenta├º├úo Canva', status: 'Publicado' },
+                { id: 'mat-vvn', title: '03 - Vivo Voz Neg├│cio (VVN)', type: 'Apresenta├º├úo Canva', status: 'Publicado' },
+            ],
+        },
+    ];
+
+    // Carregar usu├írios
+    const fetchUsers = useCallback(async () => {
+        try {
+            const { data, error } = await supabase
+                .from('user_profiles')
+                .select('*')
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            setUsers(data || []);
+        } catch (err) {
+            console.error("Erro ao carregar usu├írios:", err);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchUsers();
+    }, [fetchUsers]);
+
+    // A├º├Áes de Usu├írio
+    const handleDeleteUser = async (userToDelete) => {
+        if (!window.confirm(`Tem certeza que deseja excluir o usu├írio ${userToDelete.name || userToDelete.email}?`)) return;
+        try {
+            const { error } = await supabase.from('user_profiles').delete().eq('user_id', userToDelete.user_id);
+            if (error) throw error;
+            setUsers(users.filter(u => u.user_id !== userToDelete.user_id));
+        } catch (err) {
+            console.error("Erro ao deletar usu├írio:", err);
+            alert("Erro ao excluir usu├írio.");
+        }
+    };
+
+    const handleOpenEditUser = (u) => {
+        setEditingUser(u);
+        setEditFormData({ name: u.name || '', email: u.email || '', password: '', department: u.department || '', team: u.team || '' });
+    };
+
+    const handleSaveEditUser = async () => {
+        try {
+            // 1. Atualizar a tabela de perfis
+            const { error } = await supabase.from('user_profiles').update({
+                name: editFormData.name,
+                email: editFormData.email,
+                department: editFormData.department,
+                team: editFormData.team,
+            }).eq('user_id', editingUser.user_id);
+
+            if (error) throw error;
+
+            // 2. Tentar atualizar as credenciais no Clerk via Edge Function
+            if (editFormData.password || editFormData.email !== editingUser.email) {
+                const { error: edgeError } = await supabase.functions.invoke('update-clerk-user', {
+                    body: {
+                        userId: editingUser.user_id,
+                        email: editFormData.email !== editingUser.email ? editFormData.email : undefined,
+                        password: editFormData.password || undefined
+                    }
+                });
+
+                if (edgeError) {
+                    console.warn("Edge Function falhou (pode faltar configurar a CLERK_SECRET_KEY):", edgeError);
+                    alert("O Perfil foi atualizado com sucesso, mas a senha/email no Clerk n├úo p├┤de ser alterada. Verifique se o Edge Function est├í deployado e com a SECRET_KEY configurada.");
+                }
+            }
+
+            setUsers(users.map(u => u.user_id === editingUser.user_id ? { ...u, ...editFormData, password: undefined } : u));
+            setEditingUser(null);
+        } catch (err) {
+            console.error("Erro ao atualizar usu├írio:", err);
+            alert("Erro ao salvar altera├º├Áes.");
+        }
+    };
+
+    // Toggle expans├úo de m├│dulo
+    const toggleModule = (moduleId) => {
+        setExpandedModules(prev => ({
+            ...prev,
+            [moduleId]: !prev[moduleId]
+        }));
+    };
+
+    // A├º├Áes de conte├║do
+    const handleCreateCourse = () => {
+        // onViewChange('course-builder', { courseId: null }); // Placeholder
+        alert('Cria├º├úo de novos conte├║dos ser├í liberada na pr├│xima vers├úo.');
+    };
+
+    const handleEditCourse = (moduleId) => {
+        // onViewChange('course-builder', { courseId: moduleId }); // Placeholder
+        alert('Edi├º├úo de conte├║do em breve.');
+    };
+
+    // Tabs config
+    const mainTabs = [
+        { key: 'conteudo', label: 'Conte├║do' },
+        { key: 'times', label: 'Times' },
+        { key: 'usuarios', label: 'Usu├írios' },
+        { key: 'comentarios', label: 'Coment├írios' },
+        { key: 'certificado', label: 'Certificado' },
+    ];
+
+    const contentSubTabs = [
+        { key: 'principal', label: 'Principal' },
+        { key: 'adicional', label: 'Adicional' },
+        { key: 'trilhas', label: 'Trilhas' },
+    ];
+
+    // Contagem total de materiais
+    const totalContents = ADMIN_MODULES.reduce((sum, m) => sum + m.materials.length, 0);
+
+    // Agrupar usu├írios por time
+    const groupedByTeam = users.reduce((acc, user) => {
+        const team = user.team || 'Sem Time';
+        if (!acc[team]) acc[team] = [];
+        acc[team].push(user);
+        return acc;
+    }, {});
+    const sortedTeams = Object.keys(groupedByTeam).sort();
+
+    return (
+        <div className="admin-settings" id="admin-settings">
+            {/* ====== HEADER ====== */}
+            <header className="as-header">
+                <div className="as-header-left">
+                    <button className="as-back-btn" onClick={onBack} aria-label="Voltar" id="admin-back-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m15 18-6-6 6-6" />
+                        </svg>
+                    </button>
+                    <div className="as-header-info">
+                        <h1 className="as-title">EduTec - Treinamentos</h1>
+                        <div className="as-meta">
+                            <span className="as-meta-type">Curso Online</span>
+                            <span className="as-meta-badge active">Vendas ativas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="as-header-actions">
+                    <button className="as-action-btn" aria-label="Visualizar" title="Pr├®-visualizar">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                    </button>
+                    <button className="as-action-btn" aria-label="Filtrar" title="Filtrar">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                        </svg>
+                    </button>
+                    <button className="as-action-btn" aria-label="Configura├º├Áes" title="Configura├º├Áes avan├ºadas">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            {/* Tabs principais */}
+            <div className="as-tabs" id="admin-main-tabs">
+                {mainTabs.map(tab => (
+                    <button
+                        key={tab.key}
+                        className={`as-tab ${activeTab === tab.key ? 'active' : ''}`}
+                        onClick={() => setActiveTab(tab.key)}
+                        id={`admin-tab-${tab.key}`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* ====== TAB CONTE├ÜDO ====== */}
+            {activeTab === 'conteudo' && (
+                <div className="as-content-tab">
+                    {/* Sub-tabs */}
+                    <div className="as-subtabs-row">
+                        <div className="as-subtabs" id="admin-sub-tabs">
+                            {contentSubTabs.map(sub => (
+                                <button
+                                    key={sub.key}
+                                    className={`as-subtab ${contentSubTab === sub.key ? 'active' : ''}`}
+                                    onClick={() => setContentSubTab(sub.key)}
+                                    id={`admin-subtab-${sub.key}`}
+                                >
+                                    {sub.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="as-subtabs-actions">
+                            <button className="as-search-btn" aria-label="Buscar">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <path d="m21 21-4.3-4.3" />
+                                </svg>
+                            </button>
+                            <button className="as-upload-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                                Enviar arquivos
+                            </button>
+                            <button className="as-create-btn" onClick={handleCreateCourse} id="admin-create-btn">
+                                Criar
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Conte├║do principal ÔÇö m├│dulos com materiais Canva */}
+                    {contentSubTab === 'principal' && (
+                        <div className="as-principal-content">
+                            {/* Selecionar todos */}
+                            <div className="as-select-all-row">
+                                <label className="as-checkbox-label">
+                                    <input type="checkbox" className="as-checkbox" />
+                                    <span>Selecionar todos</span>
+                                </label>
+                                <button className="as-expand-all-btn" aria-label="Expandir">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="15 3 21 3 21 9" />
+                                        <polyline points="9 21 3 21 3 15" />
+                                        <line x1="21" y1="3" x2="14" y2="10" />
+                                        <line x1="3" y1="21" x2="10" y2="14" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Lista de m├│dulos com materiais */}
+                            <div className="as-modules-list">
+                                {ADMIN_MODULES.map((mod) => (
+                                    <div key={mod.id} className="as-module-group" id={`admin-module-${mod.id}`}>
+                                        {/* Cabe├ºalho do m├│dulo */}
+                                        <div className="as-module-header">
+                                            <div className="as-module-header-left">
+                                                <span className="as-module-icon">{mod.icon}</span>
+                                                <div className="as-module-info">
+                                                    <h3 className="as-module-title">{mod.title}</h3>
+                                                    <div className="as-module-meta">
+                                                        <span className="as-module-badge">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                                                <line x1="8" y1="21" x2="16" y2="21" />
+                                                                <line x1="12" y1="17" x2="12" y2="21" />
+                                                            </svg>
+                                                            M├│dulo principal
+                                                        </span>
+                                                        <span className="as-module-count">
+                                                            {mod.materials.length} conte├║do{mod.materials.length !== 1 ? 's' : ''}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="as-module-header-right">
+                                                <button className="as-icon-btn" aria-label="Adicionar" title="Adicionar material">
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                        <line x1="12" y1="5" x2="12" y2="19" />
+                                                        <line x1="5" y1="12" x2="19" y2="12" />
+                                                    </svg>
+                                                </button>
+                                                <button className="as-icon-btn" aria-label="Mais op├º├Áes" title="Mais op├º├Áes">
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                        <circle cx="12" cy="12" r="1" />
+                                                        <circle cx="12" cy="5" r="1" />
+                                                        <circle cx="12" cy="19" r="1" />
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    className={`as-icon-btn as-chevron ${expandedModules[mod.id] === false ? 'collapsed' : ''}`}
+                                                    onClick={() => toggleModule(mod.id)}
+                                                    aria-label="Expandir/Recolher"
+                                                >
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                        <polyline points="18 15 12 9 6 15" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Lista de materiais dentro do m├│dulo */}
+                                        {expandedModules[mod.id] !== false && (
+                                            <div className="as-module-contents">
+                                                {mod.materials.map((mat, idx) => (
+                                                    <div key={mat.id} className="as-content-item">
+                                                        <div className="as-content-item-left">
+                                                            <div className="as-drag-handle" aria-label="Arrastar">
+                                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" opacity="0.3">
+                                                                    <circle cx="8" cy="6" r="1.5" />
+                                                                    <circle cx="16" cy="6" r="1.5" />
+                                                                    <circle cx="8" cy="12" r="1.5" />
+                                                                    <circle cx="16" cy="12" r="1.5" />
+                                                                    <circle cx="8" cy="18" r="1.5" />
+                                                                    <circle cx="16" cy="18" r="1.5" />
+                                                                </svg>
+                                                            </div>
+                                                            <input type="checkbox" className="as-checkbox" />
+                                                            <div className="as-content-type-icon">
+                                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                                                                    <polyline points="14 2 14 8 20 8" />
+                                                                </svg>
+                                                            </div>
+                                                            <div className="as-content-info">
+                                                                <span className="as-content-name">{mat.title}</span>
+                                                                <span className="as-content-type-label">{mat.type}</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="as-content-item-right">
+                                                            <span className="as-status-badge published">{mat.status}</span>
+                                                            <button className="as-icon-btn-sm" aria-label="Mais op├º├Áes">
+                                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                                    <circle cx="12" cy="12" r="1" />
+                                                                    <circle cx="12" cy="5" r="1" />
+                                                                    <circle cx="12" cy="19" r="1" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                {/* Bot├úo adicionar */}
+                                                <button className="as-add-content-btn">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                        <line x1="12" y1="5" x2="12" y2="19" />
+                                                        <line x1="5" y1="12" x2="19" y2="12" />
+                                                    </svg>
+                                                    Adicionar
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Sub-tab Adicional */}
+                    {contentSubTab === 'adicional' && (
+                        <div className="as-placeholder-tab">
+                            <div className="as-placeholder-icon">­ƒôü</div>
+                            <h3>Conte├║do Adicional</h3>
+                            <p>Materiais complementares, downloads e recursos extras ficam aqui.</p>
+                            <p className="as-placeholder-hint">Em breve voc├¬ poder├í adicionar PDFs, planilhas e outros materiais de apoio.</p>
+                        </div>
+                    )}
+
+                    {/* Sub-tab Trilhas */}
+                    {contentSubTab === 'trilhas' && (
+                        <div className="as-placeholder-tab">
+                            <div className="as-placeholder-icon">­ƒøñ´©Å</div>
+                            <h3>Trilhas de Aprendizado</h3>
+                            <p>Organize seus conte├║dos em trilhas sequenciais para guiar os colaboradores.</p>
+                            <p className="as-placeholder-hint">Em breve voc├¬ poder├í criar trilhas personalizadas combinando m├│dulos existentes.</p>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* ====== TAB TIMES ====== */}
+            {activeTab === 'times' && (
+                <div className="as-tab-content">
+                    <div className="as-users-header">
+                        <h2>Gest├úo de Times</h2>
+                        <span className="as-users-count">{users.length} colaboradores distribu├¡dos em {sortedTeams.length} times</span>
+                    </div>
+
+                    <div className="as-modules-list">
+                        {sortedTeams.map(teamName => {
+                            const teamUsers = groupedByTeam[teamName];
+                            const teamId = `team-${teamName}`;
+                            
+                            return (
+                                <div key={teamName} className="as-module-group">
+                                    <div className="as-module-header" onClick={() => toggleModule(teamId)} style={{ cursor: 'pointer' }}>
+                                        <div className="as-module-header-left">
+                                            <div className="as-module-icon">­ƒôü</div>
+                                            <div className="as-module-info">
+                                                <h4 className="as-module-title">{teamName}</h4>
+                                                <div className="as-module-meta">
+                                                    <span className="as-module-badge">{teamUsers.length} usu├írios</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="as-module-header-right">
+                                            <button className={`as-icon-btn as-chevron ${expandedModules[teamId] ? '' : 'collapsed'}`}>
+                                                Ôû╝
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {expandedModules[teamId] && (
+                                        <div className="as-module-contents">
+                                            {teamUsers.length === 0 ? (
+                                                <div style={{ padding: '1rem', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>Nenhum usu├írio neste time.</div>
+                                            ) : (
+                                                teamUsers.map(u => (
+                                                    <div key={u.user_id} className="as-content-item">
+                                                        <div className="as-content-item-left">
+                                                            <div className="as-user-avatar" style={{ width: 32, height: 32, fontSize: '0.8rem' }}>
+                                                                {u.name ? u.name.charAt(0).toUpperCase() : '@'}
+                                                            </div>
+                                                            <div className="as-content-info">
+                                                                <span className="as-content-name">{u.name || 'Sem Nome'}</span>
+                                                                <div className="as-content-stats">
+                                                                    <span className="as-stat">{u.email}</span>
+                                                                    {u.department && <span className="as-stat">ÔÇó {u.department}</span>}
+                                                                    <span className="as-stat">ÔÇó {getRoleLabel(u.role)}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="as-content-item-right">
+                                                            <button className="as-icon-btn-sm" onClick={() => handleOpenEditUser(u)} title="Editar Usu├írio">Ô£Å´©Å</button>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* ====== TAB USU├üRIOS ====== */}
+            {activeTab === 'usuarios' && (
+                <div className="as-tab-content">
+                    <div className="as-users-header">
+                        <h2>Usu├írios cadastrados</h2>
+                        <span className="as-users-count">{users.length} usu├írio{users.length !== 1 ? 's' : ''}</span>
+                    </div>
+
+                    {users.length === 0 ? (
+                        <div className="as-placeholder-tab">
+                            <div className="as-placeholder-icon">­ƒæñ</div>
+                            <h3>Nenhum usu├írio cadastrado</h3>
+                        </div>
+                    ) : (
+                        <div className="as-users-table-wrapper">
+                            <table className="as-users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Usu├írio</th>
+                                        <th>Cargo / Time</th>
+                                        <th>Permiss├úo</th>
+                                        <th>Cadastro</th>
+                                        <th>A├º├Áes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {users.map(u => (
+                                        <UserRow
+                                            key={u.id || u.user_id}
+                                            user={u}
+                                            onRoleUpdated={(userId, newRole) => {
+                                                setUsers(prev => prev.map(usr =>
+                                                    (usr.id || usr.user_id) === userId
+                                                        ? { ...usr, role: newRole }
+                                                        : usr
+                                                ));
+                                            }}
+                                            onEdit={handleOpenEditUser}
+                                            onDelete={handleDeleteUser}
+                                        />
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* ====== TAB COMENT├üRIOS ====== */}
+            {activeTab === 'comentarios' && (
+                <div className="as-tab-content">
+                    <div className="as-placeholder-tab">
+                        <div className="as-placeholder-icon">­ƒÆ¼</div>
+                        <h3>Coment├írios</h3>
+                        <p>Visualize e modere os coment├írios dos colaboradores nos treinamentos.</p>
+                        <p className="as-placeholder-hint">Em breve voc├¬ poder├í responder e aprovar coment├írios diretamente por aqui.</p>
+                    </div>
+                </div>
+            )}
+
+            {/* ====== TAB CERTIFICADO ====== */}
+            {activeTab === 'certificado' && (
+                <div className="as-tab-content">
+                    <div className="as-placeholder-tab">
+                        <div className="as-placeholder-icon">­ƒÅå</div>
+                        <h3>Certificados</h3>
+                        <p>Configure modelos de certificado emitidos ao concluir os treinamentos.</p>
+                        <p className="as-placeholder-hint">Personalize a identidade visual, dados exibidos e regras de emiss├úo.</p>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal de Edi├º├úo de Usu├írio */}
+            {editingUser && (
+                <div className="welcome-login-box" style={{
+                    position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                    zIndex: 1000, background: '#1e293b', padding: '2rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: '#fff' }}>Editar Usu├írio</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div className="form-group">
+                            <label style={{ color: '#ccc', fontSize: '0.85rem' }}>Nome</label>
+                            <input
+                                className="gamified-input"
+                                value={editFormData.name}
+                                onChange={e => setEditFormData({ ...editFormData, name: e.target.value })}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label style={{ color: '#ccc', fontSize: '0.85rem' }}>E-mail</label>
+                            <input
+                                className="gamified-input"
+                                type="email"
+                                value={editFormData.email}
+                                onChange={e => setEditFormData({ ...editFormData, email: e.target.value })}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label style={{ color: '#ccc', fontSize: '0.85rem' }}>Nova Senha (deixe em branco para n├úo alterar)</label>
+                            <input
+                                className="gamified-input"
+                                type="password"
+                                value={editFormData.password}
+                                onChange={e => setEditFormData({ ...editFormData, password: e.target.value })}
+                                placeholder="Nova senha (m├¡nimo 8 caracteres)"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label style={{ color: '#ccc', fontSize: '0.85rem' }}>Departamento</label>
+                            <select
+                                className="gamified-input"
+                                value={editFormData.department}
+                                onChange={e => setEditFormData({ ...editFormData, department: e.target.value, team: '' })}
+                            >
+                                <option value="" disabled>Selecione...</option>
+                                {Object.keys(DEPARTMENTS).map(dept => (
+                                    <option key={dept} value={dept}>{dept}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label style={{ color: '#ccc', fontSize: '0.85rem' }}>Time</label>
+                            <select
+                                className="gamified-input"
+                                value={editFormData.team}
+                                onChange={e => setEditFormData({ ...editFormData, team: e.target.value })}
+                                disabled={!editFormData.department}
+                            >
+                                <option value="" disabled>Selecione o time...</option>
+                                {editFormData.department && DEPARTMENTS[editFormData.department]?.map(t => (
+                                    <option key={t} value={t}>{t}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'flex-end' }}>
+                            <button className="as-tab" onClick={() => setEditingUser(null)}>Cancelar</button>
+                            <button className="as-create-btn" onClick={handleSaveEditUser}>Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default AdminSettings;

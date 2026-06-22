@@ -77,7 +77,7 @@ const Sidebar = ({ currentView, onViewChange, department, role, onDepartmentChan
     return (
         <aside className="app-sidebar">
             <div className="sidebar-brand">
-                <img src="/logo-tec.webp" alt="TEC-B2" className="sidebar-logo-img" style={{ height: '32px', width: 'auto' }} />
+                <img src="/logo-tec.svg" alt="TEC-B2" className="sidebar-logo-img" style={{ height: '32px', width: 'auto' }} />
                 <span className="brand-subtitle">Academy</span>
             </div>
 
