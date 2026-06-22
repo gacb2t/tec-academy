@@ -127,23 +127,38 @@ const AdminSettings = ({ onViewChange, onBack }) => {
     const fetchAdminData = useCallback(async () => {
         setLoadingAdmin(true);
         try {
-            const [usersData, modulesResp, webhooksResp] = await Promise.all([
-                supabase.from('user_profiles').select('*').order('created_at', { ascending: false }),
-                moduleService.getModulesWithMaterials(),
-                webhookService.getWebhooks()
-            ]);
+            // Buscamos individualmente para que se uma falhar, não quebre a tela inteira
             
-            if (usersData.error) throw usersData.error;
+            // 1. Usuários
+            const { data: usersData, error: usersError } = await supabase
+                .from('user_profiles')
+                .select('*')
+                .order('created_at', { ascending: false });
             
-            setUsers(usersData.data || []);
-            setModulesData(modulesResp || []);
-            setWebhooksData(webhooksResp || []);
-            
-            const exp = {};
-            (modulesResp || []).forEach(m => exp[m.id] = true);
-            setExpandedModules(exp);
+            if (usersError) console.error("Erro ao carregar usuários:", usersError);
+            else setUsers(usersData || []);
+
+            // 2. Módulos
+            try {
+                const modulesResp = await moduleService.getModulesWithMaterials();
+                setModulesData(modulesResp || []);
+                const exp = {};
+                (modulesResp || []).forEach(m => exp[m.id] = true);
+                setExpandedModules(exp);
+            } catch (modErr) {
+                console.error("Erro ao carregar módulos:", modErr);
+            }
+
+            // 3. Webhooks
+            try {
+                const webhooksResp = await webhookService.getWebhooks();
+                setWebhooksData(webhooksResp || []);
+            } catch (whErr) {
+                console.error("Erro ao carregar webhooks:", whErr);
+            }
+
         } catch (err) {
-            console.error("Erro ao carregar dados admin:", err);
+            console.error("Erro geral na tela admin:", err);
         } finally {
             setLoadingAdmin(false);
         }
