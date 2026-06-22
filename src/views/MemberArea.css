@@ -88,33 +88,7 @@
     color: rgba(255, 255, 255, 0.72);
     font-size: 0.92rem;
     line-height: 1.65;
-    max-height: 3.3em;
-    overflow: hidden;
-    transition: max-height 0.4s ease;
-    margin-bottom: 0.25rem;
-}
-
-.member-hero-description.expanded {
-    max-height: 300px;
-}
-
-.member-hero-toggle {
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 0;
     margin-bottom: 1.25rem;
-    font-family: inherit;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    transition: color 0.2s;
-}
-
-.member-hero-toggle:hover {
-    color: #fff;
 }
 
 /* Progresso no hero */
@@ -177,6 +151,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+}
+
+.member-hero-brand::before {
+    content: '';
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.8) 0%, transparent 60%);
+    z-index: 0;
+    pointer-events: none;
 }
 
 .member-hero-logo {
@@ -185,6 +170,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-logo-text {

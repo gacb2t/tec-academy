@@ -66,15 +66,9 @@ const MemberArea = ({ user, progress, onViewMaterial, completedModules, role }) 
                 <div className="member-hero-content">
                     <div className="member-hero-text">
                         <h1 className="member-hero-title">Chegou a hora de superar nossos limites!</h1>
-                        <p className={`member-hero-description ${heroExpanded ? 'expanded' : ''}`}>
+                        <p className="member-hero-description">
                             {productDescription}
                         </p>
-                        <button
-                            className="member-hero-toggle"
-                            onClick={() => setHeroExpanded(!heroExpanded)}
-                        >
-                            {heroExpanded ? 'Mostrar menos' : 'Mostrar mais'}
-                        </button>
 
                         <div className="member-hero-progress">
                             <span className="member-hero-count">
