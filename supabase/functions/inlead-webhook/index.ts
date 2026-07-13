@@ -16,8 +16,24 @@ serve(async (req) => {
     const url = new URL(req.url)
     const team = url.searchParams.get('team') || 'Não Especificado'
 
-    const payload = await req.json()
-    
+    const contentType = req.headers.get('content-type') || '';
+    let payload: Record<string, any> = {};
+
+    if (contentType.includes('application/json')) {
+      payload = await req.json();
+    } else if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
+      const formData = await req.formData();
+      payload = Object.fromEntries(formData.entries());
+    } else {
+      // Fallback
+      const text = await req.text();
+      try {
+        payload = JSON.parse(text);
+      } catch (e) {
+        throw new Error('Formato de dados não suportado. Envie JSON ou FormData.');
+      }
+    }
+
     // Extração dos campos principais
     const { nome, email, telefone, score } = payload;
     const responses: Record<string, any> = {};
