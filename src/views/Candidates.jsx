@@ -30,8 +30,7 @@ const Candidates = () => {
     const [isCreating, setIsCreating] = useState(false);
     
     // Configurações para exibir o Webhook
-    const apiUrl = import.meta.env.VITE_SUPABASE_URL + '/rest/v1/job_applications';
-    const apiKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const apiUrl = import.meta.env.VITE_SUPABASE_URL + '/functions/v1/inlead-webhook';
 
     useEffect(() => {
         fetchCandidates();
@@ -149,15 +148,12 @@ const Candidates = () => {
                 
                 {showWebhook && (
                     <div style={{ marginTop: '1rem' }}>
-                        <p>Para enviar candidatos diretamente para a coluna "Inscrição realizada" deste time, faça um <strong>POST</strong> para a URL abaixo enviando um JSON com: <br/><code>{`{ "team": "${selectedTeam}", "name": "Nome", "email": "email", "phone": "119..." }`}</code></p>
+                        <p>Para enviar candidatos da Inlead diretamente para este time, configure o Webhook apontando para a URL abaixo. <strong>Atenção:</strong> O time já está incluso no link.</p>
                         
                         <div className="c-webhook-code">
                             <pre>
-                                URL: {apiUrl}{'\n'}
-                                Headers:{'\n'}
-                                apikey: {apiKey}{'\n'}
-                                Authorization: Bearer {apiKey}{'\n'}
-                                Content-Type: application/json
+                                URL: {apiUrl}?team={encodeURIComponent(selectedTeam)}{'\n'}
+                                Método: POST{'\n'}
                             </pre>
                         </div>
                     </div>
@@ -241,12 +237,44 @@ const Candidates = () => {
                             <p style={{ margin: 0 }}><strong>Etapa Atual:</strong> {selectedCandidate.stage}</p>
                             <p style={{ margin: 0 }}><strong>Data de Inscrição:</strong> {new Date(selectedCandidate.created_at).toLocaleString('pt-BR')}</p>
                             
-                            <hr style={{ borderColor: 'rgba(255,255,255,0.1)', margin: '1rem 0' }} />
+                            <hr style={{ borderColor: 'rgba(255,255,255,0.1)', margin: '1.5rem 0' }} />
                             
-                            <h4 style={{ margin: 0, color: '#fff' }}>Payload Completo (Dados do Banco)</h4>
-                            <pre style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '6px', overflowX: 'auto', fontSize: '0.85rem' }}>
-                                {JSON.stringify(selectedCandidate, null, 2)}
-                            </pre>
+                            {selectedCandidate.score !== null && selectedCandidate.score !== undefined && (
+                                <div style={{ background: 'rgba(108, 99, 255, 0.1)', border: '1px solid var(--primary)', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                                    <h4 style={{ margin: 0, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        ⭐ Score do Candidato: {selectedCandidate.score}
+                                    </h4>
+                                </div>
+                            )}
+
+                            {selectedCandidate.responses && Object.keys(selectedCandidate.responses).length > 0 && (
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <h4 style={{ margin: '0 0 1rem 0', color: '#fff' }}>Respostas do Formulário</h4>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+                                        {Object.entries(selectedCandidate.responses).map(([key, value]) => {
+                                            // Formata a chave para exibição, ex: "pergunta_idade" -> "Idade" ou mantem "Pergunta Idade"
+                                            const formattedKey = key.replace(/^(opcoes_|pergunta_)/i, '') // Remove o prefixo
+                                                                    .replace(/_/g, ' '); // Troca underscore por espaço
+                                            const displayKey = formattedKey.charAt(0).toUpperCase() + formattedKey.slice(1);
+                                            
+                                            return (
+                                                <div key={key} style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid var(--accent)' }}>
+                                                    <small style={{ color: '#888', display: 'block', marginBottom: '0.25rem' }}>{key}</small>
+                                                    <strong style={{ color: '#fff', fontSize: '0.95rem' }}>{displayKey}</strong>
+                                                    <p style={{ margin: '0.5rem 0 0 0', color: '#ddd', lineHeight: '1.4' }}>{String(value)}</p>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
+                            <details>
+                                <summary style={{ cursor: 'pointer', color: '#888', fontSize: '0.85rem' }}>Ver Payload Completo JSON (Dados do Banco)</summary>
+                                <pre style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '6px', overflowX: 'auto', fontSize: '0.75rem', marginTop: '1rem', color: '#aaa' }}>
+                                    {JSON.stringify(selectedCandidate, null, 2)}
+                                </pre>
+                            </details>
                         </div>
                     </div>
                 </>

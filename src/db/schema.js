@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, integer } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, integer, jsonb } from 'drizzle-orm/pg-core';
 
 export const jobApplications = pgTable('job_applications', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -7,6 +7,8 @@ export const jobApplications = pgTable('job_applications', {
   email: text('email'),
   phone: text('phone'),
   stage: text('stage').notNull().default('Inscrição realizada'),
+  score: integer('score'),
+  responses: jsonb('responses'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow()
 });
