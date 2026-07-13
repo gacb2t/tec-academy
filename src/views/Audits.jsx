@@ -122,6 +122,7 @@ const Audits = ({ user }) => {
     const [showFolderModal, setShowFolderModal] = useState(false);
     const [showAuditModal, setShowAuditModal] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
+    const [settingsTab, setSettingsTab] = useState('qualificacoes');
     const [loading, setLoading] = useState(true);
 
     // Form states
@@ -220,6 +221,16 @@ const Audits = ({ user }) => {
         }
     };
 
+    const handleSavePrompts = async () => {
+        try {
+            await auditService.saveSettings(settings);
+            alert("Prompts salvos com sucesso!");
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao salvar prompts.");
+        }
+    };
+
     const handleFileChange = (e) => {
         if (e.target.files && e.target.files[0]) {
             setAuditFile(e.target.files[0]);
@@ -266,11 +277,11 @@ const Audits = ({ user }) => {
             
             setAuditProgress('transcribing');
             // 4. Whisper Transcrição
-            const rawTranscription = await openaiService.transcribeAudio(auditFile);
+            const rawTranscription = await openaiService.transcribeAudio(auditFile, settings.promptWhisper);
 
             setAuditProgress('analyzing');
             // 5. GPT-4o Análise injetando o nome correto
-            const analysisJson = await openaiService.analyzeTranscription(rawTranscription, collabName);
+            const analysisJson = await openaiService.analyzeTranscription(rawTranscription, collabName, settings.promptOrientado);
 
             // 6. Atualizar resultado
             await auditService.updateAuditResult(newAuditId, {
@@ -319,9 +330,11 @@ const Audits = ({ user }) => {
                         <p>Analise, transcreva e avalie interações de colaboradores com clientes.</p>
                     </div>
                     <div style={{ display: 'flex', gap: '1rem' }}>
-                        <button className="btn-secondary" onClick={() => setShowSettingsModal(true)}>
-                            ⚙️ Configurações
-                        </button>
+                        {user?.role === 'admin' && (
+                            <button className="btn-secondary" onClick={() => setShowSettingsModal(true)}>
+                                ⚙️ Configurações
+                            </button>
+                        )}
                         <button className="audits-btn-primary" onClick={() => setShowFolderModal(true)}>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -473,25 +486,75 @@ const Audits = ({ user }) => {
             {/* Modal Configurações */}
             {showSettingsModal && (
                 <div className="audit-modal-overlay">
-                    <div className="audit-modal">
+                    <div className="audit-modal" style={{ maxWidth: '800px', width: '90%' }}>
                         <div className="audit-modal-header">
-                            <h3>Configurações - Qualificações</h3>
+                            <h3>Configurações da Auditoria</h3>
                             <button className="audit-modal-close" onClick={() => setShowSettingsModal(false)}>&times;</button>
                         </div>
-                        <div className="audit-modal-body">
-                            <p style={{ color: '#aaa', marginBottom: '1rem', fontSize: '0.9rem' }}>Cadastre as qualificações (motivos da ligação) vindas da discadora para categorizar as auditorias.</p>
-                            <ul style={{ listStyle: 'none', padding: 0, marginBottom: '1rem' }}>
-                                {settings.qualifications.map((q, idx) => (
-                                    <li key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', marginBottom: '0.5rem', borderRadius: '4px' }}>
-                                        {q}
-                                        <button onClick={() => handleRemoveQualification(idx)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}>Remover</button>
-                                    </li>
-                                ))}
-                            </ul>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <input type="text" className="member-search-input" placeholder="Nova Qualificação" value={newQualifText} onChange={e => setNewQualifText(e.target.value)} />
-                                <button className="audits-btn-primary" onClick={handleAddQualification}>Adicionar</button>
-                            </div>
+                        
+                        <div className="as-tabs" style={{ marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                            <button className={`as-tab ${settingsTab === 'qualificacoes' ? 'active' : ''}`} onClick={() => setSettingsTab('qualificacoes')} style={{ padding: '0.5rem 1rem' }}>Qualificações</button>
+                            <button className={`as-tab ${settingsTab === 'whisper' ? 'active' : ''}`} onClick={() => setSettingsTab('whisper')} style={{ padding: '0.5rem 1rem' }}>Prompt Whisper</button>
+                            <button className={`as-tab ${settingsTab === 'orientado' ? 'active' : ''}`} onClick={() => setSettingsTab('orientado')} style={{ padding: '0.5rem 1rem' }}>Prompt GPT-4o</button>
+                        </div>
+
+                        <div className="audit-modal-body" style={{ minHeight: '300px' }}>
+                            {settingsTab === 'qualificacoes' && (
+                                <div>
+                                    <p style={{ color: '#aaa', marginBottom: '1rem', fontSize: '0.9rem' }}>Cadastre as qualificações (motivos da ligação) vindas da discadora para categorizar as auditorias.</p>
+                                    <div style={{ maxHeight: '250px', overflowY: 'auto', marginBottom: '1rem', paddingRight: '0.5rem' }}>
+                                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                            {settings.qualifications.map((q, idx) => (
+                                                <li key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', marginBottom: '0.5rem', borderRadius: '4px' }}>
+                                                    {q}
+                                                    <button onClick={() => handleRemoveQualification(idx)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}>Remover</button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <input type="text" className="member-search-input" placeholder="Nova Qualificação" value={newQualifText} onChange={e => setNewQualifText(e.target.value)} />
+                                        <button className="audits-btn-primary" onClick={handleAddQualification}>Adicionar</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {settingsTab === 'whisper' && (
+                                <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                    <p style={{ color: '#aaa', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                                        O prompt do modelo Whisper orienta a transcrição a reconhecer nomes específicos e acrônimos (Ex: "A nossa empresa se chama TEC-B2, vendemos produtos da Vivo").
+                                    </p>
+                                    <textarea 
+                                        className="gamified-input" 
+                                        style={{ width: '100%', minHeight: '150px', padding: '1rem', flexGrow: 1, resize: 'vertical' }}
+                                        value={settings.promptWhisper || ''}
+                                        onChange={e => setSettings({ ...settings, promptWhisper: e.target.value })}
+                                        placeholder="Insira o contexto para a transcrição de áudio..."
+                                    />
+                                    <div style={{ marginTop: '1rem', textAlign: 'right' }}>
+                                        <button className="audits-btn-primary" onClick={handleSavePrompts}>Salvar Prompt</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {settingsTab === 'orientado' && (
+                                <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                    <p style={{ color: '#aaa', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                                        O System Prompt principal do GPT-4o. Defina o comportamento do auditor, as regras de avaliação, e a lista de cursos sugeridos. 
+                                        <br/>Use <code style={{ color: '#6C63FF' }}>{'{NOME_DO_COLABORADOR}'}</code> onde desejar injetar o nome do colaborador avaliado. O JSON Schema já está forçado pela API.
+                                    </p>
+                                    <textarea 
+                                        className="gamified-input" 
+                                        style={{ width: '100%', minHeight: '250px', padding: '1rem', flexGrow: 1, resize: 'vertical', fontFamily: 'monospace', fontSize: '0.85rem' }}
+                                        value={settings.promptOrientado || ''}
+                                        onChange={e => setSettings({ ...settings, promptOrientado: e.target.value })}
+                                        placeholder="Você é um auditor..."
+                                    />
+                                    <div style={{ marginTop: '1rem', textAlign: 'right' }}>
+                                        <button className="audits-btn-primary" onClick={handleSavePrompts}>Salvar Prompt</button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

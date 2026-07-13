@@ -17,11 +17,15 @@ export const openaiService = {
     /**
      * Transcreve o áudio usando a Edge Function segura (Whisper-1)
      * @param {File} audioFile 
+     * @param {string} promptWhisper
      * @returns {Promise<string>} Transcrição bruta
      */
-    async transcribeAudio(audioFile) {
+    async transcribeAudio(audioFile, promptWhisper) {
         const formData = new FormData();
         formData.append('file', audioFile);
+        if (promptWhisper) {
+            formData.append('promptWhisper', promptWhisper);
+        }
         
         const { data, error } = await supabase.functions.invoke('audit-call?action=transcribe', {
             body: formData,
@@ -40,13 +44,15 @@ export const openaiService = {
      * Analisa a transcrição bruta via Edge Function segura (GPT-4o)
      * @param {string} rawTranscription 
      * @param {string} collaboratorName 
+     * @param {string} promptOrientado
      * @returns {Promise<Object>} JSON estruturado com a auditoria
      */
-    async analyzeTranscription(rawTranscription, collaboratorName) {
+    async analyzeTranscription(rawTranscription, collaboratorName, promptOrientado) {
         const { data, error } = await supabase.functions.invoke('audit-call?action=analyze', {
             body: {
                 rawTranscription,
-                collaboratorName
+                collaboratorName,
+                promptOrientado
             }
         });
 
