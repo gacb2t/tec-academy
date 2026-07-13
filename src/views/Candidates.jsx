@@ -154,10 +154,8 @@ const Candidates = () => {
                             <pre>
                                 URL: {apiUrl}?team={encodeURIComponent(selectedTeam)}{'\n'}
                                 Método: POST{'\n'}
-                                TOKEN: {import.meta.env.VITE_SUPABASE_ANON_KEY}
                             </pre>
                         </div>
-                        <small style={{ color: '#aaa', display: 'block', marginTop: '0.5rem' }}>* Cole o valor acima no campo <strong>TOKEN</strong> da Inlead para permitir a autenticação.</small>
                     </div>
                 )}
             </div>
