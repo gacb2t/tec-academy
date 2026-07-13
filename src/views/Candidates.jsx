@@ -80,6 +80,25 @@ const Candidates = () => {
         }
     };
 
+    const handleChangeStageModal = async (newStage) => {
+        if (!selectedCandidate) return;
+        const candId = selectedCandidate.id;
+        
+        // Atualização Otimista
+        setSelectedCandidate(prev => ({ ...prev, stage: newStage }));
+        setCandidates(prev => prev.map(c => c.id === candId ? { ...c, stage: newStage, updated_at: new Date().toISOString() } : c));
+
+        const { error } = await supabase
+            .from('job_applications')
+            .update({ stage: newStage, updated_at: new Date().toISOString() })
+            .eq('id', candId);
+        
+        if (error) {
+            console.error("Erro ao mudar etapa:", error);
+            fetchCandidates(); // Reverte
+        }
+    };
+
     const handleDeleteCandidate = async (e, cand) => {
         e.preventDefault();
         if (window.confirm(`Tem certeza que deseja deletar a inscrição de ${cand.name}?`)) {
@@ -190,7 +209,18 @@ const Candidates = () => {
                                                                 onClick={() => setSelectedCandidate(cand)}
                                                                 onContextMenu={(e) => handleDeleteCandidate(e, cand)}
                                                             >
-                                                                <h4>{cand.name}</h4>
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                                    <h4 style={{ margin: '0 0 0.5rem 0', paddingRight: '1rem' }}>{cand.name}</h4>
+                                                                    <button 
+                                                                        onClick={(e) => { e.stopPropagation(); handleDeleteCandidate(e, cand); }}
+                                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: 0.5, padding: '0.2rem', fontSize: '1.2rem', marginTop: '-0.2rem', marginRight: '-0.2rem' }}
+                                                                        title="Excluir Inscrição"
+                                                                        onMouseOver={e => e.currentTarget.style.opacity = 1}
+                                                                        onMouseOut={e => e.currentTarget.style.opacity = 0.5}
+                                                                    >
+                                                                        🗑️
+                                                                    </button>
+                                                                </div>
                                                                 <div className="k-card-info">
                                                                     <span>📧 {cand.email || '—'}</span>
                                                                     <span>📱 {cand.phone || '—'}</span>
@@ -234,7 +264,17 @@ const Candidates = () => {
                             <p style={{ margin: 0 }}><strong>E-mail:</strong> {selectedCandidate.email || 'Não informado'}</p>
                             <p style={{ margin: 0 }}><strong>Telefone:</strong> {selectedCandidate.phone || 'Não informado'}</p>
                             <p style={{ margin: 0 }}><strong>Time:</strong> {selectedCandidate.team}</p>
-                            <p style={{ margin: 0 }}><strong>Etapa Atual:</strong> {selectedCandidate.stage}</p>
+                            <div style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <strong>Etapa Atual:</strong>
+                                <select 
+                                    className="gamified-input" 
+                                    style={{ padding: '0.2rem 0.5rem', width: 'auto', fontSize: '0.9rem' }} 
+                                    value={selectedCandidate.stage} 
+                                    onChange={e => handleChangeStageModal(e.target.value)}
+                                >
+                                    {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                            </div>
                             <p style={{ margin: 0 }}><strong>Data de Inscrição:</strong> {new Date(selectedCandidate.created_at).toLocaleString('pt-BR')}</p>
                             
                             <hr style={{ borderColor: 'rgba(255,255,255,0.1)', margin: '1.5rem 0' }} />
