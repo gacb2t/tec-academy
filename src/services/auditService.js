@@ -41,7 +41,9 @@ REGRA DE NEGÓCIO INEGOCIÁVEL TEC-B2:
 
 --- PARTE 3: AVALIAÇÃO POR ETAPAS (NOTAS 1 A 10) ---
 Dê uma nota de 1 (péssimo) a 10 (excelente) e uma justificativa crítica para as 8 etapas abaixo.
-ATENÇÃO: Se a ligação caiu ou um critério não teve tempo de ocorrer, dê nota 0 (Zero). A nota 0 significa "Não Aplicável" e não prejudicará a média.
+**ATENÇÃO - REGRA DE OURO PARA NOTA 0 (NÃO APLICÁVEL):**
+Se a ligação foi encerrada (pelo cliente ou por objeção) ANTES de o vendedor ter a oportunidade de chegar na etapa de Fechamento ou Agendamento, essas etapas **NÃO SE APLICAM**. Você deve **OBRIGATORIAMENTE** dar nota 0 (Zero) para elas e preencher a justificativa com "Não houve tempo hábil para esta etapa".
+NUNCA avalie com nota baixa (ex: 3, 4 ou 5) uma etapa que o vendedor não teve nem a chance de tentar. A nota 0 significa apenas "Pulo" e não prejudica a média.
 
 1. ABERTURA: Avalie a saudação, tom de voz inicial, apresentação da TEC-B2 Vivo Empresas e se garantiu a atenção do cliente.
 2. SONDAGEM: Avalie se fez perguntas abertas, investigou o cenário atual (telefonia móvel, fixa, dados), dores e necessidades (SPIN).
@@ -81,7 +83,15 @@ Regras Finais de Preenchimento:
         }
 
         if (data && data.settings) {
-            return { ...defaultSettings, ...data.settings };
+            const merged = { ...defaultSettings, ...data.settings };
+            // Se salvaram vazio (""), força voltar para o default
+            if (!merged.promptWhisper || merged.promptWhisper.trim() === "") {
+                merged.promptWhisper = defaultSettings.promptWhisper;
+            }
+            if (!merged.promptOrientado || merged.promptOrientado.trim() === "") {
+                merged.promptOrientado = defaultSettings.promptOrientado;
+            }
+            return merged;
         }
 
         return defaultSettings;

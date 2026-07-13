@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { auditService } from '../../services/auditService';
 import './AuditReport.css';
 
-const AuditReport = ({ audit, onBack }) => {
+const AuditReport = ({ audit, user, onBack }) => {
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
     const [feedbackAuthor, setFeedbackAuthor] = useState('Gestor');
     const [feedbackText, setFeedbackText] = useState('');
@@ -10,6 +10,9 @@ const AuditReport = ({ audit, onBack }) => {
     
     // Trabalhamos com um clone local para atualizar a tela instantaneamente
     const [localAudit, setLocalAudit] = useState(audit);
+    
+    const canEdit = user?.role === 'admin' || user?.role === 'gestor';
+    const [isEditMode, setIsEditMode] = useState(false);
 
     if (!localAudit || !localAudit.result) return null;
 
@@ -48,6 +51,46 @@ const AuditReport = ({ audit, onBack }) => {
         }
     };
 
+    const handleFieldChange = (fieldPath, value) => {
+        const newData = JSON.parse(JSON.stringify(localAudit.result));
+        let current = newData;
+        const keys = fieldPath.split('.');
+        for (let i = 0; i < keys.length - 1; i++) {
+            if (!current[keys[i]]) current[keys[i]] = {};
+            current = current[keys[i]];
+        }
+        current[keys[keys.length - 1]] = value;
+        setLocalAudit({ ...localAudit, result: newData });
+    };
+
+    const handleSaveEdits = async () => {
+        setIsSaving(true);
+        try {
+            const res = { ...localAudit.result };
+            // Recalcular nota geral
+            if (res.criterios_vendedor) {
+                let total = 0;
+                let count = 0;
+                for (const key in res.criterios_vendedor) {
+                    const nota = parseFloat(res.criterios_vendedor[key].nota);
+                    if (!isNaN(nota) && nota > 0) {
+                        total += nota;
+                        count++;
+                    }
+                }
+                res.nota_geral_vendedor = count > 0 ? Math.round((total / count) * 10) / 10 : 0;
+            }
+            await auditService.updateAuditResult(localAudit.id, { result: res });
+            setIsEditMode(false);
+            setLocalAudit({ ...localAudit, result: res });
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao salvar edições.");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     // Helper para extrair a cor baseada na nota
     const getScoreColor = (nota) => {
         if (nota >= 8) return '#10b981'; // Verde
@@ -65,6 +108,17 @@ const AuditReport = ({ audit, onBack }) => {
                     &larr; Voltar
                 </button>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {canEdit && (
+                        isEditMode ? (
+                            <button className="btn-primary" style={{ backgroundColor: '#10b981', borderColor: '#10b981' }} onClick={handleSaveEdits} disabled={isSaving}>
+                                {isSaving ? 'Salvando...' : '💾 Salvar Edições'}
+                            </button>
+                        ) : (
+                            <button className="btn-secondary" onClick={() => setIsEditMode(true)}>
+                                ✏️ Editar Relatório
+                            </button>
+                        )
+                    )}
                     <button className="btn-secondary" onClick={() => setShowFeedbackModal(true)}>
                         💬 Adicionar Feedback
                     </button>
@@ -109,9 +163,9 @@ const AuditReport = ({ audit, onBack }) => {
                             <strong>Provedor Atual:</strong> {reportData.analise_cliente?.provedor_atual}
                         </div>
                     </div>
-                    <p className="mt-2"><strong>Perfil do Cliente:</strong> {reportData.perfil_cliente}</p>
-                    <p><strong>Resistência Apresentada:</strong> {reportData.analise_cliente?.resistencia}</p>
-                    <p><strong>Comportamento:</strong> {reportData.analise_cliente?.comportamento}</p>
+                    <p className="mt-2"><strong>Perfil do Cliente:</strong> {isEditMode ? <textarea className="inline-edit-textarea" value={reportData.perfil_cliente} onChange={e => handleFieldChange('perfil_cliente', e.target.value)} /> : reportData.perfil_cliente}</p>
+                    <p><strong>Resistência Apresentada:</strong> {isEditMode ? <textarea className="inline-edit-textarea" value={reportData.analise_cliente?.resistencia} onChange={e => handleFieldChange('analise_cliente.resistencia', e.target.value)} /> : reportData.analise_cliente?.resistencia}</p>
+                    <p><strong>Comportamento:</strong> {isEditMode ? <textarea className="inline-edit-textarea" value={reportData.analise_cliente?.comportamento} onChange={e => handleFieldChange('analise_cliente.comportamento', e.target.value)} /> : reportData.analise_cliente?.comportamento}</p>
                 </div>
 
                 <div className="report-section">
@@ -121,7 +175,7 @@ const AuditReport = ({ audit, onBack }) => {
                             <li key={idx}>{obj}</li>
                         ))}
                     </ul>
-                    <p><strong>Principais Preocupações:</strong> {reportData.analise_cliente?.principais_preocupacoes}</p>
+                    <p><strong>Principais Preocupações:</strong> {isEditMode ? <textarea className="inline-edit-textarea" value={reportData.analise_cliente?.principais_preocupacoes} onChange={e => handleFieldChange('analise_cliente.principais_preocupacoes', e.target.value)} /> : reportData.analise_cliente?.principais_preocupacoes}</p>
                 </div>
 
                 <div className="report-section">
@@ -132,10 +186,10 @@ const AuditReport = ({ audit, onBack }) => {
                                 <h4>
                                     {key.replace(/_/g, ' ').toUpperCase()} 
                                     <span className="nota-badge" style={{ backgroundColor: getScoreColor(value.nota) }}>
-                                        {value.nota}
+                                        {isEditMode ? <input type="number" min="0" max="10" className="inline-edit-number" value={value.nota} onChange={e => handleFieldChange(`criterios_vendedor.${key}.nota`, e.target.value)} /> : value.nota}
                                     </span>
                                 </h4>
-                                <p>{value.comentario}</p>
+                                {isEditMode ? <textarea className="inline-edit-textarea" value={value.comentario} onChange={e => handleFieldChange(`criterios_vendedor.${key}.comentario`, e.target.value)} /> : <p>{value.comentario}</p>}
                             </div>
                         ))}
                     </div>
@@ -143,16 +197,16 @@ const AuditReport = ({ audit, onBack }) => {
 
                 <div className="report-section">
                     <h3>🧠 Visão Geral Estratégica</h3>
-                    <p>{reportData.resumo_estrategico}</p>
+                    {isEditMode ? <textarea className="inline-edit-textarea" value={reportData.resumo_estrategico} onChange={e => handleFieldChange('resumo_estrategico', e.target.value)} /> : <p>{reportData.resumo_estrategico}</p>}
                     
                     <div className="split-columns">
                         <div className="column strong-points">
                             <h4>⭐ Pontos Fortes</h4>
-                            <p>{reportData.pontos_fortes_vendedor}</p>
+                            {isEditMode ? <textarea className="inline-edit-textarea" value={reportData.pontos_fortes_vendedor} onChange={e => handleFieldChange('pontos_fortes_vendedor', e.target.value)} /> : <p>{reportData.pontos_fortes_vendedor}</p>}
                         </div>
                         <div className="column weak-points">
                             <h4>📈 Pontos de Melhoria</h4>
-                            <p>{reportData.pontos_melhoria_vendedor}</p>
+                            {isEditMode ? <textarea className="inline-edit-textarea" value={reportData.pontos_melhoria_vendedor} onChange={e => handleFieldChange('pontos_melhoria_vendedor', e.target.value)} /> : <p>{reportData.pontos_melhoria_vendedor}</p>}
                         </div>
                     </div>
                 </div>

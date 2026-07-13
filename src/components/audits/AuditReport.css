@@ -267,3 +267,57 @@
     font-size: 0.9rem;
     color: #475569;
 }
+
+/* === MODO DE EDIÇÃO === */
+.inline-edit-input {
+    width: 100%;
+    background: transparent;
+    border: 1px dashed #6C63FF;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0.2rem;
+    border-radius: 4px;
+}
+
+.inline-edit-input:focus {
+    outline: none;
+    border: 1px solid #6C63FF;
+    background: rgba(108, 99, 255, 0.05);
+}
+
+.inline-edit-textarea {
+    width: 100%;
+    background: transparent;
+    border: 1px dashed #6C63FF;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0.5rem;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.inline-edit-textarea:focus {
+    outline: none;
+    border: 1px solid #6C63FF;
+    background: rgba(108, 99, 255, 0.05);
+}
+
+.inline-edit-number {
+    width: 50px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px dashed #fff;
+    color: inherit;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 4px;
+}
+
+.inline-edit-number:focus {
+    outline: none;
+    background: #fff;
+    color: #333;
+}
+

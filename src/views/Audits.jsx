@@ -318,7 +318,7 @@ const Audits = ({ user }) => {
     };
 
     if (viewingReport) {
-        return <AuditReport audit={viewingReport} onBack={() => { setViewingReport(null); loadInitialData(); }} />;
+        return <AuditReport audit={viewingReport} user={user} onBack={() => { setViewingReport(null); loadInitialData(); }} />;
     }
 
     return (
